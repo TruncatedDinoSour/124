@@ -11,11 +11,17 @@ from sqlalchemy.orm import Session, declarative_base  # type: ignore
 __all__: tuple[str] = ("SQLiteDB",)
 
 
-@dataclass(slots=True)
+@dataclass
 class SQLiteDB:
     engine: sqlalchemy.engine.base.Engine
     base: typing.Any
     session: Session
+
+    __slots__: tuple[str, ...] = (
+        "engine",
+        "base",
+        "session",
+    )
 
     def __init__(self, url: str) -> None:
         self.engine = sqlalchemy.create_engine(url)
