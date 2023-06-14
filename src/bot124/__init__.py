@@ -75,6 +75,17 @@ class Bot124(discord.Client):
             except sqlalchemy.exc.IntegrityError:  # type: ignore
                 await msg.delete()
 
+    async def on_member_join(self, member: discord.member.Member):
+        await member.guild.system_channel.send(
+            f"w-wewcome {member.mention} ( {member.name}#{member.discriminator} ), XD have fun w-with @Clyde ( uppewcase c ), \
+>_< a-awso d-dont miss o-out on `/rules` :3"
+        )
+
+    async def on_member_remove(self, member: discord.member.Member):
+        await member.guild.system_channel.send(
+            f"goodbye {member.mention} ( {member.name}#{member.discriminator} ) ^w^, (U ᵕ U❁) h-haww a ny-nice day :3"
+        )
+
 
 def load_cmds(b: Bot124) -> None:
     @b.ct.command(name="status", description="set or reset bots 'playing' status")
