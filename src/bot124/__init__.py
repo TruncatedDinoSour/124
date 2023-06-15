@@ -16,6 +16,10 @@ from . import const, menu, models
 __all__: tuple[str] = ("Bot124",)
 
 
+def datetime_s(ts: int) -> str:
+    return datetime.utcfromtimestamp(ts).strftime("%Y/%m/%d %H:%M")
+
+
 def word_count(lst: typing.Iterable[str]) -> dict[str, int]:
     word_dict: dict[str, int] = {}
 
@@ -257,7 +261,7 @@ def load_cmds(b: Bot124) -> None:
         )
 
         for r in q:
-            rules += f"{r.id}, {r.content} ( {'real' if r.real else 'fake'} rule ) by <@{r.author}> on {str(datetime.utcfromtimestamp(r.timestamp))} UTC\n"
+            rules += f"{r.id}, {r.content} ( {'real' if r.real else 'fake'} rule ) by <@{r.author}> on {datetime_s(r.timestamp)}\n"
 
         await menu.text_menu(msg, rules)
 
@@ -423,7 +427,7 @@ def load_cmds(b: Bot124) -> None:
         await menu.menu(
             msg,
             tuple(
-                f"*confession #{c.id}, {len(q)}/{confession_count} result( s ) on {str(datetime.utcfromtimestamp(c.timestamp))} UTC*\n\n{c.content}"
+                f"*confession #{c.id}, {len(q)}/{confession_count} result( s ) on {datetime_s(c.timestamp)}*\n\n{c.content}"
                 for c in q
             ),
         )
