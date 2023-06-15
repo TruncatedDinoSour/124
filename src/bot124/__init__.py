@@ -418,10 +418,12 @@ def load_cmds(b: Bot124) -> None:
             else tuple(c for c in q.all() if c.content in query or query in c.content)
         )
 
+        confession_count: int = models.DB.session.query(models.Confession.id).count()
+
         await menu.menu(
             msg,
             tuple(
-                f"*confession #{c.id} on {str(datetime.utcfromtimestamp(c.timestamp))} UTC*\n\n{c.content}"
+                f"*confession #{c.id}, {len(q)}/{confession_count} result( s ) on {str(datetime.utcfromtimestamp(c.timestamp))} UTC*\n\n{c.content}"
                 for c in q
             ),
         )
