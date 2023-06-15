@@ -72,8 +72,8 @@ def calc_score(s: models.Score) -> float:
         (
             (
                 (
-                    (s.total_messages / s.total_bytes + 1)
-                    + (s.total_bytes / s.total_messages + 1)
+                    (s.total_messages / (s.total_bytes + 1))
+                    + (s.total_bytes / (s.total_messages + 1))
                 )
                 / const.GOLDEN_RATIO
             )
