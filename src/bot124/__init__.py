@@ -339,9 +339,12 @@ def load_cmds(b: Bot124) -> None:
             q = q.where(models.WordCloud.usage <= usage_lt)
 
         if usage_mt is not None:
-            q = q.where(models.WordCloud.usage >= usage_lt)
+            q = q.where(models.WordCloud.usage >= usage_mt)
 
         q = q.limit(limit)
+
+        if query is not None:
+            query = query.lower()
 
         q = (
             q.all()
