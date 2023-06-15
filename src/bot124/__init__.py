@@ -96,11 +96,7 @@ class Bot124(discord.Client):
             # record wordcloud
 
             for word, usage in word_count(
-                "".join(
-                    c
-                    for c in msg.content
-                    if c in (string.ascii_letters + string.digits + string.whitespace)
-                )
+                "".join(c for c in msg.content.lower() if c not in string.punctuation)
                 .strip()
                 .split()
             ).items():
@@ -148,6 +144,11 @@ class Bot124(discord.Client):
             except sqlalchemy.exc.IntegrityError:  # type: ignore
                 await msg.delete()
 
+    async def on_message_edit(
+        self, _: discord.message.Message, msg: discord.message.Message
+    ) -> None:
+        await self.on_message(msg)
+
     async def on_member_join(self, member: discord.member.Member):
         if (c := member.guild.system_channel) is not None:
             await c.send(
@@ -189,6 +190,7 @@ def load_cmds(b: Bot124) -> None:
         user: typing.Optional[discord.User] = None,
         yyyymmddhh_before: typing.Optional[str] = None,
         yyyymmddhh_after: typing.Optional[str] = None,
+        limit: int = const.MIN_RULES_LIMIT,
     ) -> None:  # type: ignore
         q: typing.Any = filter_rules(
             id=id,
@@ -202,6 +204,8 @@ def load_cmds(b: Bot124) -> None:
             await msg.response.defer()
             await msg.followup.send(content=q)
             return
+
+        q = q.limit(limit)
 
         q = (
             q.all()
