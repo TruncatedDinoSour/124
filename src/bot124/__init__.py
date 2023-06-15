@@ -114,6 +114,8 @@ class Bot124(discord.Client):
             sql_obj.total_messages += 1
             sql_obj.total_bytes += len(msg.content)
 
+            models.DB.commit()
+
             # record wordcloud
 
             for word, usage in word_count(
@@ -132,7 +134,7 @@ class Bot124(discord.Client):
 
                 sql_obj.usage += usage
 
-            models.DB.commit()
+                models.DB.commit()
 
         if msg.channel.name == const.OK_CHANNEL and (msg.author.bot or msg.content != const.OK_CHANNEL):  # type: ignore
             await msg.delete()
