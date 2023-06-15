@@ -196,7 +196,7 @@ def load_cmds(b: Bot124) -> None:
             "no score found for this user"
             if score is None
             else f"the chat score for this user is `{score.total_bytes / score.total_messages * 100:.2f}` \
-( `{score.total_bytes}` thoughout `{score.total_messages}` messages )",
+( `{score.total_bytes}` bytes thoughout `{score.total_messages}` messages )",
         )
 
     @b.ct.command(name="scores", description="get chat scores")
