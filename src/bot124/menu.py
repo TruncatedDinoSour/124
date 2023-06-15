@@ -10,15 +10,15 @@ from reactionmenu import ViewMenu  # type: ignore
 from . import const
 
 
-async def text_menu(msg: discord.interactions.Interaction, text: str) -> None:
+async def text_menu(
+    msg: discord.interactions.Interaction, text: str, wrap: int = const.MESSAGE_WRAP_LEN
+) -> None:
     if len(text) <= const.MESSAGE_WRAP_LEN:
         await msg.response.defer()
         await msg.followup.send(content=text)
         return
 
     menu: ViewMenu = ViewMenu(msg, menu_type=ViewMenu.TypeText, style="$/&")
-    menu.add_pages(
-        textwrap.wrap(text, const.MESSAGE_WRAP_LEN, replace_whitespace=False)
-    )
+    menu.add_pages(textwrap.wrap(text, wrap, replace_whitespace=False))
     menu.add_buttons(const.VIEW_BUTTONS)
     await menu.start()

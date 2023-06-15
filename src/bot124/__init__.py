@@ -308,10 +308,8 @@ def load_cmds(b: Bot124) -> None:
         usage_mt: typing.Optional[int] = None,
         query: typing.Optional[str] = None,
     ) -> None:  # type: ignore
-        q: typing.Any = (
-            models.DB.session.query(models.WordCloud)
-            .order_by(models.WordCloud.usage.desc())
-            .limit(limit)
+        q: typing.Any = models.DB.session.query(models.WordCloud).order_by(
+            models.WordCloud.usage.desc()
         )
 
         if usage_lt is not None:
@@ -319,6 +317,8 @@ def load_cmds(b: Bot124) -> None:
 
         if usage_mt is not None:
             q = q.where(models.WordCloud.usage >= usage_lt)
+
+        q = q.limit(limit)
 
         q = (
             q.all()
@@ -337,4 +337,5 @@ def load_cmds(b: Bot124) -> None:
                     for idx, w in enumerate(q, 1)
                 )
             ),
+            const.WORDCLOUD_WRAP,
         )

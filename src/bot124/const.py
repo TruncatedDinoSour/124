@@ -25,3 +25,4 @@ RULES_CHANNEL: Final[str] = "rules"
 REAL_RULES_ID: Final[tuple[str, ...]] = ("(real rule)", "( real rule )")
 FAKE_RULES_ID: Final[tuple[str, ...]] = ("(fake rule)", "( fake rule )")
 MIN_WORDCLOUD_LIMIT: Final[int] = 1000
+WORDCLOUD_WRAP: Final[int] = 540
