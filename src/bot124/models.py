@@ -39,7 +39,6 @@ class Score:
         sqlalchemy.Integer,
         primary_key=True,
         unique=True,
-        autoincrement=True,
     )
     total_bytes: sqlalchemy.Column[int] = sqlalchemy.Column(sqlalchemy.Integer)
     total_messages: sqlalchemy.Column[int] = sqlalchemy.Column(sqlalchemy.Integer)
@@ -62,3 +61,19 @@ class WordCloud:
     def __init__(self, word: str) -> None:
         self.word = word  # type: ignore
         self.usage = 0  # type: ignore
+
+
+@DB.table
+class Confession:
+    id: sqlalchemy.Column[int] = sqlalchemy.Column(
+        sqlalchemy.Integer,
+        primary_key=True,
+        unique=True,
+        autoincrement=True,
+    )
+    content: sqlalchemy.Column[str] = sqlalchemy.Column(sqlalchemy.String)
+    timestamp: sqlalchemy.Column[int] = sqlalchemy.Column(sqlalchemy.Integer)
+
+    def __init__(self, content: str) -> None:
+        self.content = content  # type: ignore
+        self.timestamp = round(datetime.utcnow().timestamp())  # type: ignore

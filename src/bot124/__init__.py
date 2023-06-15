@@ -28,6 +28,35 @@ def word_count(lst: typing.Iterable[str]) -> dict[str, int]:
     return word_dict
 
 
+def filter_rule_like(
+    model: typing.Any,
+    id: typing.Optional[int] = None,
+    yyyymmddhh_before: typing.Optional[str] = None,
+    yyyymmddhh_after: typing.Optional[str] = None,
+) -> typing.Any:  # type: ignore
+    q: typing.Any = models.DB.session.query(model)
+
+    if id is not None:
+        q = q.filter(model.id == id)
+
+    try:
+        if yyyymmddhh_before is not None:
+            q = q.filter(
+                model.timestamp
+                <= datetime.strptime(yyyymmddhh_before, "%Y%m%d%H").timestamp()
+            )
+
+        if yyyymmddhh_after is not None:
+            q = q.filter(
+                model.timestamp
+                >= datetime.strptime(yyyymmddhh_after, "%Y%m%d%H").timestamp()
+            )
+    except ValueError:
+        return "invalid datetime format for yyyymmmddhh* arguments, keep in mind the format is yyyymmmddhh, so ***2023011023*** = 2023/01/10 23:00"
+
+    return q
+
+
 def filter_rules(
     id: typing.Optional[int] = None,
     real: typing.Optional[bool] = None,
@@ -35,31 +64,15 @@ def filter_rules(
     yyyymmddhh_before: typing.Optional[str] = None,
     yyyymmddhh_after: typing.Optional[str] = None,
 ) -> typing.Any:  # type: ignore
-    q: typing.Any = models.DB.session.query(models.Rule)
+    q: typing.Any = filter_rule_like(
+        models.Rule, id, yyyymmddhh_before, yyyymmddhh_after
+    )
 
     if real is not None:
         q = q.filter(models.Rule.real == real)
 
     if user is not None:
         q = q.filter(models.Rule.author == user.id)
-
-    if id is not None:
-        q = q.filter(models.Rule.id == id)
-
-    try:
-        if yyyymmddhh_before is not None:
-            q = q.filter(
-                models.Rule.timestamp
-                <= datetime.strptime(yyyymmddhh_before, "%Y%m%d%H").timestamp()
-            )
-
-        if yyyymmddhh_after is not None:
-            q = q.filter(
-                models.Rule.timestamp
-                >= datetime.strptime(yyyymmddhh_after, "%Y%m%d%H").timestamp()
-            )
-    except ValueError:
-        return "invalid datetime format for yyyymmmddhh* arguments, keep in mind the format is yyyymmmddhh, so ***2023011023*** = 2023/01/10 23:00"
 
     return q
 
@@ -133,6 +146,9 @@ class Bot124(discord.Client):
                 sql_obj.usage += usage
 
             models.DB.commit()
+
+        if isinstance(msg.channel, discord.channel.DMChannel):
+            return
 
         if msg.channel.name == const.OK_CHANNEL and (msg.author.bot or msg.content != const.OK_CHANNEL):  # type: ignore
             await msg.delete()
@@ -368,4 +384,44 @@ def load_cmds(b: Bot124) -> None:
                 )
             ),
             const.WORDCLOUD_WRAP,
+        )
+
+    @b.ct.command(name="confess", description="add an anonymous confession")
+    async def _(
+        msg: discord.interactions.Interaction,
+        content: str,
+    ) -> None:  # type: ignore
+        await msg.response.defer(ephemeral=True)
+        models.DB.add(
+            (sql_obj := models.Confession(content=content[: const.MESSAGE_WRAP_LEN]))
+        )
+        await msg.followup.send(
+            content=f"saved confession #{sql_obj.id}", ephemeral=True
+        )
+
+    @b.ct.command(name="confessions", description="view, list and filter confessions")
+    async def _(
+        msg: discord.interactions.Interaction,
+        query: typing.Optional[str] = None,
+        id: typing.Optional[int] = None,
+        yyyymmddhh_before: typing.Optional[str] = None,
+        yyyymmddhh_after: typing.Optional[str] = None,
+        limit: int = const.MIN_CONFESSION_LIMIT,
+    ) -> None:  # type: ignore
+        q: typing.Any = filter_rule_like(
+            models.Confession, id, yyyymmddhh_before, yyyymmddhh_after
+        ).limit(limit)
+
+        q = (
+            q.all()
+            if query is None
+            else tuple(c for c in q.all() if c.content in query or query in c.content)
+        )
+
+        await menu.menu(
+            msg,
+            tuple(
+                f"*confession #{c.id} on {str(datetime.utcfromtimestamp(c.timestamp))} UTC*\n\n{c.content}"
+                for c in q
+            ),
         )

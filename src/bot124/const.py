@@ -23,3 +23,4 @@ MIN_WORDCLOUD_LIMIT: Final[int] = 500
 WORDCLOUD_WRAP: Final[int] = 540
 MIN_RULES_LIMIT: Final[int] = 1000
 GOLDEN_RATIO: Final[float] = (1 + 5**0.5) / 2
+MIN_CONFESSION_LIMIT: Final[int] = 500
