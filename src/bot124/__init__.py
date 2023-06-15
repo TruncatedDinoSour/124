@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 """124 bot"""
 
+import math
 import string
 import typing
 from datetime import datetime
@@ -61,6 +62,26 @@ def filter_rules(
         return "invalid datetime format for yyyymmmddhh* arguments, keep in mind the format is yyyymmmddhh, so ***2023011023*** = 2023/01/10 23:00"
 
     return q
+
+
+def calc_score(s: models.Score) -> float:
+    # honestly this is purely obscurity lol, these constants mean nothing,
+    # just obscure underlying ratio lol
+
+    return round(
+        (
+            (
+                (
+                    (s.total_messages / s.total_bytes)
+                    + (s.total_bytes / s.total_messages)
+                )
+                / const.GOLDEN_RATIO
+            )
+            * math.pi
+        )
+        + (1 / 90),
+        2,
+    )
 
 
 class Bot124(discord.Client):
@@ -268,7 +289,7 @@ def load_cmds(b: Bot124) -> None:
             if score is None
             else "the chat score for "
             + ("you" if user is None else user.mention)
-            + f" is `{score.total_bytes / score.total_messages * 100:.2f}` \
+            + f" is `{calc_score(score)}` \
 ( `{score.total_bytes}` bytes throughout `{score.total_messages}` messages )",
         )
 
@@ -282,9 +303,7 @@ def load_cmds(b: Bot124) -> None:
 
         lb: dict[int, int] = dict(
             sorted(
-                {
-                    s.author: s.total_bytes / s.total_messages * 100 for s in scores
-                }.items(),
+                {s.author: calc_score(s) for s in scores}.items(),
                 key=lambda x: x[1],
                 reverse=True,
             )
@@ -296,7 +315,7 @@ def load_cmds(b: Bot124) -> None:
             msg,
             "chat score leaderboard :\n\n"
             + "\n".join(
-                f"{idx}, <@{value[0]}> with score {value[1]:.2f}"
+                f"{idx}, <@{value[0]}> with score `{value[1]}`"
                 for idx, value in enumerate(lb.items(), 1)
             )
             + f"\n\naverage chat score : {total_lbv / len(lbv):.2f}\ntotal chat score : {total_lbv:.2f}",
