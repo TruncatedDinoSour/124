@@ -226,5 +226,5 @@ def load_cmds(b: Bot124) -> None:
                 f"{idx}, <@{value[0]}> with score {value[1]:.2f}"
                 for idx, value in enumerate(lb.items(), 1)
             )
-            + f"\n\naverage chat score : {total_lbv / len(lbv):.2f}\ntotal chat score : {total_lbv}",
+            + f"\n\naverage chat score : {total_lbv / len(lbv):.2f}\ntotal chat score : {total_lbv:.2f}",
         )
