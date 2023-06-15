@@ -234,7 +234,11 @@ def load_cmds(b: Bot124) -> None:
             else tuple(r for r in q.all() if r.content in query or query in r.content)
         )
 
-        rules: str = f"rules ( {len(q)} result( s ) ) :\n\n" if id is None else ""
+        rules: str = (
+            f"rules ( {len(q)}/{models.DB.session.query(models.Rule.id).count()} result( s ) ) :\n\n"
+            if id is None
+            else ""
+        )
 
         for r in q:
             rules += f"{r.id}, {r.content} ( {'real' if r.real else 'fake'} rule ) by <@{r.author}> on {str(datetime.utcfromtimestamp(r.timestamp))} UTC\n"
