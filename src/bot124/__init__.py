@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 """124 bot"""
 
+import string
 import typing
 from datetime import datetime
 
@@ -12,6 +13,54 @@ import sqlalchemy
 from . import const, menu, models
 
 __all__: tuple[str] = ("Bot124",)
+
+
+def word_count(lst: typing.Iterable[str]) -> dict[str, int]:
+    word_dict: dict[str, int] = {}
+
+    for word in lst:
+        if word in word_dict:
+            word_dict[word] += 1
+        else:
+            word_dict[word] = 1
+
+    return word_dict
+
+
+def filter_rules(
+    id: typing.Optional[int] = None,
+    real: typing.Optional[bool] = None,
+    user: typing.Optional[discord.User] = None,
+    yyyymmddhh_before: typing.Optional[str] = None,
+    yyyymmddhh_after: typing.Optional[str] = None,
+) -> typing.Any:  # type: ignore
+    q: typing.Any = models.DB.session.query(models.Rule)
+
+    if real is not None:
+        q = q.filter(models.Rule.real == real)
+
+    if user is not None:
+        q = q.filter(models.Rule.author == user.id)
+
+    if id is not None:
+        q = q.filter(models.Rule.id == id)
+
+    try:
+        if yyyymmddhh_before is not None:
+            q = q.filter(
+                models.Rule.timestamp
+                <= datetime.strptime(yyyymmddhh_before, "%Y%m%d%H").timestamp()
+            )
+
+        if yyyymmddhh_after is not None:
+            q = q.filter(
+                models.Rule.timestamp
+                >= datetime.strptime(yyyymmddhh_after, "%Y%m%d%H").timestamp()
+            )
+    except ValueError:
+        return "invalid datetime format for yyyymmmddhh* arguments, keep in mind the format is yyyymmmddhh, so ***2023011023*** = 2023/01/10 23:00"
+
+    return q
 
 
 class Bot124(discord.Client):
@@ -30,6 +79,8 @@ class Bot124(discord.Client):
 
     async def on_message(self, msg: discord.message.Message) -> None:
         if not msg.author.bot:
+            # record scores
+
             sql_obj: typing.Any = (
                 models.DB.session.query(models.Score)
                 .where(models.Score.author == msg.author.id)
@@ -41,6 +92,28 @@ class Bot124(discord.Client):
 
             sql_obj.total_messages += 1
             sql_obj.total_bytes += len(msg.content)
+
+            # record wordcloud
+
+            for word, usage in word_count(
+                "".join(
+                    c
+                    for c in msg.content
+                    if c in (string.ascii_letters + string.digits + string.whitespace)
+                )
+                .strip()
+                .split()
+            ).items():
+                sql_obj = (
+                    models.DB.session.query(models.WordCloud)
+                    .where(models.WordCloud.word == word)
+                    .first()
+                )
+
+                if sql_obj is None:
+                    models.DB.add(sql_obj := models.WordCloud(word=word))
+
+                sql_obj.usage += usage
 
             models.DB.commit()
 
@@ -107,46 +180,36 @@ def load_cmds(b: Bot124) -> None:
             else f"status is now : `playing {value}`"
         )
 
-    @b.ct.command(name="rules", description="get all rules by filter")
+    @b.ct.command(name="rules", description="get rules by filter and / or query")
     async def _(
         msg: discord.interactions.Interaction,
+        query: typing.Optional[str] = None,
         id: typing.Optional[int] = None,
         real: typing.Optional[bool] = None,
         user: typing.Optional[discord.User] = None,
         yyyymmddhh_before: typing.Optional[str] = None,
         yyyymmddhh_after: typing.Optional[str] = None,
     ) -> None:  # type: ignore
-        q: typing.Any = models.DB.session.query(models.Rule)
+        q: typing.Any = filter_rules(
+            id=id,
+            real=real,
+            user=user,
+            yyyymmddhh_before=yyyymmddhh_before,
+            yyyymmddhh_after=yyyymmddhh_after,
+        )
 
-        if real is not None:
-            q = q.filter(models.Rule.real == real)
-
-        if user is not None:
-            q = q.filter(models.Rule.author == user.id)
-
-        if id is not None:
-            q = q.filter(models.Rule.id == id)
-
-        try:
-            if yyyymmddhh_before is not None:
-                q = q.filter(
-                    models.Rule.timestamp
-                    <= datetime.strptime(yyyymmddhh_before, "%Y%m%d%H").timestamp()
-                )
-
-            if yyyymmddhh_after is not None:
-                q = q.filter(
-                    models.Rule.timestamp
-                    >= datetime.strptime(yyyymmddhh_after, "%Y%m%d%H").timestamp()
-                )
-        except ValueError:
+        if type(q) is str:
             await msg.response.defer()
-            await msg.followup.send(
-                "invalid datetime format for yyyymmmddhh* arguments, keep in mind the format is yyyymmmddhh, so ***2023011023*** = 2023/01/10 23:00"
-            )
+            await msg.followup.send(content=q)
             return
 
-        rules: str = f"rules ( {q.count()} result( s ) ) :\n\n" if id is None else ""
+        q = (
+            q.all()
+            if query is None
+            else tuple(r for r in q.all() if r.content in query or query in r.content)
+        )
+
+        rules: str = f"rules ( {len(q)} result( s ) ) :\n\n" if id is None else ""
 
         for r in q:
             rules += f"{r.id}, {r.content} ( {'real' if r.real else 'fake'} rule ) by <@{r.author}> on {str(datetime.utcfromtimestamp(r.timestamp))} UTC\n"
@@ -166,7 +229,7 @@ def load_cmds(b: Bot124) -> None:
                 .count()
             )
 
-        lb = {
+        lb: dict[int, int] = {
             k: v for k, v in sorted(lb.items(), key=lambda item: item[1], reverse=True)
         }
         total: int = sum(lb.values())
@@ -185,6 +248,10 @@ def load_cmds(b: Bot124) -> None:
         name="score", description="get your or other users' chat score chat score"
     )
     async def _(msg: discord.interactions.Interaction, user: typing.Optional[discord.user.User] = None) -> None:  # type: ignore
+        if user is not None and user.bot:
+            await menu.text_menu(msg, "bots cannot have scores")
+            return
+
         score: typing.Any = (
             models.DB.session.query(models.Score)
             .where(models.Score.author == (msg.user.id if user is None else user.id))  # type: ignore
@@ -193,9 +260,11 @@ def load_cmds(b: Bot124) -> None:
 
         await menu.text_menu(
             msg,
-            "no score found for this user"
+            (("you have" if user is None else f"{user.mention} has") + " no score")
             if score is None
-            else f"the chat score for this user is `{score.total_bytes / score.total_messages * 100:.2f}` \
+            else "the chat score for "
+            + ("you" if user is None else user.mention)
+            + f" is `{score.total_bytes / score.total_messages * 100:.2f}` \
 ( `{score.total_bytes}` bytes thoughout `{score.total_messages}` messages )",
         )
 
@@ -227,4 +296,45 @@ def load_cmds(b: Bot124) -> None:
                 for idx, value in enumerate(lb.items(), 1)
             )
             + f"\n\naverage chat score : {total_lbv / len(lbv):.2f}\ntotal chat score : {total_lbv:.2f}",
+        )
+
+    @b.ct.command(
+        name="wordcloud", description="get the word cloud by filter, limit and query"
+    )
+    async def _(
+        msg: discord.interactions.Interaction,
+        limit: int = const.MIN_WORDCLOUD_LIMIT,
+        usage_lt: typing.Optional[int] = None,
+        usage_mt: typing.Optional[int] = None,
+        query: typing.Optional[str] = None,
+    ) -> None:  # type: ignore
+        q: typing.Any = (
+            models.DB.session.query(models.WordCloud)
+            .order_by(models.WordCloud.usage.desc())
+            .limit(limit)
+        )
+
+        if usage_lt is not None:
+            q = q.where(models.WordCloud.usage <= usage_lt)
+
+        if usage_mt is not None:
+            q = q.where(models.WordCloud.usage >= usage_lt)
+
+        q = (
+            q.all()
+            if query is None
+            else tuple(r for r in q.all() if r.word in query or query in r.word)
+        )
+
+        ql: int = len(q)
+
+        await menu.text_menu(
+            msg,
+            f"word cloud ( {ql}/{models.DB.session.query(models.WordCloud.usage).count()} word( s ) )\n\n"
+            + (
+                "".join(
+                    f"{idx}, {w.word} ( {w.usage} ( {w.usage / ql * 100:.2f}% ) )\n"
+                    for idx, w in enumerate(q, 1)
+                )
+            ),
         )

@@ -48,3 +48,17 @@ class Score:
         self.author = author  # type: ignore
         self.total_bytes = 0  # type: ignore
         self.total_messages = 0  # type: ignore
+
+
+@DB.table
+class WordCloud:
+    word: sqlalchemy.Column[str] = sqlalchemy.Column(
+        sqlalchemy.String,
+        primary_key=True,
+        unique=True,
+    )
+    usage: sqlalchemy.Column[int] = sqlalchemy.Column(sqlalchemy.Integer)
+
+    def __init__(self, word: str) -> None:
+        self.word = word  # type: ignore
+        self.usage = 0  # type: ignore
