@@ -5,7 +5,7 @@
 import textwrap
 
 import discord
-from reactionmenu import ViewMenu  # type: ignore
+from reactionmenu import ReactionMenu  # type: ignore
 
 from . import const
 
@@ -18,7 +18,7 @@ async def text_menu(
         await msg.followup.send(content=text)
         return
 
-    menu: ViewMenu = ViewMenu(msg, menu_type=ViewMenu.TypeText, style="$/&")
+    menu: ReactionMenu = ReactionMenu(msg, menu_type=ReactionMenu.TypeText, style="$/&")
     menu.add_pages(textwrap.wrap(text, wrap, replace_whitespace=False))
-    menu.add_buttons(const.VIEW_BUTTONS)
+    menu.add_buttons(const.BUTTONS)
     await menu.start()
