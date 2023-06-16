@@ -206,20 +206,26 @@ class Bot124(discord.Client):
 
 def load_cmds(b: Bot124) -> None:
     @b.ct.command(name="status", description="set or reset bots 'playing' status")
-    async def _(msg: discord.interactions.Interaction, value: typing.Union[str, None] = None) -> None:  # type: ignore
+    async def _(
+        msg: discord.interactions.Interaction,
+        value: typing.Optional[str] = None,
+        type: discord.ActivityType = discord.ActivityType.playing,
+    ) -> None:  # type: ignore
         await msg.response.defer()
 
         if value is not None:
             value = value[: const.MAX_PRESENCE_LEN].strip()
 
         await b.change_presence(
-            activity=None if value is None else discord.Game(name=value)
+            activity=None
+            if (reset := value is None or type == discord.ActivityType.unknown)
+            else discord.Activity(name=value, type=type)
         )
 
         await msg.followup.send(
-            content="'playing' status has been reset"
-            if value is None
-            else f"status is now : `playing {value}`"
+            content="i am no longer doing anything"
+            if reset
+            else f"i am now `{type.name} {value}`"
         )
 
     @b.ct.command(name="rules", description="get rules by filter and / or query")
@@ -326,7 +332,7 @@ def load_cmds(b: Bot124) -> None:
             return
 
         lb: dict[int, int] = dict(
-            sorted(
+            sorted(  # type: ignore
                 {s.author: calc_score(s) for s in scores}.items(),
                 key=lambda x: x[1],
                 reverse=True,
