@@ -2,8 +2,9 @@
 # -*- coding: utf-8 -*-
 """124bot database models"""
 
-from datetime import datetime
+import datetime
 
+import humanize
 import sqlalchemy
 
 from . import const, sql
@@ -19,10 +20,17 @@ class Rule:
         unique=True,
         autoincrement=True,
     )
-    content: sqlalchemy.Column[str] = sqlalchemy.Column(sqlalchemy.String, unique=True)
+    content: sqlalchemy.Column[str] = sqlalchemy.Column(
+        sqlalchemy.String,
+        unique=True,
+    )
     real: sqlalchemy.Column[bool] = sqlalchemy.Column(sqlalchemy.Boolean)
-    author: sqlalchemy.Column[int] = sqlalchemy.Column(sqlalchemy.Integer)
-    timestamp: sqlalchemy.Column[int] = sqlalchemy.Column(sqlalchemy.Integer)
+    author: sqlalchemy.Column[int] = sqlalchemy.Column(
+        sqlalchemy.Integer,
+    )
+    timestamp: sqlalchemy.Column[int] = sqlalchemy.Column(
+        sqlalchemy.Integer,
+    )
 
     def __init__(self, content: str, real: bool, author: int) -> None:
         # todo : make init gen cleaner and automatic
@@ -30,7 +38,7 @@ class Rule:
         self.content = content  # type: ignore
         self.real = real  # type: ignore
         self.author = author  # type: ignore
-        self.timestamp = round(datetime.utcnow().timestamp())  # type: ignore
+        self.timestamp = round(datetime.datetime.utcnow().timestamp())  # type: ignore
 
 
 @DB.table
@@ -40,13 +48,25 @@ class Score:
         primary_key=True,
         unique=True,
     )
-    total_bytes: sqlalchemy.Column[int] = sqlalchemy.Column(sqlalchemy.Integer)
-    total_messages: sqlalchemy.Column[int] = sqlalchemy.Column(sqlalchemy.Integer)
+    total_bytes: sqlalchemy.Column[int] = sqlalchemy.Column(
+        sqlalchemy.Integer,
+    )
+    total_messages: sqlalchemy.Column[int] = sqlalchemy.Column(
+        sqlalchemy.Integer,
+    )
+    vcs_joined: sqlalchemy.Column[int] = sqlalchemy.Column(
+        sqlalchemy.Integer,
+    )
+    vcs_time: sqlalchemy.Column[int] = sqlalchemy.Column(
+        sqlalchemy.Integer,
+    )
 
     def __init__(self, author: int) -> None:
         self.author = author  # type: ignore
-        self.total_bytes = 0  # type: ignore
-        self.total_messages = 0  # type: ignore
+        self.total_bytes = self.total_messages = self.vcs_joined = self.vcs_time = 0  # type: ignore
+
+    def __str__(self) -> str:
+        return f"`{self.total_bytes}` b / `{self.total_messages}` msgs; `{self.vcs_time}` s ( {humanize.precisedelta(datetime.timedelta(seconds=self.vcs_time), minimum_unit='seconds')} ) / `{self.vcs_joined}` vcs"
 
 
 @DB.table
@@ -56,7 +76,9 @@ class WordCloud:
         primary_key=True,
         unique=True,
     )
-    usage: sqlalchemy.Column[int] = sqlalchemy.Column(sqlalchemy.Integer)
+    usage: sqlalchemy.Column[int] = sqlalchemy.Column(
+        sqlalchemy.Integer,
+    )
 
     def __init__(self, word: str) -> None:
         self.word = word  # type: ignore
@@ -71,9 +93,13 @@ class Confession:
         unique=True,
         autoincrement=True,
     )
-    content: sqlalchemy.Column[str] = sqlalchemy.Column(sqlalchemy.String)
-    timestamp: sqlalchemy.Column[int] = sqlalchemy.Column(sqlalchemy.Integer)
+    content: sqlalchemy.Column[str] = sqlalchemy.Column(
+        sqlalchemy.String,
+    )
+    timestamp: sqlalchemy.Column[int] = sqlalchemy.Column(
+        sqlalchemy.Integer,
+    )
 
     def __init__(self, content: str) -> None:
         self.content = content  # type: ignore
-        self.timestamp = round(datetime.utcnow().timestamp())  # type: ignore
+        self.timestamp = round(datetime.datetime.utcnow().timestamp())  # type: ignore

@@ -2,103 +2,17 @@
 # -*- coding: utf-8 -*-
 """124 bot"""
 
-import math
+import asyncio
 import string
 import typing
-from datetime import datetime
 
 import discord
 import discord.app_commands  # type: ignore
 import sqlalchemy
 
-from . import const, menu, models
+from . import const, models, util, cmds
 
 __all__: tuple[str] = ("Bot124",)
-
-
-def datetime_s(ts: int) -> str:
-    return datetime.utcfromtimestamp(ts).strftime("%Y/%m/%d %H:%M")
-
-
-def word_count(lst: typing.Iterable[str]) -> dict[str, int]:
-    word_dict: dict[str, int] = {}
-
-    for word in lst:
-        if word in word_dict:
-            word_dict[word] += 1
-        else:
-            word_dict[word] = 1
-
-    return word_dict
-
-
-def filter_rule_like(
-    model: typing.Any,
-    id: typing.Optional[int] = None,
-    yyyymmddhh_before: typing.Optional[str] = None,
-    yyyymmddhh_after: typing.Optional[str] = None,
-) -> typing.Any:  # type: ignore
-    q: typing.Any = models.DB.session.query(model)
-
-    if id is not None:
-        q = q.filter(model.id == id)
-
-    try:
-        if yyyymmddhh_before is not None:
-            q = q.filter(
-                model.timestamp
-                <= datetime.strptime(yyyymmddhh_before, "%Y%m%d%H").timestamp()
-            )
-
-        if yyyymmddhh_after is not None:
-            q = q.filter(
-                model.timestamp
-                >= datetime.strptime(yyyymmddhh_after, "%Y%m%d%H").timestamp()
-            )
-    except ValueError:
-        return "invalid datetime format for yyyymmmddhh* arguments, keep in mind the format is yyyymmmddhh, so ***2023011023*** = 2023/01/10 23:00"
-
-    return q
-
-
-def filter_rules(
-    id: typing.Optional[int] = None,
-    real: typing.Optional[bool] = None,
-    user: typing.Optional[discord.User] = None,
-    yyyymmddhh_before: typing.Optional[str] = None,
-    yyyymmddhh_after: typing.Optional[str] = None,
-) -> typing.Any:  # type: ignore
-    q: typing.Any = filter_rule_like(
-        models.Rule, id, yyyymmddhh_before, yyyymmddhh_after
-    )
-
-    if real is not None:
-        q = q.filter(models.Rule.real == real)
-
-    if user is not None:
-        q = q.filter(models.Rule.author == user.id)
-
-    return q
-
-
-def calc_score(s: models.Score) -> float:
-    # honestly this is purely obscurity lol, these constants mean nothing,
-    # just obscure underlying ratio lol
-
-    return round(
-        (
-            (
-                (
-                    (s.total_messages / (s.total_bytes + 1))
-                    + (s.total_bytes / (s.total_messages + 1))
-                )
-                / const.GOLDEN_RATIO
-            )
-            * math.pi
-        )
-        + (1 / 90),
-        2,
-    )
 
 
 class Bot124(discord.Client):
@@ -109,31 +23,35 @@ class Bot124(discord.Client):
             self,
         )
 
-        load_cmds(self)
+        cmds.cmds.init(self.ct, self)
+
+        self.vc_times: list[int] = []
+
+    async def _update_vc_score(self) -> typing.NoReturn:
+        while True:
+            await asyncio.sleep(1)
+
+            for id in self.vc_times.copy():
+                util.get_score(id).vcs_time += 1
+
+            models.DB.commit()
 
     async def on_ready(self) -> None:
         models.DB.init()
         await self.ct.sync()
+        self.loop.create_task(self._update_vc_score())
 
     async def on_message(self, msg: discord.message.Message) -> None:
-        if not msg.author.bot:
+        if msg.content and not msg.author.bot:
             # record scores
 
-            sql_obj: typing.Any = (
-                models.DB.session.query(models.Score)
-                .where(models.Score.author == msg.author.id)
-                .first()
-            )
-
-            if sql_obj is None:
-                models.DB.add(sql_obj := models.Score(author=msg.author.id))
-
-            sql_obj.total_messages += 1
-            sql_obj.total_bytes += len(msg.content)
+            score: models.Score = util.get_score(msg.author.id)
+            score.total_messages += 1
+            score.total_bytes += len(msg.content)
 
             # record wordcloud
 
-            for word, usage in word_count(
+            for word, usage in util.word_count(
                 "".join(c for c in msg.content.lower() if c not in string.punctuation)
                 .strip()
                 .split()
@@ -203,237 +121,18 @@ class Bot124(discord.Client):
                 f"goodbye {member.mention} ( {member.name}#{member.discriminator} ) ^w^, (U ᵕ U❁) h-haww a ny-nice day :3"
             )
 
+    async def on_voice_state_update(
+        self,
+        member: discord.Member,
+        before: discord.VoiceState,
+        after: discord.VoiceState,
+    ) -> None:
+        score: models.Score = util.get_score(member.id)
 
-def load_cmds(b: Bot124) -> None:
-    @b.ct.command(name="status", description="set or reset bots 'playing' status")
-    async def _(
-        msg: discord.interactions.Interaction,
-        value: typing.Optional[str] = None,
-        type: discord.ActivityType = discord.ActivityType.playing,
-    ) -> None:  # type: ignore
-        await msg.response.defer()
+        if before.channel is None and after.channel is not None:
+            self.vc_times.append(member.id)
+            score.vcs_joined += 1
+        elif before.channel is not None and after.channel is None:
+            self.vc_times.remove(member.id)
 
-        if value is not None:
-            value = value[: const.MAX_PRESENCE_LEN].strip()
-
-        await b.change_presence(
-            activity=None
-            if (reset := value is None or type == discord.ActivityType.unknown)
-            else discord.Activity(name=value, type=type)
-        )
-
-        await msg.followup.send(
-            content="i am no longer doing anything"
-            if reset
-            else f"i am now `{type.name} {value}`"
-        )
-
-    @b.ct.command(name="rules", description="get rules by filter and / or query")
-    async def _(
-        msg: discord.interactions.Interaction,
-        query: typing.Optional[str] = None,
-        id: typing.Optional[int] = None,
-        real: typing.Optional[bool] = None,
-        user: typing.Optional[discord.User] = None,
-        yyyymmddhh_before: typing.Optional[str] = None,
-        yyyymmddhh_after: typing.Optional[str] = None,
-        limit: int = const.MIN_RULES_LIMIT,
-    ) -> None:  # type: ignore
-        q: typing.Any = filter_rules(
-            id=id,
-            real=real,
-            user=user,
-            yyyymmddhh_before=yyyymmddhh_before,
-            yyyymmddhh_after=yyyymmddhh_after,
-        )
-
-        if type(q) is str:
-            await msg.response.defer()
-            await msg.followup.send(content=q)
-            return
-
-        q = q.limit(limit)
-
-        q = (
-            q.all()
-            if query is None
-            else tuple(r for r in q.all() if r.content in query or query in r.content)
-        )
-
-        rules: str = (
-            f"rules ( {len(q)}/{models.DB.session.query(models.Rule.id).count()} result( s ) ) :\n\n"
-            if id is None
-            else ""
-        )
-
-        for r in q:
-            rules += f"{r.id}, {r.content} ( {'real' if r.real else 'fake'} rule ) by <@{r.author}> on {datetime_s(r.timestamp)}\n"
-
-        await menu.text_menu(msg, rules)
-
-    @b.ct.command(name="lb", description="rules leaderboard by rule creation count")
-    async def _(msg: discord.interactions.Interaction) -> None:  # type: ignore
-        lb: typing.Dict[int, int] = {}
-
-        for (author,) in models.DB.session.query(
-            sqlalchemy.distinct(models.Rule.author)
-        ).all():
-            lb[author] = (
-                models.DB.session.query(sqlalchemy.distinct(models.Rule.id))
-                .where(models.Rule.author == author)
-                .count()
-            )
-
-        lb: dict[int, int] = {
-            k: v for k, v in sorted(lb.items(), key=lambda item: item[1], reverse=True)
-        }
-        total: int = sum(lb.values())
-
-        await menu.text_menu(
-            msg,
-            "rules leaderboard :\n\n"
-            + "".join(
-                f"{rank}, <@{id}> with {count} ( {(count / total * 100):.2f}% ) created rule( s )\n"
-                for rank, (id, count) in enumerate(lb.items(), 1)
-            )
-            + f"\n{total} rule( s ) in total",
-        )
-
-    @b.ct.command(
-        name="score", description="get your or other users' chat score chat score"
-    )
-    async def _(msg: discord.interactions.Interaction, user: typing.Optional[discord.user.User] = None) -> None:  # type: ignore
-        if user is not None and user.bot:
-            await menu.text_menu(msg, "bots cannot have scores")
-            return
-
-        score: typing.Any = (
-            models.DB.session.query(models.Score)
-            .where(models.Score.author == (msg.user.id if user is None else user.id))  # type: ignore
-            .first()
-        )
-
-        await menu.text_menu(
-            msg,
-            (("you have" if user is None else f"{user.mention} has") + " no score")
-            if score is None
-            else "the chat score for "
-            + ("you" if user is None else user.mention)
-            + f" is `{calc_score(score)}` \
-( `{score.total_bytes}` bytes throughout `{score.total_messages}` messages )",
-        )
-
-    @b.ct.command(name="scores", description="get chat scores")
-    async def _(msg: discord.interactions.Interaction) -> None:  # type: ignore
-        scores: typing.Any = models.DB.session.query(models.Score).all()
-
-        if not scores:
-            await menu.text_menu(msg, "no people currently have a score")
-            return
-
-        lb: dict[int, int] = dict(
-            sorted(  # type: ignore
-                {s.author: calc_score(s) for s in scores}.items(),
-                key=lambda x: x[1],
-                reverse=True,
-            )
-        )
-        lbv: tuple[int] = tuple(lb.values())
-        total_lbv: int = sum(lbv)
-
-        await menu.text_menu(
-            msg,
-            "chat score leaderboard :\n\n"
-            + "\n".join(
-                f"{idx}, <@{value[0]}> with score `{value[1]}`"
-                for idx, value in enumerate(lb.items(), 1)
-            )
-            + f"\n\naverage chat score : {total_lbv / len(lbv):.2f}\ntotal chat score : {total_lbv:.2f}",
-        )
-
-    @b.ct.command(
-        name="wordcloud", description="get the word cloud by filter, limit and query"
-    )
-    async def _(
-        msg: discord.interactions.Interaction,
-        limit: int = const.MIN_WORDCLOUD_LIMIT,
-        usage_lt: typing.Optional[int] = None,
-        usage_mt: typing.Optional[int] = None,
-        query: typing.Optional[str] = None,
-    ) -> None:  # type: ignore
-        q: typing.Any = models.DB.session.query(models.WordCloud).order_by(
-            models.WordCloud.usage.desc()
-        )
-
-        if usage_lt is not None:
-            q = q.where(models.WordCloud.usage <= usage_lt)
-
-        if usage_mt is not None:
-            q = q.where(models.WordCloud.usage >= usage_mt)
-
-        q = q.limit(limit)
-
-        if query is not None:
-            query = query.lower()
-
-        q = (
-            q.all()
-            if query is None
-            else tuple(r for r in q.all() if r.word in query or query in r.word)
-        )
-
-        ql: int = len(q)
-
-        await menu.text_menu(
-            msg,
-            f"word cloud ( {ql}/{models.DB.session.query(models.WordCloud.usage).count()} word( s ) )\n\n"
-            + (
-                "".join(
-                    f"{idx}, {w.word} ( {w.usage} ( {w.usage / ql * 100:.2f}% ) )\n"
-                    for idx, w in enumerate(q, 1)
-                )
-            ),
-            const.WORDCLOUD_WRAP,
-        )
-
-    @b.ct.command(name="confess", description="add an anonymous confession")
-    async def _(
-        msg: discord.interactions.Interaction,
-        content: str,
-    ) -> None:  # type: ignore
-        await msg.response.defer(ephemeral=True)
-        models.DB.add(
-            (sql_obj := models.Confession(content=content[: const.MESSAGE_WRAP_LEN]))
-        )
-        await msg.followup.send(
-            content=f"saved confession #{sql_obj.id}", ephemeral=True
-        )
-
-    @b.ct.command(name="confessions", description="view, list and filter confessions")
-    async def _(
-        msg: discord.interactions.Interaction,
-        query: typing.Optional[str] = None,
-        id: typing.Optional[int] = None,
-        yyyymmddhh_before: typing.Optional[str] = None,
-        yyyymmddhh_after: typing.Optional[str] = None,
-        limit: int = const.MIN_CONFESSION_LIMIT,
-    ) -> None:  # type: ignore
-        q: typing.Any = filter_rule_like(
-            models.Confession, id, yyyymmddhh_before, yyyymmddhh_after
-        ).limit(limit)
-
-        q = (
-            q.all()
-            if query is None
-            else tuple(c for c in q.all() if c.content in query or query in c.content)
-        )
-
-        confession_count: int = models.DB.session.query(models.Confession.id).count()
-
-        await menu.menu(
-            msg,
-            tuple(
-                f"*confession #{c.id}, {len(q)}/{confession_count} result( s ) on {datetime_s(c.timestamp)}*\n\n{c.content}"
-                for c in q
-            ),
-        )
+        models.DB.commit()
