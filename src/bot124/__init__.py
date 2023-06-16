@@ -10,7 +10,7 @@ import discord
 import discord.app_commands  # type: ignore
 import sqlalchemy
 
-from . import const, models, util, cmds
+from . import cmds, const, models, util
 
 __all__: tuple[str] = ("Bot124",)
 

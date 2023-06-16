@@ -4,7 +4,7 @@
 
 import datetime
 
-import humanize
+import humanize  # type: ignore
 import sqlalchemy
 
 from . import const, sql
@@ -19,10 +19,12 @@ class Rule:
         primary_key=True,
         unique=True,
         autoincrement=True,
+        nullable=False,
     )
     content: sqlalchemy.Column[str] = sqlalchemy.Column(
         sqlalchemy.String,
         unique=True,
+        nullable=False,
     )
     real: sqlalchemy.Column[bool] = sqlalchemy.Column(sqlalchemy.Boolean)
     author: sqlalchemy.Column[int] = sqlalchemy.Column(
@@ -47,6 +49,7 @@ class Score:
         sqlalchemy.Integer,
         primary_key=True,
         unique=True,
+        nullable=False,
     )
     total_bytes: sqlalchemy.Column[int] = sqlalchemy.Column(
         sqlalchemy.Integer,
@@ -66,7 +69,8 @@ class Score:
         self.total_bytes = self.total_messages = self.vcs_joined = self.vcs_time = 0  # type: ignore
 
     def __str__(self) -> str:
-        return f"`{self.total_bytes}` b / `{self.total_messages}` msgs; `{self.vcs_time}` s ( {humanize.precisedelta(datetime.timedelta(seconds=self.vcs_time), minimum_unit='seconds')} ) / `{self.vcs_joined}` vcs"
+        return f"`{self.total_bytes}` b / `{self.total_messages}` msgs; `{self.vcs_time}` s \
+( {humanize.precisedelta(datetime.timedelta(seconds=self.vcs_time), minimum_unit='seconds')} ) / `{self.vcs_joined}` vcs"  # type: ignore
 
 
 @DB.table
@@ -75,6 +79,7 @@ class WordCloud:
         sqlalchemy.String,
         primary_key=True,
         unique=True,
+        nullable=False,
     )
     usage: sqlalchemy.Column[int] = sqlalchemy.Column(
         sqlalchemy.Integer,
@@ -92,9 +97,11 @@ class Confession:
         primary_key=True,
         unique=True,
         autoincrement=True,
+        nullable=False,
     )
     content: sqlalchemy.Column[str] = sqlalchemy.Column(
         sqlalchemy.String,
+        nullable=False,
     )
     timestamp: sqlalchemy.Column[int] = sqlalchemy.Column(
         sqlalchemy.Integer,
