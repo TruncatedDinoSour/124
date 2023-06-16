@@ -11,6 +11,8 @@ import sqlalchemy
 from . import const, menu, models, util
 from .cmdmgr import CommandManager
 
+__all__: tuple[str] = ("cmds",)
+
 cmds: CommandManager = CommandManager()
 
 

@@ -25,7 +25,7 @@ class Bot124(discord.Client):
 
         cmds.cmds.init(self.ct, self)
 
-        self.vc_times: list[int] = []
+        self.vc_times: set[int] = set()
 
     async def _update_vc_score(self) -> typing.NoReturn:
         while True:
@@ -38,6 +38,13 @@ class Bot124(discord.Client):
 
     async def on_ready(self) -> None:
         models.DB.init()
+
+        for guild in self.guilds:
+            for vc in guild.voice_channels:
+                for member in vc.members:
+                    util.get_score(member.id).vcs_joined += 1
+                    self.vc_times.add(member.id)
+
         await self.ct.sync()
         self.loop.create_task(self._update_vc_score())
 
@@ -130,9 +137,13 @@ class Bot124(discord.Client):
         score: models.Score = util.get_score(member.id)
 
         if before.channel is None and after.channel is not None:
-            self.vc_times.append(member.id)
+            self.vc_times.add(member.id)
             score.vcs_joined += 1
-        elif before.channel is not None and after.channel is None:
+        elif (
+            member.id in self.vc_times
+            and before.channel is not None
+            and after.channel is None
+        ):
             self.vc_times.remove(member.id)
 
         models.DB.commit()

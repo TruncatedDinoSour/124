@@ -8,6 +8,8 @@ from functools import wraps
 import discord
 import discord.app_commands  # type: ignore
 
+__all__: tuple[str] = ("CommandManager",)
+
 
 class CommandManager:
     def __init__(self) -> None:

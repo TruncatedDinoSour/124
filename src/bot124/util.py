@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 """random bot utilities"""
 
-import math
 import typing
 from datetime import datetime
 
@@ -88,22 +87,16 @@ def filter_rules(
 
 
 def calc_score(s: models.Score) -> float:
-    # honestly this is purely obscurity lol, these constants mean nothing,
-    # just obscure underlying ratio lol
-
     return round(
         (
-            (
-                (
-                    (s.total_messages / (s.total_bytes + 1))
-                    + (s.total_bytes / (s.total_messages + 1))
-                    + (s.vcs_joined + (s.vcs_time + 1))
-                    + (s.vcs_time + (s.vcs_joined + 1))
-                )
-                / const.GOLDEN_RATIO
-            )
-            * math.pi
+            const.MSGS_WEIGHT
+            * (s.total_messages / (s.total_messages + s.total_bytes + 1))
+            + const.BYTES_WEIGHT
+            * (s.total_bytes / (s.total_messages + s.total_bytes + 1))
+            + const.VC_JOIN_WEIGHT
+            * (s.vcs_joined / (s.total_messages + s.vcs_joined + 1))
+            + const.VC_TIME_WEIGHT * (s.vcs_time / (s.vcs_joined + s.vcs_time + 1))
         )
-        + (1 / 90),
+        * const.SCORE_MULT,
         2,
     )
