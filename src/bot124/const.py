@@ -24,17 +24,10 @@ WORDCLOUD_WRAP: Final[int] = 540
 MIN_RULES_LIMIT: Final[int] = 1000
 MIN_CONFESSION_LIMIT: Final[int] = 500
 
-# random constants for obscurity ig
+MSGS_W: Final[float] = 0.25
+VCS_W: Final[float] = 0.22
+WC_W: Final[float] = 0.32
+REACT_GET_W: Final[float] = 0.2
+REACT_POST_W: Final[float] = 0.14
 
-LEN_FACTOR_DIVISOR: Final[float] = 500
-LEN_FACTOR_THRESHOLD: Final[float] = 250
-VCS_FACTOR_DIVISOR: Final[float] = 1500
-VCS_FACTOR_THRESHOLD: Final[float] = 1000
-NEW_WORDS_WEIGHT_MULTIPLIER: Final[float] = 0.15
-REACTION_WEIGHT_MULTIPLIER: Final[float] = 0.1
-SCORE_DIVISOR: Final[float] = 10
-LEN_FACTOR_DEF: Final[float] = 0.025
-SCORE_MULT: Final[float] = 1e7
-LEN_MULTIPLIER: Final[float] = 0.5
-VCS_FACTOR_DEF: Final[float] = 0
-SCORE_COEFFICIENT: Final[float] = 1.1
+REACT_POST_K: Final[float] = 0.7

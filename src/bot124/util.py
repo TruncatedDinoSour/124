@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*-
 """random bot utilities"""
 
+import math
 import typing
 from datetime import datetime
-from math import log
 
 from discord import User
 
@@ -13,7 +13,7 @@ from . import const, models
 
 def get_score(id: int) -> models.Score:
     sql_obj: typing.Any = (
-        models.DB.query(models.Score).where(models.Score.author == id).first()
+        models.DB.query(models.Score).where(models.Score.author == id).first()  # type: ignore
     )
 
     if sql_obj is None:
@@ -44,7 +44,7 @@ def filter_rule_like(
     yyyymmddhh_before: typing.Optional[str] = None,
     yyyymmddhh_after: typing.Optional[str] = None,
 ) -> typing.Any:  # type: ignore
-    q: typing.Any = models.DB.query(model)
+    q: typing.Any = models.DB.query(model)  # type: ignore
 
     if id is not None:
         q = q.filter(model.id == id)
@@ -88,54 +88,14 @@ def filter_rules(
 
 
 def calc_score(s: models.Score) -> float:
-    if (
-        s.vcs_joined == 0
-        and s.reactions_get == 0
-        and s.reactions_post == 0
-        and s.new_words == 0
-    ):
-        return 0.0
-
-    if (
-        s.total_bytes is not None
-        and s.total_messages is not None
-        and s.total_messages > 0
-    ):
-        if s.total_bytes / s.total_messages >= const.LEN_FACTOR_THRESHOLD:
-            len_factor: float = const.LEN_FACTOR_DIVISOR * const.LEN_MULTIPLIER
-        else:
-            len_factor: float = (
-                s.total_bytes / s.total_messages
-            ) / const.LEN_FACTOR_DIVISOR
-    else:
-        len_factor: float = const.LEN_FACTOR_DEF
-
-    if s.vcs_joined > 0:
-        if s.vcs_time / s.vcs_joined > const.VCS_FACTOR_THRESHOLD:
-            vcs_factor: float = const.VCS_FACTOR_DIVISOR * 0.5
-        else:
-            vcs_factor: float = (s.vcs_time / s.vcs_joined) / const.VCS_FACTOR_DIVISOR
-    else:
-        vcs_factor: float = const.VCS_FACTOR_DEF
-
     return round(
-        const.SCORE_MULT
-        * (
-            sum(
-                stat * weight
-                for stat, weight in zip(
-                    (s.new_words, s.reactions_get + s.reactions_post),
-                    (
-                        const.NEW_WORDS_WEIGHT_MULTIPLIER,
-                        const.REACTION_WEIGHT_MULTIPLIER,
-                    ),
-                )
-                if stat > 0
-            )
-            / const.SCORE_DIVISOR
-            * len_factor
-            * vcs_factor
+        (
+            math.sqrt(s.total_bytes / (s.total_messages + 1)) * const.MSGS_W
+            + math.sqrt(abs(math.log(s.vcs_time + 1) / s.vcs_joined)) * const.VCS_W
+            + s.new_words * const.WC_W
+            + math.sqrt(s.reactions_get) * const.REACT_GET_W
+            - math.sqrt(s.reactions_post * const.REACT_POST_K) * const.REACT_POST_W
         )
-        ** const.SCORE_COEFFICIENT,
+        * 100,
         2,
     )
