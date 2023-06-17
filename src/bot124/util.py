@@ -88,18 +88,54 @@ def filter_rules(
 
 
 def calc_score(s: models.Score) -> float:
+    if (
+        s.vcs_joined == 0
+        and s.reactions_get == 0
+        and s.reactions_post == 0
+        and s.new_words == 0
+    ):
+        return 0.0
+
+    if (
+        s.total_bytes is not None
+        and s.total_messages is not None
+        and s.total_messages > 0
+    ):
+        if s.total_bytes / s.total_messages >= const.LEN_FACTOR_THRESHOLD:
+            len_factor: float = const.LEN_FACTOR_DIVISOR * const.LEN_MULTIPLIER
+        else:
+            len_factor: float = (
+                s.total_bytes / s.total_messages
+            ) / const.LEN_FACTOR_DIVISOR
+    else:
+        len_factor: float = const.LEN_FACTOR_DEF
+
+    if s.vcs_joined > 0:
+        if s.vcs_time / s.vcs_joined > const.VCS_FACTOR_THRESHOLD:
+            vcs_factor: float = const.VCS_FACTOR_DIVISOR * 0.5
+        else:
+            vcs_factor: float = (s.vcs_time / s.vcs_joined) / const.VCS_FACTOR_DIVISOR
+    else:
+        vcs_factor: float = const.VCS_FACTOR_DEF
+
     return round(
-        const.MSGS_WEIGHT * (s.total_messages / (s.total_messages + s.total_bytes + 1))
-        + const.BYTES_WEIGHT * (s.total_bytes / (s.total_messages + s.total_bytes + 1))
-        + const.VC_JOIN_WEIGHT * (s.vcs_joined / (s.total_messages + s.vcs_joined + 1))
-        + const.VC_TIME_WEIGHT * (s.vcs_time / (s.vcs_joined + s.vcs_time + 1))
-        + const.NEW_WORDS_WEIGHT
-        * log(models.DB.query(models.WordCloud.word).count() + 1)  # type: ignore
-        * s.new_words
-        + const.REACTIONS_POST_WEIGHT
-        * min(s.reactions_post / max(s.reactions_get, 1), 1)
-        + const.REACTIONS_GET_WEIGHT
-        * (s.reactions_get / (s.total_messages + 1))
-        * const.SCORE_MULT,
+        const.SCORE_MULT
+        * (
+            sum(
+                stat * weight
+                for stat, weight in zip(
+                    (s.new_words, s.reactions_get + s.reactions_post),
+                    (
+                        const.NEW_WORDS_WEIGHT_MULTIPLIER,
+                        const.REACTION_WEIGHT_MULTIPLIER,
+                    ),
+                )
+                if stat > 0
+            )
+            / const.SCORE_DIVISOR
+            * len_factor
+            * vcs_factor
+        )
+        ** const.SCORE_COEFFICIENT,
         2,
     )

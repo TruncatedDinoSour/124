@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 """124bot constants"""
 
-from math import cos, e, pi
 from typing import Final
 
 from reactionmenu import ReactionButton  # type: ignore
@@ -27,11 +26,15 @@ MIN_CONFESSION_LIMIT: Final[int] = 500
 
 # random constants for obscurity ig
 
-BYTES_WEIGHT: Final[float] = (1 + 5**0.5) / 9.2
-VC_JOIN_WEIGHT: Final[float] = BYTES_WEIGHT * 1.05
-VC_TIME_WEIGHT: Final[float] = e / pi / 3.5
-MSGS_WEIGHT: Final[float] = (BYTES_WEIGHT + VC_JOIN_WEIGHT + VC_TIME_WEIGHT) / 5.5
-NEW_WORDS_WEIGHT: Final[float] = cos(BYTES_WEIGHT) / 20
-SCORE_MULT: Final[float] = 0.1 - cos(e) * 113
-REACTIONS_POST_WEIGHT: Final[float] = BYTES_WEIGHT / 3
-REACTIONS_GET_WEIGHT: Final[float] = NEW_WORDS_WEIGHT * 7
+LEN_FACTOR_DIVISOR: Final[float] = 500
+LEN_FACTOR_THRESHOLD: Final[float] = 250
+VCS_FACTOR_DIVISOR: Final[float] = 1500
+VCS_FACTOR_THRESHOLD: Final[float] = 1000
+NEW_WORDS_WEIGHT_MULTIPLIER: Final[float] = 0.15
+REACTION_WEIGHT_MULTIPLIER: Final[float] = 0.1
+SCORE_DIVISOR: Final[float] = 10
+LEN_FACTOR_DEF: Final[float] = 0.025
+SCORE_MULT: Final[float] = 1e7
+LEN_MULTIPLIER: Final[float] = 0.5
+VCS_FACTOR_DEF: Final[float] = 0
+SCORE_COEFFICIENT: Final[float] = 1.1

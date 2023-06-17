@@ -208,11 +208,11 @@ async def wordcloud(
         else tuple(r for r in q.all() if r.word in query or query in r.word)
     )
 
-    ql: int = len(q)
+    ql: int = models.DB.query(models.WordCloud.usage).count()  # type: ignore
 
     await menu.text_menu(
         msg,
-        f"word cloud ( {ql}/{models.DB.query(models.WordCloud.usage).count()} word( s ) )\n\n"
+        f"word cloud ( {len(q)}/{ql} word( s ) )\n\n"
         + (
             "".join(
                 f"{idx}, {w.word} ( {w.usage} ( {w.usage / ql * 100:.2f}% ) )\n"
