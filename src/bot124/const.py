@@ -24,10 +24,10 @@ WORDCLOUD_WRAP: Final[int] = 540
 MIN_RULES_LIMIT: Final[int] = 1000
 MIN_CONFESSION_LIMIT: Final[int] = 500
 
-MSGS_W: Final[float] = 0.25
-VCS_W: Final[float] = 0.22
-WC_W: Final[float] = 0.32
+MSGS_W: Final[float] = 0.1
+VCS_W: Final[float] = 0.2
+WC_W: Final[float] = 0.25
 REACT_GET_W: Final[float] = 0.2
-REACT_POST_W: Final[float] = 0.14
+REACT_POST_W: Final[float] = 0.15
 
 REACT_POST_K: Final[float] = 0.7
