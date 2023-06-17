@@ -39,6 +39,9 @@ class SQLiteDB:
     def commit(self) -> None:
         self.session.commit()
 
+    def query(self, *args: typing.Any, **kwargs: typing.Any) -> Session.query:
+        return self.session.query(*args, **kwargs)
+
     def add(self, what: typing.Any) -> None:
         try:
             self.session.add(what)

@@ -31,4 +31,7 @@ BYTES_WEIGHT: Final[float] = (1 + 5**0.5) / 9.2
 VC_JOIN_WEIGHT: Final[float] = BYTES_WEIGHT * 1.05
 VC_TIME_WEIGHT: Final[float] = e / pi / 3.5
 MSGS_WEIGHT: Final[float] = (BYTES_WEIGHT + VC_JOIN_WEIGHT + VC_TIME_WEIGHT) / 5.5
+NEW_WORDS_WEIGHT: Final[float] = cos(BYTES_WEIGHT) / 20
 SCORE_MULT: Final[float] = 0.1 - cos(e) * 113
+REACTIONS_POST_WEIGHT: Final[float] = BYTES_WEIGHT / 3
+REACTIONS_GET_WEIGHT: Final[float] = NEW_WORDS_WEIGHT * 7

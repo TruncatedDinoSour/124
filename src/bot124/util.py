@@ -4,6 +4,7 @@
 
 import typing
 from datetime import datetime
+from math import log
 
 from discord import User
 
@@ -12,7 +13,7 @@ from . import const, models
 
 def get_score(id: int) -> models.Score:
     sql_obj: typing.Any = (
-        models.DB.session.query(models.Score).where(models.Score.author == id).first()
+        models.DB.query(models.Score).where(models.Score.author == id).first()
     )
 
     if sql_obj is None:
@@ -43,7 +44,7 @@ def filter_rule_like(
     yyyymmddhh_before: typing.Optional[str] = None,
     yyyymmddhh_after: typing.Optional[str] = None,
 ) -> typing.Any:  # type: ignore
-    q: typing.Any = models.DB.session.query(model)
+    q: typing.Any = models.DB.query(model)
 
     if id is not None:
         q = q.filter(model.id == id)
@@ -88,15 +89,17 @@ def filter_rules(
 
 def calc_score(s: models.Score) -> float:
     return round(
-        (
-            const.MSGS_WEIGHT
-            * (s.total_messages / (s.total_messages + s.total_bytes + 1))
-            + const.BYTES_WEIGHT
-            * (s.total_bytes / (s.total_messages + s.total_bytes + 1))
-            + const.VC_JOIN_WEIGHT
-            * (s.vcs_joined / (s.total_messages + s.vcs_joined + 1))
-            + const.VC_TIME_WEIGHT * (s.vcs_time / (s.vcs_joined + s.vcs_time + 1))
-        )
+        const.MSGS_WEIGHT * (s.total_messages / (s.total_messages + s.total_bytes + 1))
+        + const.BYTES_WEIGHT * (s.total_bytes / (s.total_messages + s.total_bytes + 1))
+        + const.VC_JOIN_WEIGHT * (s.vcs_joined / (s.total_messages + s.vcs_joined + 1))
+        + const.VC_TIME_WEIGHT * (s.vcs_time / (s.vcs_joined + s.vcs_time + 1))
+        + const.NEW_WORDS_WEIGHT
+        * log(models.DB.query(models.WordCloud.word).count() + 1)  # type: ignore
+        * s.new_words
+        + const.REACTIONS_POST_WEIGHT
+        * min(s.reactions_post / max(s.reactions_get, 1), 1)
+        + const.REACTIONS_GET_WEIGHT
+        * (s.reactions_get / (s.total_messages + 1))
         * const.SCORE_MULT,
         2,
     )

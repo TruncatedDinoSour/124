@@ -42,8 +42,9 @@ class Bot124(discord.Client):
         for guild in self.guilds:
             for vc in guild.voice_channels:
                 for member in vc.members:
-                    util.get_score(member.id).vcs_joined += 1
-                    self.vc_times.add(member.id)
+                    if not member.bot:
+                        util.get_score(member.id).vcs_joined += 1
+                        self.vc_times.add(member.id)
 
         await self.ct.sync()
         self.loop.create_task(self._update_vc_score())
@@ -63,16 +64,17 @@ class Bot124(discord.Client):
                 .strip()
                 .split()
             ).items():
-                sql_obj = (
-                    models.DB.session.query(models.WordCloud)
-                    .where(models.WordCloud.word == word)
+                wc: typing.Optional[models.WordCloud] = (  # type: ignore
+                    models.DB.query(models.WordCloud)
+                    .where(models.WordCloud.word == word)  # type: ignore
                     .first()
                 )
 
-                if sql_obj is None:
-                    models.DB.add(sql_obj := models.WordCloud(word=word))
+                if wc is None:
+                    models.DB.add(wc := models.WordCloud(word=word))
+                    score.new_words += 1
 
-                sql_obj.usage += usage
+                wc.usage += usage
 
             models.DB.commit()
 
@@ -134,6 +136,9 @@ class Bot124(discord.Client):
         before: discord.VoiceState,
         after: discord.VoiceState,
     ) -> None:
+        if member.bot:
+            return
+
         score: models.Score = util.get_score(member.id)
 
         if before.channel is None and after.channel is not None:
@@ -147,3 +152,21 @@ class Bot124(discord.Client):
             self.vc_times.remove(member.id)
 
         models.DB.commit()
+
+    async def on_reaction_add(
+        self, reaction: discord.Reaction, user: discord.User
+    ) -> None:
+        if user.bot or reaction.message.author.bot or reaction.message.author.id == user.id:
+            return
+
+        util.get_score(user.id).reactions_post += 1
+        util.get_score(reaction.message.author.id).reactions_get += 1
+
+    async def on_reaction_remove(
+        self, reaction: discord.Reaction, user: discord.User
+    ) -> None:
+        if user.bot or reaction.message.author.bot or reaction.message.author.id == user.id:
+            return
+
+        util.get_score(user.id).reactions_post -= 1
+        util.get_score(reaction.message.author.id).reactions_get -= 1

@@ -80,7 +80,7 @@ async def rules(
     )
 
     rules: str = (
-        f"rules ( {len(q)}/{models.DB.session.query(models.Rule.id).count()} result( s ) ) :\n\n"
+        f"rules ( {len(q)}/{models.DB.query(models.Rule.id).count()} result( s ) ) :\n\n"
         if id is None
         else ""
     )
@@ -97,11 +97,11 @@ async def lb(msg: discord.interactions.Interaction) -> None:  # type: ignore
 
     lb: typing.Dict[int, int] = {}
 
-    for (author,) in models.DB.session.query(
+    for (author,) in models.DB.query(
         sqlalchemy.distinct(models.Rule.author)
     ).all():
         lb[author] = (
-            models.DB.session.query(sqlalchemy.distinct(models.Rule.id))
+            models.DB.query(sqlalchemy.distinct(models.Rule.id))
             .where(models.Rule.author == author)
             .count()
         )
@@ -131,7 +131,7 @@ async def score(msg: discord.interactions.Interaction, user: typing.Optional[dis
         return
 
     score: typing.Any = (
-        models.DB.session.query(models.Score)
+        models.DB.query(models.Score)
         .where(models.Score.author == (msg.user.id if user is None else user.id))  # type: ignore
         .first()
     )
@@ -150,7 +150,7 @@ async def score(msg: discord.interactions.Interaction, user: typing.Optional[dis
 async def scores(msg: discord.interactions.Interaction) -> None:  # type: ignore
     """get chat scores"""
 
-    scores: typing.Any = models.DB.session.query(models.Score).all()
+    scores: typing.Any = models.DB.query(models.Score).all()
 
     if not scores:
         await menu.text_menu(msg, "no people currently have a score")
@@ -187,7 +187,7 @@ async def wordcloud(
 ) -> None:  # type: ignore
     """get the word cloud by filter, limit and query"""
 
-    q: typing.Any = models.DB.session.query(models.WordCloud).order_by(
+    q: typing.Any = models.DB.query(models.WordCloud).order_by(
         models.WordCloud.usage.desc()
     )
 
@@ -212,7 +212,7 @@ async def wordcloud(
 
     await menu.text_menu(
         msg,
-        f"word cloud ( {ql}/{models.DB.session.query(models.WordCloud.usage).count()} word( s ) )\n\n"
+        f"word cloud ( {ql}/{models.DB.query(models.WordCloud.usage).count()} word( s ) )\n\n"
         + (
             "".join(
                 f"{idx}, {w.word} ( {w.usage} ( {w.usage / ql * 100:.2f}% ) )\n"
@@ -258,7 +258,7 @@ async def confessions(
         else tuple(c for c in q.all() if c.content in query or query in c.content)
     )
 
-    confession_count: int = models.DB.session.query(models.Confession.id).count()
+    confession_count: int = models.DB.query(models.Confession.id).count()
 
     await menu.menu(
         msg,
