@@ -94,7 +94,7 @@ def calc_score(s: models.Score) -> float:
                 (
                     math.sqrt(
                         math.sqrt(s.total_bytes / (s.total_messages + 1)) * const.MSGS_W
-                        + math.sqrt(abs(math.log(s.vcs_time + 1) / (s.vcs_joined + 1)))
+                        + math.sqrt(s.vcs_time / (s.vcs_joined + 1))
                         * const.VCS_W
                         + s.new_words * const.WC_W
                         + math.sqrt(s.reactions_get) * const.REACT_GET_W
