@@ -33,3 +33,6 @@ REACT_POST_K: Final[float] = 0.7
 K_MULT: Final[float] = 300
 SCORE_MULT: Final[float] = 50
 SCORE_E: Final[float] = 0.69
+
+STAR_EMOJI: Final[str] = "⭐"
+STAR_COUNT: Final[int] = 3

@@ -120,3 +120,23 @@ class Confession:
     def __init__(self, content: str) -> None:
         self.content = content  # type: ignore
         self.timestamp = round(datetime.datetime.utcnow().timestamp())  # type: ignore
+
+
+@DB.table
+class StarBoard:
+    id: sqlalchemy.Column[int] = sqlalchemy.Column(
+        sqlalchemy.Integer,
+        primary_key=True,
+        unique=True,
+        nullable=False,
+    )
+    star_channel: sqlalchemy.Column[int] = sqlalchemy.Column(
+        sqlalchemy.Integer,
+    )
+    starred_msgs: sqlalchemy.Column[str] = sqlalchemy.Column(
+        sqlalchemy.String,
+    )
+
+    def __init__(self, id: int) -> None:
+        self.id = id  # type: ignore
+        self.starred_msgs = ""  # type: ignore

@@ -22,6 +22,17 @@ def get_score(id: int) -> models.Score:
     return sql_obj
 
 
+def get_starboard(id: int) -> models.StarBoard:
+    sql_obj: typing.Any = (
+        models.DB.query(models.StarBoard).where(models.StarBoard.id == id).first()  # type: ignore
+    )
+
+    if sql_obj is None:
+        models.DB.add(sql_obj := models.StarBoard(id=id))
+
+    return sql_obj
+
+
 def datetime_s(ts: int) -> str:
     return datetime.utcfromtimestamp(ts).strftime("%Y/%m/%d %H:%M")
 

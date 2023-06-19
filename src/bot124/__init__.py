@@ -173,6 +173,24 @@ class Bot124(discord.Client):
         self, reaction: discord.Reaction, user: discord.User
     ) -> None:
         if (
+            str(reaction.emoji) == const.STAR_EMOJI
+            and reaction.count >= const.STAR_COUNT
+            and reaction.message.guild
+            and (
+                channel_id := (
+                    sb := util.get_starboard(reaction.message.guild.id)
+                ).star_channel
+            )
+            and (channel := self.get_channel(channel_id)) is not None
+            and f"{reaction.message.id}," not in sb.starred_msgs
+        ):
+            sb.starred_msgs += f"{reaction.message.id},"
+            models.DB.commit()
+            await channel.send(
+                f"{reaction.message.jump_url} • {reaction.message.author.mention} • >={const.STAR_COUNT} {const.STAR_EMOJI}\n\n{reaction.message.content[:const.MESSAGE_WRAP_LEN]}"
+            )
+
+        if (
             user.bot
             or reaction.message.author.bot
             or reaction.message.author.id == user.id
@@ -181,6 +199,7 @@ class Bot124(discord.Client):
 
         util.get_score(user.id).reactions_post += 1
         util.get_score(reaction.message.author.id).reactions_get += 1
+        models.DB.commit()
 
     async def on_reaction_remove(
         self, reaction: discord.Reaction, user: discord.User
@@ -194,3 +213,4 @@ class Bot124(discord.Client):
 
         util.get_score(user.id).reactions_post -= 1
         util.get_score(reaction.message.author.id).reactions_get -= 1
+        models.DB.commit()

@@ -6,6 +6,7 @@ import typing
 from functools import wraps
 
 import discord
+from . import menu
 import discord.app_commands  # type: ignore
 
 __all__: tuple[str] = ("CommandManager",)
@@ -27,6 +28,17 @@ class CommandManager:
             return await fn(*args, **kwargs)
 
         self.cmds.append(wrapper)
+        return wrapper
+
+    def admin(
+        self, fn: typing.Callable[..., typing.Any]
+    ) -> typing.Callable[..., typing.Any]:
+        @wraps(fn)
+        async def wrapper(*args: typing.Any, **kwargs: typing.Any) -> typing.Any:
+            if args[0].user.guild_permissions.administrator:
+                return await fn(*args, **kwargs)
+            await menu.text_menu(args[0], "you have no permissions to run this command")
+
         return wrapper
 
     def register_commands(self, ct: discord.app_commands.CommandTree) -> None:

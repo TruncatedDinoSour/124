@@ -97,9 +97,7 @@ async def lb(msg: discord.interactions.Interaction) -> None:  # type: ignore
 
     lb: typing.Dict[int, int] = {}
 
-    for (author,) in models.DB.query(
-        sqlalchemy.distinct(models.Rule.author)
-    ).all():
+    for (author,) in models.DB.query(sqlalchemy.distinct(models.Rule.author)).all():
         lb[author] = (
             models.DB.query(sqlalchemy.distinct(models.Rule.id))
             .where(models.Rule.author == author)
@@ -265,5 +263,16 @@ async def confessions(
         tuple(
             f"*confession #{c.id}, {len(q)}/{confession_count} result( s ) on {util.datetime_s(c.timestamp)}*\n\n{c.content}"
             for c in q
-        ),
+        )
+        or ("no confessions found",),
     )
+
+
+@cmds.new
+@cmds.admin
+async def starboard(
+    msg: discord.interactions.Interaction, channel: discord.channel.TextChannel
+) -> None:
+    util.get_starboard(msg.guild.id).star_channel = channel.id
+    models.DB.commit()
+    await menu.text_menu(msg, f"set starboard channel to <#{channel.id}>")
