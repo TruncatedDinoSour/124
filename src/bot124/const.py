@@ -23,6 +23,7 @@ MIN_WORDCLOUD_LIMIT: Final[int] = 500
 WORDCLOUD_WRAP: Final[int] = 540
 MIN_RULES_LIMIT: Final[int] = 1000
 MIN_CONFESSION_LIMIT: Final[int] = 500
+STARBOARD_WRAP_LEN: Final[int] = MESSAGE_WRAP_LEN - 128
 
 MSGS_W: Final[float] = 0.1
 VCS_W: Final[float] = 0.2
