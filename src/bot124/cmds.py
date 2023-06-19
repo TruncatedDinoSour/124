@@ -271,8 +271,13 @@ async def confessions(
 @cmds.new
 @cmds.admin
 async def starboard(
-    msg: discord.interactions.Interaction, channel: discord.channel.TextChannel
+    msg: discord.interactions.Interaction, channel: typing.Optional[discord.channel.TextChannel] = None
 ) -> None:
+    """set starboard channel"""
+
+    if channel is None:
+        channel = msg.channel
+
     util.get_starboard(msg.guild.id).star_channel = channel.id
     models.DB.commit()
     await menu.text_menu(msg, f"set starboard channel to <#{channel.id}>")
