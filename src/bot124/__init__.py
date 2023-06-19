@@ -186,9 +186,14 @@ class Bot124(discord.Client):
         ):
             sb.starred_msgs += f"{reaction.message.id},"
             models.DB.commit()
+
             await channel.send(  # type: ignore
                 f"{reaction.message.jump_url} • {reaction.message.author.mention} • >={const.STAR_COUNT} {const.STAR_EMOJI}\n\n\
-{reaction.message.content[:const.STARBOARD_WRAP_LEN]}"
+{reaction.message.content[:const.STARBOARD_WRAP_LEN]}".strip(),
+                files=[
+                    await attachment.to_file()
+                    for attachment in reaction.message.attachments
+                ],
             )
 
         if (
