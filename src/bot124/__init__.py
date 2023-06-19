@@ -108,6 +108,9 @@ class Bot124(discord.Client):
                 if content != msg.content:
                     break
 
+            if not (content := content.strip()):
+                return
+
             try:
                 models.DB.add(
                     rule := models.Rule(
