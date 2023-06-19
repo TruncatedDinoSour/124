@@ -185,6 +185,7 @@ class Bot124(discord.Client):
             and f"{reaction.message.id}," not in sb.starred_msgs
         ):
             sb.starred_msgs += f"{reaction.message.id},"
+            util.get_score(reaction.message.author.id).starboard_score += 1
             models.DB.commit()
 
             await channel.send(  # type: ignore

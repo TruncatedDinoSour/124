@@ -113,6 +113,7 @@ def calc_score(s: models.Score) -> float:
                 .count()
                 + 1
             )
+            + s.starboard_score * const.STAR_W
             - math.sqrt(s.reactions_post * const.REACT_POST_K) * const.REACT_POST_W
         ),
     )

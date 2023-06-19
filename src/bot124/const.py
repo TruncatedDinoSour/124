@@ -30,9 +30,13 @@ VCS_W: Final[float] = 0.2
 WC_W: Final[float] = 0.15
 REACT_GET_W: Final[float] = 0.2
 REACT_POST_W: Final[float] = 0.1
+STAR_W: Final[float] = 0.5
+
 REACT_POST_K: Final[float] = 0.7
+
 K_MULT: Final[float] = 300
 SCORE_MULT: Final[float] = 50
+
 SCORE_E: Final[float] = 0.69
 
 STAR_EMOJI: Final[str] = "⭐"
