@@ -80,7 +80,8 @@ class Score:
     def __str__(self) -> str:
         return f"`{self.total_bytes}` b / `{self.total_messages}` msgs; `{self.vcs_time}` s \
 ( {humanize.precisedelta(datetime.timedelta(seconds=self.vcs_time), minimum_unit='seconds')} ) / `{self.vcs_joined}` vcs; \
-`{self.new_words}` wordcloud contributions; `{self.reactions_get}` reac recv; `{self.reactions_post}` reac given"  # type: ignore
+`{self.new_words}` wordcloud words; `{self.reactions_get}` reac recv; `{self.reactions_post}` reac given; \
+`{DB.query(Rule.id).where(Rule.author == self.author).count()}` rules"  # type: ignore
 
 
 @DB.table
