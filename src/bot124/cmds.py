@@ -2,10 +2,10 @@
 # -*- coding: utf-8 -*-
 """bot 124 commands"""
 
+import time
 import typing
 from datetime import datetime
 from enum import Enum
-import time
 
 import discord
 import discord.app_commands  # type: ignore
@@ -300,13 +300,13 @@ async def starboard(
 async def ai(
     msg: discord.interactions.Interaction,
     prompt: str,
-    ai: AICommands = AICommands.gpt4,
+    model: AICommands = AICommands.gpt4,
 ) -> None:
     """generate content using an AI large language model"""
 
     await msg.response.defer()
 
-    r: typing.Union[str, dict[str, str]] = ai.value.create(prompt)  # type: ignore
+    r: typing.Union[str, dict[str, str]] = model.value.create(prompt)  # type: ignore
 
     if type(r) is dict:
         r = str(r.get("text")) or "*no content*"  # type: ignore
@@ -320,7 +320,9 @@ async def ai(
 
 
 @cmds.new
-async def chatai(msg: discord.interactions.Interaction, ai: AICommands) -> None:
+async def chatai(
+    msg: discord.interactions.Interaction, model: AICommands = AICommands.gpt4
+) -> None:
     """create a thread with an AI model"""
 
     await msg.response.defer()
@@ -351,7 +353,7 @@ async def chatai(msg: discord.interactions.Interaction, ai: AICommands) -> None:
         async with thread.typing():
             while True:
                 try:
-                    r: typing.Union[str, dict[str, str]] = ai.value.create(chat)  # type: ignore
+                    r: typing.Union[str, dict[str, str]] = model.value.create(chat)  # type: ignore
                     break
                 except Exception:
                     time.sleep(0.5)
