@@ -25,10 +25,11 @@ MIN_RULES_LIMIT: Final[int] = 1000
 MIN_CONFESSION_LIMIT: Final[int] = 500
 
 MSGS_W: Final[float] = 0.1
-VCS_W: Final[float] = 0.4
-WC_W: Final[float] = 0.14
+VCS_W: Final[float] = 0.2
+WC_W: Final[float] = 0.15
 REACT_GET_W: Final[float] = 0.2
-REACT_POST_W: Final[float] = 0.15
+REACT_POST_W: Final[float] = 0.1
 REACT_POST_K: Final[float] = 0.7
-K_MULT: Final[float] = 100
+K_MULT: Final[float] = 300
 SCORE_MULT: Final[float] = 50
+SCORE_E: Final[float] = 0.69

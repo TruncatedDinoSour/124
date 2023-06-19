@@ -92,17 +92,18 @@ def calc_score(s: models.Score) -> float:
         0,
         const.SCORE_MULT
         * (
-            math.sqrt(s.total_bytes / (s.total_messages + 1)) * const.MSGS_W
-            + math.sqrt(s.vcs_time / (s.vcs_joined + 1)) * const.VCS_W
+            s.total_bytes / (s.total_messages + 1) * const.MSGS_W
+            + s.vcs_time / (s.vcs_joined + 1) * const.VCS_W
             + s.new_words * const.WC_W
             + math.sqrt(s.reactions_get) * const.REACT_GET_W
             - math.sqrt(s.reactions_post * const.REACT_POST_K) * const.REACT_POST_W
         ),
     )
 
-    k: float = 3 / (s.total_messages + s.vcs_joined + s.reactions_get) * const.K_MULT
-
-    return round(
-        score if k > score else score - k,
-        2,
+    data: tuple[int] = tuple(
+        v for k, v in s.__dict__.items() if k[0] != "_" and "_" in k
     )
+
+    k: float = len(data) / sum(data) * const.K_MULT
+
+    return round((score if k > score else score - k) ** const.SCORE_E, 2)
