@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 """bot 124 commands"""
 
+import asyncio
 import time
 import typing
 from datetime import datetime
@@ -336,10 +337,13 @@ async def chatai(
     await msg.followup.send(content=thread.jump_url)
     await thread.send(msg.user.mention)
 
-    while True:
-        m: discord.Message = await cmds.b.wait_for(  # type: ignore
-            "message", check=lambda m: m.channel == thread
-        )
+    while not thread.archived and not thread.locked and thread.member_count > 0:
+        try:
+            m: discord.Message = await cmds.b.wait_for(  # type: ignore
+                "message", check=lambda m: m.channel == thread
+            )
+        except asyncio.TimeoutError:
+            continue
 
         if not m.content:  # type: ignore
             continue
