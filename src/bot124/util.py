@@ -107,6 +107,12 @@ def calc_score(s: models.Score) -> float:
             + s.vcs_time / (s.vcs_joined + 1) * const.VCS_W
             + s.new_words * const.WC_W
             + math.sqrt(s.reactions_get) * const.REACT_GET_W
+            + math.log2(
+                models.DB.query(models.Rule.id)  # type: ignore
+                .where(models.Rule.author == s.author)
+                .count()
+                + 1
+            )
             - math.sqrt(s.reactions_post * const.REACT_POST_K) * const.REACT_POST_W
         ),
     )
