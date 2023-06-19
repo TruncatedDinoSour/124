@@ -7,6 +7,9 @@ import typing
 import discord
 import discord.app_commands  # type: ignore
 import sqlalchemy
+from freeGPT import alpaca_7b as a7
+from freeGPT import gpt3 as g3
+from freeGPT import gpt4 as g4
 
 from . import const, menu, models, util
 from .cmdmgr import CommandManager
@@ -271,7 +274,8 @@ async def confessions(
 @cmds.new
 @cmds.admin
 async def starboard(
-    msg: discord.interactions.Interaction, channel: typing.Optional[discord.channel.TextChannel] = None
+    msg: discord.interactions.Interaction,
+    channel: typing.Optional[discord.channel.TextChannel] = None,
 ) -> None:
     """set starboard channel"""
 
@@ -281,3 +285,27 @@ async def starboard(
     util.get_starboard(msg.guild.id).star_channel = channel.id
     models.DB.commit()
     await menu.text_menu(msg, f"set starboard channel to <#{channel.id}>")
+
+
+@cmds.new
+async def gpt3(msg: discord.interactions.Interaction, prompt: str) -> None:
+    """generate content using gpt3 model"""
+
+    await msg.response.defer()
+    await msg.followup.send(content=str(g3.Completion.create(prompt=prompt)["text"])[:2000])  # type: ignore
+
+
+@cmds.new
+async def gpt4(msg: discord.interactions.Interaction, prompt: str) -> None:
+    """generate content using gpt4 model"""
+
+    await msg.response.defer()
+    await msg.followup.send(content=str(g4.Completion.create(prompt=prompt))[:2000])  # type: ignore
+
+
+@cmds.new
+async def alpaca7(msg: discord.interactions.Interaction, prompt: str) -> None:
+    """generate content using alpaca 7 billion model"""
+
+    await msg.response.defer()
+    await msg.followup.send(content=str(a7.Completion.create(prompt=prompt))[:2000])  # type: ignore
