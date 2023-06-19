@@ -328,7 +328,7 @@ async def chatai(
     await msg.response.defer()
 
     thread: discord.Thread = await msg.channel.create_thread(  # type: ignore
-        name=(name := f"{msg.user.name}'s {ai.name!r} chat @ {datetime.utcnow()} UTC")  # type: ignore
+        name=(name := f"{msg.user.name}'s {model.name!r} chat @ {datetime.utcnow()} UTC")  # type: ignore
     )
     chat: str = f"{cmds.b.user.mention} welcome to {name!r}, you have access to this chat"  # type: ignore
 
@@ -362,7 +362,7 @@ async def chatai(
             r = str(r.get("text")) or "*no content*"  # type: ignore
 
         r = r[:2000]  # type: ignore
-        chat += f"\n{ai.name if cmds.b.user is None else cmds.b.user.mention} {r}"
+        chat += f"\n{model.name if cmds.b.user is None else cmds.b.user.mention} {r}"
         chat = chat.strip()
 
         await thread.send(r)
