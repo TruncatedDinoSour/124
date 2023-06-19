@@ -296,27 +296,21 @@ async def starboard(
 
 
 @cmds.new
-async def gpt3(msg: discord.interactions.Interaction, prompt: str) -> None:
-    """generate content using gpt3 model"""
+async def ai(
+    msg: discord.interactions.Interaction,
+    prompt: str,
+    ai: AICommands = AICommands.gpt4,
+) -> None:
+    """generate content using an AI large language model"""
 
     await msg.response.defer()
-    await msg.followup.send(content=str(g3.Completion.create(prompt=prompt)["text"])[:2000])  # type: ignore
 
+    r: typing.Union[str, dict[str, str]] = ai.value.create(prompt)  # type: ignore
 
-@cmds.new
-async def gpt4(msg: discord.interactions.Interaction, prompt: str) -> None:
-    """generate content using gpt4 model"""
+    if type(r) is dict:
+        r = str(r.get("text")) or "*no content*"  # type: ignore
 
-    await msg.response.defer()
-    await msg.followup.send(content=str(g4.Completion.create(prompt=prompt))[:2000])  # type: ignore
-
-
-@cmds.new
-async def alpaca7(msg: discord.interactions.Interaction, prompt: str) -> None:
-    """generate content using alpaca 7 billion model"""
-
-    await msg.response.defer()
-    await msg.followup.send(content=str(a7.Completion.create(prompt=prompt))[:2000])  # type: ignore
+    await msg.followup.send(content=r[:2000])  # type: ignore
 
 
 @cmds.new
