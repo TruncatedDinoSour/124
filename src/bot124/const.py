@@ -29,5 +29,6 @@ VCS_W: Final[float] = 0.18
 WC_W: Final[float] = 0.14
 REACT_GET_W: Final[float] = 0.2
 REACT_POST_W: Final[float] = 0.15
-
 REACT_POST_K: Final[float] = 0.7
+K_MULT: Final[float] = 50
+SCORE_MULT: Final[float] = 50

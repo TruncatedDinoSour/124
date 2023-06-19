@@ -88,24 +88,21 @@ def filter_rules(
 
 
 def calc_score(s: models.Score) -> float:
+    score: float = max(
+        0,
+        const.SCORE_MULT
+        * (
+            math.sqrt(s.total_bytes / (s.total_messages + 1)) * const.MSGS_W
+            + math.sqrt(s.vcs_time / (s.vcs_joined + 1)) * const.VCS_W
+            + s.new_words * const.WC_W
+            + math.sqrt(s.reactions_get) * const.REACT_GET_W
+            - math.sqrt(s.reactions_post * const.REACT_POST_K) * const.REACT_POST_W
+        ),
+    )
+
+    k: float = 3 / (s.total_messages + s.vcs_joined + s.reactions_get) * const.K_MULT
+
     return round(
-        abs(
-            math.log(
-                (
-                    math.sqrt(
-                        math.sqrt(s.total_bytes / (s.total_messages + 1)) * const.MSGS_W
-                        + math.sqrt(s.vcs_time / (s.vcs_joined + 1))
-                        * const.VCS_W
-                        + s.new_words * const.WC_W
-                        + math.sqrt(s.reactions_get) * const.REACT_GET_W
-                        - math.sqrt(s.reactions_post * const.REACT_POST_K)
-                        * const.REACT_POST_W
-                    )
-                    * 50
-                )
-                + 1
-            ) / 2
-        )
-        * 69,
+        score if k > score else score - k,
         2,
     )
