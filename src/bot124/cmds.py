@@ -5,6 +5,7 @@
 import typing
 from datetime import datetime
 from enum import Enum
+import time
 
 import discord
 import discord.app_commands  # type: ignore
@@ -310,7 +311,12 @@ async def ai(
     if type(r) is dict:
         r = str(r.get("text")) or "*no content*"  # type: ignore
 
-    await msg.followup.send(content=r[:2000])  # type: ignore
+    while True:
+        try:
+            await msg.followup.send(content=r[:2000])  # type: ignore
+            break
+        except Exception:
+            time.sleep(0.5)
 
 
 @cmds.new
@@ -343,7 +349,12 @@ async def chatai(msg: discord.interactions.Interaction, ai: AICommands) -> None:
             continue
 
         async with thread.typing():
-            r: typing.Union[str, dict[str, str]] = ai.value.create(chat)  # type: ignore
+            while True:
+                try:
+                    r: typing.Union[str, dict[str, str]] = ai.value.create(chat)  # type: ignore
+                    break
+                except Exception:
+                    time.sleep(0.5)
 
         if type(r) is dict:
             r = str(r.get("text")) or "*no content*"  # type: ignore
