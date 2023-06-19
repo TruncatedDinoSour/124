@@ -14,3 +14,13 @@ python3 src/main.py
 ```
 
 ty
+
+# todo
+
+- [ ] starboard
+- [x] fix muted score ( no score while muted )
+- [ ] auto inflation of score ?
+    - [ ] economy ?
+- [ ] less initial score growing
+- [ ] music function
+- [ ] actions logger

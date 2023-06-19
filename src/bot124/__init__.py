@@ -42,9 +42,18 @@ class Bot124(discord.Client):
         for guild in self.guilds:
             for vc in guild.voice_channels:
                 for member in vc.members:
-                    if not member.bot:
+                    if member.voice and not any(
+                        (
+                            member.voice.mute,
+                            member.voice.self_mute,
+                            member.voice.deaf,
+                            member.voice.self_deaf,
+                        )
+                    ):
                         util.get_score(member.id).vcs_joined += 1
                         self.vc_times.add(member.id)
+
+        models.DB.commit()
 
         await self.ct.sync()
         self.loop.create_task(self._update_vc_score())
@@ -65,7 +74,7 @@ class Bot124(discord.Client):
                 .split()
             ).items():
                 wc: typing.Optional[models.WordCloud] = (  # type: ignore
-                    models.DB.query(models.WordCloud)
+                    models.DB.query(models.WordCloud)  # type: ignore
                     .where(models.WordCloud.word == word)  # type: ignore
                     .first()
                 )
@@ -74,7 +83,7 @@ class Bot124(discord.Client):
                     models.DB.add(wc := models.WordCloud(word=word))
                     score.new_words += 1
 
-                wc.usage += usage
+                wc.usage += usage  # type: ignore
 
             models.DB.commit()
 
@@ -136,27 +145,38 @@ class Bot124(discord.Client):
         before: discord.VoiceState,
         after: discord.VoiceState,
     ) -> None:
-        if member.bot:
+        if member.bot or member.voice is None:
+            self.vc_times.discard(member.id)
             return
 
         score: models.Score = util.get_score(member.id)
+        not_muted: bool = not (
+            member.voice.mute
+            or member.voice.self_mute
+            or member.voice.deaf
+            or member.voice.self_deaf
+        )
 
         if before.channel is None and after.channel is not None:
-            self.vc_times.add(member.id)
             score.vcs_joined += 1
-        elif (
-            member.id in self.vc_times
-            and before.channel is not None
-            and after.channel is None
-        ):
-            self.vc_times.remove(member.id)
+        elif before.channel is not None and after.channel is None:
+            self.vc_times.discard(member.id)
+
+        if not_muted:
+            self.vc_times.add(member.id)
+        else:
+            self.vc_times.discard(member.id)
 
         models.DB.commit()
 
     async def on_reaction_add(
         self, reaction: discord.Reaction, user: discord.User
     ) -> None:
-        if user.bot or reaction.message.author.bot or reaction.message.author.id == user.id:
+        if (
+            user.bot
+            or reaction.message.author.bot
+            or reaction.message.author.id == user.id
+        ):
             return
 
         util.get_score(user.id).reactions_post += 1
@@ -165,7 +185,11 @@ class Bot124(discord.Client):
     async def on_reaction_remove(
         self, reaction: discord.Reaction, user: discord.User
     ) -> None:
-        if user.bot or reaction.message.author.bot or reaction.message.author.id == user.id:
+        if (
+            user.bot
+            or reaction.message.author.bot
+            or reaction.message.author.id == user.id
+        ):
             return
 
         util.get_score(user.id).reactions_post -= 1
