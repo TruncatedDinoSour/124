@@ -3,13 +3,15 @@
 """bot 124 commands"""
 
 import typing
+from datetime import datetime
+from enum import Enum
 
 import discord
 import discord.app_commands  # type: ignore
 import sqlalchemy
-from freeGPT import alpaca_7b as a7
-from freeGPT import gpt3 as g3
-from freeGPT import gpt4 as g4
+from freeGPT import alpaca_7b as a7  # type: ignore
+from freeGPT import gpt3 as g3  # type: ignore
+from freeGPT import gpt4 as g4  # type: ignore
 
 from . import const, menu, models, util
 from .cmdmgr import CommandManager
@@ -17,6 +19,12 @@ from .cmdmgr import CommandManager
 __all__: tuple[str] = ("cmds",)
 
 cmds: CommandManager = CommandManager()
+
+
+class AICommands(Enum):
+    gpt3 = g3.Completion
+    gpt4 = g4.Completion
+    alpaca7 = a7.Completion
 
 
 @cmds.new
@@ -309,3 +317,44 @@ async def alpaca7(msg: discord.interactions.Interaction, prompt: str) -> None:
 
     await msg.response.defer()
     await msg.followup.send(content=str(a7.Completion.create(prompt=prompt))[:2000])  # type: ignore
+
+
+@cmds.new
+async def chatai(msg: discord.interactions.Interaction, ai: AICommands) -> None:
+    """create a thread with an AI model"""
+
+    await msg.response.defer()
+
+    thread: discord.Thread = await msg.channel.create_thread(  # type: ignore
+        name=(name := f"{msg.user.name}'s {ai.name!r} chat @ {datetime.utcnow()} UTC")  # type: ignore
+    )
+    chat: str = f"{cmds.b.user.mention} welcome to {name!r}, you have access to this chat"  # type: ignore
+
+    await msg.followup.send(content=thread.jump_url)
+    await thread.send(msg.user.mention)
+
+    while True:
+        m: discord.Message = await cmds.b.wait_for(  # type: ignore
+            "message", check=lambda m: m.channel == thread
+        )
+
+        if not m.content:  # type: ignore
+            continue
+
+        chat += f"\n{m.author.mention} {m.content}"  # type: ignore
+        chat = ("\n" + chat[-1999:]).strip()
+
+        if m.author.bot:  # type: ignore
+            continue
+
+        async with thread.typing():
+            r: typing.Union[str, dict[str, str]] = ai.value.create(chat)  # type: ignore
+
+        if type(r) is dict:
+            r = str(r.get("text")) or "*no content*"  # type: ignore
+
+        r = r[:2000]  # type: ignore
+        chat += f"\n{ai.name if cmds.b.user is None else cmds.b.user.mention} {r}"
+        chat = chat.strip()
+
+        await thread.send(r)
