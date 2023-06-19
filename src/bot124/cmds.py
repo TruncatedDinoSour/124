@@ -324,6 +324,7 @@ async def chatai(msg: discord.interactions.Interaction, ai: AICommands) -> None:
     )
     chat: str = f"{cmds.b.user.mention} welcome to {name!r}, you have access to this chat"  # type: ignore
 
+    await thread.add_user(msg.user)
     await msg.followup.send(content=thread.jump_url)
     await thread.send(msg.user.mention)
 
