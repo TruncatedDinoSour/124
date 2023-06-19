@@ -25,7 +25,7 @@ MIN_RULES_LIMIT: Final[int] = 1000
 MIN_CONFESSION_LIMIT: Final[int] = 500
 
 MSGS_W: Final[float] = 0.1
-VCS_W: Final[float] = 0.18
+VCS_W: Final[float] = 0.25
 WC_W: Final[float] = 0.14
 REACT_GET_W: Final[float] = 0.2
 REACT_POST_W: Final[float] = 0.15

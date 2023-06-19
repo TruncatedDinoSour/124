@@ -24,3 +24,4 @@ ty
 - [x] less initial score growing
 - [ ] music function
 - [ ] actions logger
+- [ ] value streaming in voice chats a bit more
