@@ -312,11 +312,14 @@ async def ai(
     if type(r) is dict:
         r = str(r.get("text")) or "*no content*"  # type: ignore
 
-    while True:
+    cnt: int = 0
+
+    while cnt < 3:
         try:
             await msg.followup.send(content=r[:2000])  # type: ignore
             break
         except Exception:
+            cnt += 1
             time.sleep(0.5)
 
 
@@ -337,12 +340,20 @@ async def chatai(
     await msg.followup.send(content=thread.jump_url)
     await thread.send(msg.user.mention)
 
-    while not thread.archived and not thread.locked and thread.member_count > 0:
+    cnt: int = 0
+
+    while (
+        cnt < 3
+        and not thread.archived
+        and not thread.locked
+        and thread.member_count > 0
+    ):
         try:
             m: discord.Message = await cmds.b.wait_for(  # type: ignore
                 "message", check=lambda m: m.channel == thread
             )
         except asyncio.TimeoutError:
+            cnt += 1
             continue
 
         if not m.content:  # type: ignore
