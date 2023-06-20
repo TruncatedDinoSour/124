@@ -133,7 +133,7 @@ class Bot124(discord.Client):
         if (c := member.guild.system_channel) is not None:
             await c.send(
                 f"w-wewcome {member.mention} ( {member.name}#{member.discriminator} ), XD have fun w-with @Clyde ( uppewcase c ), \
-s-see `/gpt3`, `/gpt4` ow `/alpaca7` too ^^, >_< a-awso d-dont miss o-out on `/rules` :3"
+s-see `/ai` and `/chatai` too ^^, >_< a-awso d-dont miss o-out on `/rules` :3"
             )
 
     async def on_member_remove(self, member: discord.member.Member):
