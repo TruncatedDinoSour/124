@@ -224,10 +224,11 @@ async def wordcloud(
     )
 
     ql: int = models.DB.query(models.WordCloud.usage).count()  # type: ignore
+    qa: int = models.DB.query(sqlalchemy.func.sum(models.WordCloud.usage)).scalar()  # type: ignore
 
     await menu.text_menu(
         msg,
-        f"word cloud ( {len(q)}/{ql} word( s ) )\n\n"
+        f"word cloud ( {len(q)}/{ql} unique word( s )/{qa} used words )\n{qa / ql:.2f} uses per word per avg\n\n"
         + (
             "".join(
                 f"{idx}, {w.word} ( {w.usage} ( {w.usage / ql * 100:.2f}% ) )\n"
