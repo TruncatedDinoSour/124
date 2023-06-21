@@ -177,7 +177,7 @@ s-see `/ai` and `/chatai` too ^^, >_< a-awso d-dont miss o-out on `/rules` :3"
     ) -> None:
         if (
             str(reaction.emoji) == const.STAR_EMOJI
-            and reaction.count >= const.STAR_COUNT
+            and sum([(not u.bot) async for u in reaction.users()]) >= const.STAR_COUNT
             and reaction.message.guild
             and (
                 channel_id := (
