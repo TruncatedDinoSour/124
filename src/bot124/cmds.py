@@ -54,7 +54,8 @@ async def status(
     await msg.followup.send(
         content="i am no longer doing anything"
         if reset
-        else f"i am now `{type.name} {value}`"
+        else f"i am now `{type.name} {value}`",
+        allowed_mentions=discord.mentions.AllowedMentions.none(),
     )
 
 
@@ -81,7 +82,10 @@ async def rules(
 
     if type(q) is str:
         await msg.response.defer()
-        await msg.followup.send(content=q)
+        await msg.followup.send(
+            content=q,
+            allowed_mentions=discord.mentions.AllowedMentions.none(),
+        )
         return
 
     q = q.limit(limit)
@@ -318,7 +322,10 @@ async def ai(
         except Exception:
             time.sleep(0.5)
 
-    await msg.followup.send(content=(r[:2000].strip()) or "*no content*")  # type: ignore
+    await msg.followup.send(
+        content=(r[:2000].strip()) or "*no content*",  # type: ignore
+        allowed_mentions=discord.mentions.AllowedMentions.none(),
+    )
 
 
 @cmds.new

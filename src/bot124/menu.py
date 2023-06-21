@@ -17,10 +17,17 @@ async def menu(
 ) -> None:
     if len(pages) == 1:
         await msg.response.defer()
-        await msg.followup.send(content=pages[0])
+        await msg.followup.send(
+            content=pages[0], allowed_mentions=discord.mentions.AllowedMentions.none()
+        )
         return
 
-    menu: ReactionMenu = ReactionMenu(msg, menu_type=ReactionMenu.TypeText, style="$/&")
+    menu: ReactionMenu = ReactionMenu(
+        msg,
+        menu_type=ReactionMenu.TypeText,
+        style="$/&",
+        allowed_mentions=discord.mentions.AllowedMentions.none(),
+    )
     menu.add_pages(pages)
     menu.add_buttons(const.BUTTONS)
     await menu.start()
