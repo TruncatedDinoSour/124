@@ -187,8 +187,10 @@ s-see `/ai` and `/chatai` too ^^, >_< a-awso d-dont miss o-out on `/rules` :3"
             and (channel := self.get_channel(channel_id)) is not None
             and f"{reaction.message.id}," not in sb.starred_msgs
         ):
+            if not user.bot:
+                util.get_score(reaction.message.author.id).starboard_score += 1
+
             sb.starred_msgs += f"{reaction.message.id},"
-            util.get_score(reaction.message.author.id).starboard_score += 1
             models.DB.commit()
 
             await channel.send(  # type: ignore

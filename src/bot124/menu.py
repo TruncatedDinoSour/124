@@ -36,9 +36,4 @@ async def menu(
 async def text_menu(
     msg: discord.interactions.Interaction, text: str, wrap: int = const.MESSAGE_WRAP_LEN
 ) -> None:
-    if len(text) <= const.MESSAGE_WRAP_LEN:
-        await msg.response.defer()
-        await msg.followup.send(content=text)
-        return
-
     await menu(msg, textwrap.wrap(text, wrap, replace_whitespace=False))

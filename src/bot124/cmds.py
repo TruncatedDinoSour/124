@@ -384,4 +384,7 @@ async def chatai(
         chat += f"\n{model.name if cmds.b.user is None else cmds.b.user.mention} {r}"
         chat = chat.strip()
 
-        await thread.send(r)
+        await thread.send(
+            r,
+            allowed_mentions=discord.mentions.AllowedMentions.none(),
+        )
