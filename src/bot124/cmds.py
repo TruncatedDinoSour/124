@@ -99,7 +99,7 @@ async def rules(
     )
 
     for r in q:
-        rules += f"{r.id}, {r.content} ( {'real' if r.real else 'fake'} rule ) by <@{r.author}> on {util.datetime_s(r.timestamp)}\n"
+        rules += f"{r.id}, {r.content} ( {'real' if r.real else 'fake'} rule ) by <@!{r.author}> on {util.datetime_s(r.timestamp)}\n"
 
     await menu.text_menu(msg, rules)
 
@@ -110,9 +110,9 @@ async def lb(msg: discord.interactions.Interaction) -> None:  # type: ignore
 
     lb: typing.Dict[int, int] = {}
 
-    for (author,) in models.DB.query(sqlalchemy.distinct(models.Rule.author)).all():
-        lb[author] = (
-            models.DB.query(sqlalchemy.distinct(models.Rule.id))
+    for (author,) in models.DB.query(sqlalchemy.distinct(models.Rule.author)).all():  # type: ignore
+        lb[author] = (  # type: ignore
+            models.DB.query(sqlalchemy.distinct(models.Rule.id))  # type: ignore
             .where(models.Rule.author == author)
             .count()
         )
@@ -126,7 +126,7 @@ async def lb(msg: discord.interactions.Interaction) -> None:  # type: ignore
         msg,
         "rules leaderboard :\n\n"
         + "".join(
-            f"{rank}, <@{id}> with {count} ( {(count / total * 100):.2f}% ) created rule( s )\n"
+            f"{rank}, <@!{id}> with {count} ( {(count / total * 100):.2f}% ) created rule( s )\n"
             for rank, (id, count) in enumerate(lb.items(), 1)
         )
         + f"\n{total} rule( s ) in total",
@@ -142,7 +142,7 @@ async def score(msg: discord.interactions.Interaction, user: typing.Optional[dis
         return
 
     score: typing.Any = (
-        models.DB.query(models.Score)
+        models.DB.query(models.Score)  # type: ignore
         .where(models.Score.author == (msg.user.id if user is None else user.id))  # type: ignore
         .first()
     )
@@ -161,7 +161,7 @@ async def score(msg: discord.interactions.Interaction, user: typing.Optional[dis
 async def scores(msg: discord.interactions.Interaction) -> None:  # type: ignore
     """get chat scores"""
 
-    scores: typing.Any = models.DB.query(models.Score).all()
+    scores: typing.Any = models.DB.query(models.Score).all()  # type: ignore
 
     if not scores:
         await menu.text_menu(msg, "no people currently have a score")
@@ -181,7 +181,7 @@ async def scores(msg: discord.interactions.Interaction) -> None:  # type: ignore
         msg,
         "chat score leaderboard :\n\n"
         + "\n".join(
-            f"{idx}, <@{value[0]}> with score `{value[1]}`"
+            f"{idx}, <@!{value[0]}> with score `{value[1]}`"
             for idx, value in enumerate(lb.items(), 1)
         )
         + f"\n\naverage chat score : {total_lbv / len(lbv):.2f}\ntotal chat score : {total_lbv:.2f}",
@@ -198,7 +198,7 @@ async def wordcloud(
 ) -> None:  # type: ignore
     """get the word cloud by filter, limit and query"""
 
-    q: typing.Any = models.DB.query(models.WordCloud).order_by(
+    q: typing.Any = models.DB.query(models.WordCloud).order_by(  # type: ignore
         models.WordCloud.usage.desc()
     )
 
@@ -269,7 +269,7 @@ async def confessions(
         else tuple(c for c in q.all() if c.content in query or query in c.content)
     )
 
-    confession_count: int = models.DB.query(models.Confession.id).count()
+    confession_count: int = models.DB.query(models.Confession.id).count()  # type: ignore
 
     await menu.menu(
         msg,
@@ -290,11 +290,11 @@ async def starboard(
     """set starboard channel"""
 
     if channel is None:
-        channel = msg.channel
+        channel = msg.channel  # type: ignore
 
-    util.get_starboard(msg.guild.id).star_channel = channel.id
+    util.get_starboard(msg.guild.id).star_channel = channel.id  # type: ignore
     models.DB.commit()
-    await menu.text_menu(msg, f"set starboard channel to <#{channel.id}>")
+    await menu.text_menu(msg, f"set starboard channel to <#{channel.id}>")  # type: ignore
 
 
 @cmds.new
@@ -307,20 +307,18 @@ async def ai(
 
     await msg.response.defer()
 
-    r: typing.Union[str, dict[str, str]] = model.value.create(prompt)  # type: ignore
-
-    if type(r) is dict:
-        r = str(r.get("text")) or "*no content*"  # type: ignore
-
-    cnt: int = 0
-
-    while cnt < 3:
+    for _ in range(3):
         try:
-            await msg.followup.send(content=r[:2000])  # type: ignore
+            r: typing.Union[str, dict[str, str]] = model.value.create(prompt)  # type: ignore
+
+            if type(r) is dict:
+                r = str(r.get("text")) or "*no content*"  # type: ignore
+
             break
         except Exception:
-            cnt += 1
             time.sleep(0.5)
+
+    await msg.followup.send(content=(r[:2000].strip()) or "*no content*")  # type: ignore
 
 
 @cmds.new
@@ -340,20 +338,12 @@ async def chatai(
     await msg.followup.send(content=thread.jump_url)
     await thread.send(msg.user.mention)
 
-    cnt: int = 0
-
-    while (
-        cnt < 3
-        and not thread.archived
-        and not thread.locked
-        and thread.member_count > 0
-    ):
+    while not thread.archived and not thread.locked and thread.member_count > 0:
         try:
             m: discord.Message = await cmds.b.wait_for(  # type: ignore
                 "message", check=lambda m: m.channel == thread
             )
         except asyncio.TimeoutError:
-            cnt += 1
             continue
 
         if not m.content:  # type: ignore
@@ -365,16 +355,23 @@ async def chatai(
         if m.author.bot:  # type: ignore
             continue
 
+        r: typing.Union[str, dict[str, str]] = ""
+
         async with thread.typing():
-            while True:
+            for _ in range(3):
                 try:
-                    r: typing.Union[str, dict[str, str]] = model.value.create(chat)  # type: ignore
+                    r = model.value.create(chat)  # type: ignore
                     break
                 except Exception:
                     time.sleep(0.5)
 
         if type(r) is dict:
             r = str(r.get("text")) or "*no content*"  # type: ignore
+
+        r = r.strip()  # type: ignore
+
+        if not r:
+            continue
 
         r = r[:2000]  # type: ignore
         chat += f"\n{model.name if cmds.b.user is None else cmds.b.user.mention} {r}"
