@@ -394,6 +394,8 @@ async def pfp(
     msg: discord.interactions.Interaction,
     user: typing.Optional[typing.Union[discord.User, discord.Member]] = None,
 ) -> None:
+    """extract yours or other users' profile pictures"""
+
     await msg.response.defer()
 
     if user is None:
