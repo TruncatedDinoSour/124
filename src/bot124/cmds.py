@@ -387,3 +387,18 @@ unconditionally"  # type: ignore
         chat = chat.strip()
 
         await thread.send(r)
+
+
+@cmds.new
+async def pfp(
+    msg: discord.interactions.Interaction,
+    user: typing.Optional[typing.Union[discord.User, discord.Member]] = None,
+) -> None:
+    await msg.response.defer()
+
+    if user is None:
+        user = msg.user
+
+    await msg.followup.send(
+        content="*no pfp found*" if user.avatar is None else user.avatar.url
+    )
