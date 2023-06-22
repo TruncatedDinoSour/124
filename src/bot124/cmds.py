@@ -405,3 +405,20 @@ async def pfp(
     await msg.followup.send(
         content="*no pfp found*" if user.avatar is None else user.avatar.url
     )
+
+
+@cmds.new
+async def bnr(
+    msg: discord.interactions.Interaction,
+    user: typing.Optional[typing.Union[discord.User, discord.Member]] = None,
+) -> None:
+    """extract yours or other users' banners"""
+
+    await msg.response.defer()
+
+    if user is None:
+        user = msg.user
+
+    await msg.followup.send(
+        content="*no banner found*" if user.banner is None else user.banner.url
+    )
