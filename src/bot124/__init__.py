@@ -131,15 +131,19 @@ class Bot124(discord.Client):
 
     async def on_member_join(self, member: discord.member.Member):
         if (c := member.guild.system_channel) is not None:
+            end: str = "" if member.discriminator == "0" else f"#{member.discriminator}"
+
             await c.send(
-                f"w-wewcome {member.mention} ( {member.name}#{member.discriminator} ), XD have fun w-with @Clyde ( uppewcase c ), \
+                f"w-wewcome {member.mention} ( {member.name}{end} ), XD have fun w-with @Clyde ( uppewcase c ), \
 s-see `/ai` and `/chatai` too ^^, >_< a-awso d-dont miss o-out on `/rules` :3"
             )
 
     async def on_member_remove(self, member: discord.member.Member):
         if (c := member.guild.system_channel) is not None:
+            end: str = "" if member.discriminator == "0" else f"#{member.discriminator}"
+
             await c.send(
-                f"goodbye {member.mention} ( {member.name}#{member.discriminator} ) ^w^, (U ᵕ U❁) h-haww a ny-nice day :3"
+                f"goodbye {member.mention} ( {member.name}{end} ) ^w^, (U ᵕ U❁) h-haww a ny-nice day :3"
             )
 
     async def on_voice_state_update(
