@@ -19,6 +19,7 @@ def get_score(id: int) -> models.Score:
     if sql_obj is None:
         models.DB.add(sql_obj := models.Score(author=id))
 
+    models.DB.commit()
     return sql_obj
 
 
@@ -30,6 +31,7 @@ def get_starboard(id: int) -> models.StarBoard:
     if sql_obj is None:
         models.DB.add(sql_obj := models.StarBoard(id=id))
 
+    models.DB.commit()
     return sql_obj
 
 
