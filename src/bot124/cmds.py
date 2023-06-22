@@ -103,7 +103,7 @@ async def rules(
     )
 
     for r in q:
-        rules += f"{r.id}, {r.content} ( {'real' if r.real else 'fake'} rule ) by <@!{r.author}> on {util.datetime_s(r.timestamp)}\n"
+        rules += f"{r.id}, {r.content} ( {'real' if r.real else 'fake'} rule ) by <@{r.author}> on {util.datetime_s(r.timestamp)}\n"
 
     await menu.text_menu(msg, rules)
 
@@ -130,7 +130,7 @@ async def lb(msg: discord.interactions.Interaction) -> None:  # type: ignore
         msg,
         "rules leaderboard :\n\n"
         + "".join(
-            f"{rank}, <@!{id}> with {count} ( {(count / total * 100):.2f}% ) created rule( s )\n"
+            f"{rank}, <@{id}> with {count} ( {(count / total * 100):.2f}% ) created rule( s )\n"
             for rank, (id, count) in enumerate(lb.items(), 1)
         )
         + f"\n{total} rule( s ) in total",
@@ -185,7 +185,7 @@ async def scores(msg: discord.interactions.Interaction) -> None:  # type: ignore
         msg,
         "chat score leaderboard :\n\n"
         + "\n".join(
-            f"{idx}, <@!{value[0]}> with score `{value[1]}`"
+            f"{idx}, <@{value[0]}> with score `{value[1]}`"
             for idx, value in enumerate(lb.items(), 1)
         )
         + f"\n\naverage chat score : {total_lbv / len(lbv):.2f}\ntotal chat score : {total_lbv:.2f}",
