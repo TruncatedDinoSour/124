@@ -68,7 +68,6 @@ async def rules(
     user: typing.Optional[discord.User] = None,
     yyyymmddhh_before: typing.Optional[str] = None,
     yyyymmddhh_after: typing.Optional[str] = None,
-    limit: int = const.MIN_RULES_LIMIT,
 ) -> None:  # type: ignore
     """get rules by filter and / or query"""
 
@@ -87,8 +86,6 @@ async def rules(
             allowed_mentions=discord.mentions.AllowedMentions.none(),
         )
         return
-
-    q = q.limit(limit)
 
     q = (
         q.all()
@@ -195,12 +192,11 @@ async def scores(msg: discord.interactions.Interaction) -> None:  # type: ignore
 @cmds.new
 async def wordcloud(
     msg: discord.interactions.Interaction,
-    limit: int = const.MIN_WORDCLOUD_LIMIT,
     usage_lt: typing.Optional[int] = None,
     usage_mt: typing.Optional[int] = None,
     query: typing.Optional[str] = None,
 ) -> None:  # type: ignore
-    """get the word cloud by filter, limit and query"""
+    """get the word cloud by filter and query"""
 
     q: typing.Any = models.DB.query(models.WordCloud).order_by(  # type: ignore
         models.WordCloud.usage.desc()
@@ -211,8 +207,6 @@ async def wordcloud(
 
     if usage_mt is not None:
         q = q.where(models.WordCloud.usage >= usage_mt)
-
-    q = q.limit(limit)
 
     if query is not None:
         query = query.lower()
@@ -260,13 +254,12 @@ async def confessions(
     id: typing.Optional[int] = None,
     yyyymmddhh_before: typing.Optional[str] = None,
     yyyymmddhh_after: typing.Optional[str] = None,
-    limit: int = const.MIN_CONFESSION_LIMIT,
 ) -> None:  # type: ignore
     """view, list and filter confessions"""
 
     q: typing.Any = util.filter_rule_like(
         models.Confession, id, yyyymmddhh_before, yyyymmddhh_after
-    ).limit(limit)
+    )
 
     q = (
         q.all()
