@@ -11,6 +11,7 @@ MESSAGE_WRAP_LEN: Final[int] = 1900
 BUTTONS: Final[tuple[ReactionButton, ...]] = (
     ReactionButton.go_to_first_page(),
     ReactionButton.back(),
+    ReactionButton.go_to_page(),
     ReactionButton.next(),
     ReactionButton.go_to_last_page(),
 )
