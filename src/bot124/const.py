@@ -28,7 +28,7 @@ WC_W: Final[float] = 0.15
 REACT_GET_W: Final[float] = 0.2
 REACT_POST_W: Final[float] = 0.1
 STAR_W: Final[float] = 0.5
-OK_W: Final[float] = 0.2
+OK_W: Final[float] = 0.1
 
 REACT_POST_K: Final[float] = 0.7
 
