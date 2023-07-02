@@ -90,8 +90,11 @@ class Bot124(discord.Client):
         if isinstance(msg.channel, discord.channel.DMChannel):
             return
 
-        if msg.channel.name == const.OK_CHANNEL and (msg.author.bot or msg.content != const.OK_CHANNEL):  # type: ignore
-            await msg.delete()
+        if msg.channel.name == const.OK_CHANNEL:  # type: ignore
+            if msg.author.bot or msg.content != const.OK_CHANNEL:
+                await msg.delete()
+            else:
+                util.get_score(msg.author.id).ok += 1
         elif msg.channel.name == const.RULES_CHANNEL:  # type: ignore
             if msg.author.bot:
                 return
