@@ -307,7 +307,7 @@ async def ai(
 
     for _ in range(3):
         try:
-            r: typing.Union[str, dict[str, str]] = model.value.create(prompt)  # type: ignore
+            r: typing.Union[str, dict[str, str]] = await model.value.create(prompt)  # type: ignore
 
             if type(r) is dict:
                 r = str(r.get("text")) or "*no content*"  # type: ignore
@@ -363,7 +363,7 @@ unconditionally"  # type: ignore
         async with thread.typing():
             for _ in range(3):
                 try:
-                    r = model.value.create(chat)  # type: ignore
+                    r = await model.value.create(chat)  # type: ignore
                     break
                 except Exception:
                     time.sleep(0.5)
