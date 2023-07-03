@@ -225,7 +225,7 @@ async def wordcloud(
         f"word cloud ( {len(q)}/{ql} unique word( s )/{qa} used words )\n{qa / ql:.2f} uses per word per avg\n\n"
         + (
             "".join(
-                f"{idx}, {w.word} ( {w.usage} ( {w.usage / ql * 100:.2f}% ) )\n"
+                f"{idx}, {w.word} ( {w.usage} ( {w.usage / qa * 100:.2f}% ) )\n"
                 for idx, w in enumerate(q, 1)
             )
         ),
