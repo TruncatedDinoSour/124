@@ -137,8 +137,9 @@ class Bot124(discord.Client):
             end: str = "" if member.discriminator == "0" else f"#{member.discriminator}"
 
             await c.send(
-                f"w-wewcome {member.mention} ( {member.name}{end} ), XD have fun w-with @Clyde ( uppewcase c ), \
-s-see `/ai` and `/chatai` too ^^, >_< a-awso d-dont miss o-out on `/rules` :3"
+                f"w-wewcome {member.mention} ( `{member.name}{end}` ), u whore , XD have fun w-with @Clyde ( uppewcase c ), \
+s-see `/ai` and `/chatai` too ^^, >_< a-awso d-dont miss o-out on `/rules` and our nyationaw awnthem -- \
+WAP https://www.youtube.com/watch?v=Wc5IbN4xw70 :3"
             )
 
     async def on_member_remove(self, member: discord.member.Member):
@@ -146,7 +147,8 @@ s-see `/ai` and `/chatai` too ^^, >_< a-awso d-dont miss o-out on `/rules` :3"
             end: str = "" if member.discriminator == "0" else f"#{member.discriminator}"
 
             await c.send(
-                f"goodbye {member.mention} ( {member.name}{end} ) ^w^, (U ᵕ U❁) h-haww a ny-nice day :3"
+                f"gwoodbye {member.mention} ( `{member.name}{end}` ) ^w^, (U ᵕ U❁) h-haww a ny-nice day, w-whore, \
+everyone, wise fow da nyationaw awnthem -- WAP https://www.youtube.com/watch?v=Wc5IbN4xw70 :3",
             )
 
     async def on_voice_state_update(
