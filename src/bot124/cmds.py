@@ -310,6 +310,8 @@ async def ai(
 
     await msg.response.defer()
 
+    r: typing.Union[str, dict[str, str]] = ""
+
     for _ in range(3):
         try:
             r: typing.Union[str, dict[str, str]] = await model.value.create(prompt)  # type: ignore
