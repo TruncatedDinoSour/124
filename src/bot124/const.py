@@ -37,6 +37,10 @@ K_MULT: Final[float] = 300
 SCORE_MULT: Final[float] = 50
 
 SCORE_E: Final[float] = 0.69
+SCORE_DELTA_E: Final[float] = 0.34
 
 STAR_EMOJI: Final[str] = "⭐"
 STAR_COUNT: Final[int] = 3
+
+SCORE_KICK_SLEEP: Final[int] = 10 * 60
+SCORE_KICK_DELTA: Final[int] = 7 * 24 * 60 * 60

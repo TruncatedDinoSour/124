@@ -3,11 +3,13 @@
 """124 bot"""
 
 import asyncio
+import datetime
 import string
 import typing
 
 import discord
 import discord.app_commands  # type: ignore
+import humanize  # type: ignore
 import sqlalchemy
 
 from . import cmds, const, models, util
@@ -36,6 +38,35 @@ class Bot124(discord.Client):
 
             models.DB.commit()
 
+    async def _kick_scores(self) -> typing.NoReturn:
+        while True:
+            await asyncio.sleep(const.SCORE_KICK_SLEEP)
+
+            for score in models.DB.query(models.Score):  # type: ignore
+                if (
+                    delta := round(
+                        datetime.datetime.utcnow().timestamp() - score.last_act
+                    )
+                ) >= const.SCORE_KICK_DELTA:  # type: ignore
+                    models.DB.session.execute(
+                        sqlalchemy.delete(models.Score).where(
+                            models.Score.author == score.author
+                        )
+                    )
+
+                    for g in self.guilds:
+                        if (c := g.system_channel) is not None:
+                            await c.send(
+                                f"user <@{score.author}> has been kicked off the score leaderboard due to inactivity, no activity for \
+{humanize.precisedelta(datetime.timedelta(seconds=delta), minimum_unit='seconds')}"
+                            )
+
+                        await asyncio.sleep(1)
+
+                await asyncio.sleep(1)
+
+            models.DB.commit()
+
     async def on_ready(self) -> None:
         models.DB.init()
 
@@ -56,9 +87,14 @@ class Bot124(discord.Client):
         models.DB.commit()
 
         await self.ct.sync()
+
         self.loop.create_task(self._update_vc_score())
+        self.loop.create_task(self._kick_scores())
 
     async def on_message(self, msg: discord.message.Message) -> None:
+        if not msg.author.bot:
+            util.update_act(msg.author.id)
+
         if msg.content and not msg.author.bot:
             # record scores
 
@@ -137,9 +173,19 @@ class Bot124(discord.Client):
             end: str = "" if member.discriminator == "0" else f"#{member.discriminator}"
 
             await c.send(
-                f"w-wewcome {member.mention} ( `{member.name}{end}` ), u whore , XD have fun w-with @Clyde ( uppewcase c ), \
-s-see `/ai` and `/chatai` too ^^, >_< a-awso d-dont miss o-out on `/rules` and our nyationaw awnthem -- \
-WAP https://www.youtube.com/watch?v=Wc5IbN4xw70 :3"
+                f"""welcome, {member.mention} ( `{member.name}{end}` ),
+
+hope youre doing alright, you can check out @Clyde ( with an uppsercase C ) if \
+you want to use clyde AI, you can also use {self.user.mention if self.user else 'my'} commands to use AI \
+stuff : `/ai` and `/chatai`
+
+also, dont forget to check out our rules using `/rules` command and \
+make sure to show your respect to our national anthem -- WAP https://www.youtube.com/watch?v=Wc5IbN4xw70
+
+also we have a system for chat score which you can check out using `/score` or `/scores`, \
+although dont forget that this score is volatile, if youre not active for \
+{humanize.precisedelta(datetime.timedelta(seconds=const.SCORE_KICK_DELTA), minimum_unit='seconds')} \
+you will be kicked off the score leaderboard"""
             )
 
     async def on_member_remove(self, member: discord.member.Member):
@@ -147,8 +193,9 @@ WAP https://www.youtube.com/watch?v=Wc5IbN4xw70 :3"
             end: str = "" if member.discriminator == "0" else f"#{member.discriminator}"
 
             await c.send(
-                f"gwoodbye {member.mention} ( `{member.name}{end}` ) ^w^, (U ᵕ U❁) h-haww a ny-nice day, w-whore, \
-everyone, wise fow da nyationaw awnthem -- WAP https://www.youtube.com/watch?v=Wc5IbN4xw70 :3",
+                f"""goodbye, {member.mention} ( `{member.name}{end}` ), \
+thank you for being in this server for \
+{humanize.precisedelta(datetime.timedelta(seconds=datetime.datetime.utcnow().timestamp() - member.joined_at.timestamp()), minimum_unit='seconds') if member.joined_at is not None else "[?]"}"""
             )
 
     async def on_voice_state_update(
@@ -157,6 +204,9 @@ everyone, wise fow da nyationaw awnthem -- WAP https://www.youtube.com/watch?v=W
         before: discord.VoiceState,
         after: discord.VoiceState,
     ) -> None:
+        if not member.bot:
+            util.update_act(member.id)
+
         if member.bot or member.voice is None:
             self.vc_times.discard(member.id)
             return
@@ -184,6 +234,9 @@ everyone, wise fow da nyationaw awnthem -- WAP https://www.youtube.com/watch?v=W
     async def on_reaction_add(
         self, reaction: discord.Reaction, user: discord.User
     ) -> None:
+        if not user.bot:
+            util.update_act(user.id)
+
         if (
             str(reaction.emoji) == const.STAR_EMOJI
             and sum([(not u.bot) async for u in reaction.users()]) >= const.STAR_COUNT
@@ -234,4 +287,8 @@ everyone, wise fow da nyationaw awnthem -- WAP https://www.youtube.com/watch?v=W
 
         util.get_score(user.id).reactions_post -= 1
         util.get_score(reaction.message.author.id).reactions_get -= 1
+
+        util.update_act(user.id)
+        util.update_act(reaction.message.author.id)
+
         models.DB.commit()

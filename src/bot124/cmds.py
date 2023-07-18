@@ -6,7 +6,7 @@ import asyncio
 import time
 import typing
 from datetime import datetime
-from enum import Enum
+from enum import Enum, auto
 
 import discord
 import discord.app_commands  # type: ignore
@@ -27,6 +27,11 @@ class AICommands(Enum):
     gpt3 = g3.Completion
     gpt4 = g4.Completion
     alpaca7 = a7.Completion
+
+
+class WelcomeType(Enum):
+    WELCOME = auto()
+    LEAVE = auto()
 
 
 @cmds.new
@@ -299,7 +304,7 @@ async def starboard(
 async def ai(
     msg: discord.interactions.Interaction,
     prompt: str,
-    model: AICommands = AICommands.gpt4,
+    model: AICommands = AICommands.gpt3,
 ) -> None:
     """generate content using an AI large language model"""
 
@@ -323,7 +328,7 @@ async def ai(
 
 @cmds.new
 async def chatai(
-    msg: discord.interactions.Interaction, model: AICommands = AICommands.gpt4
+    msg: discord.interactions.Interaction, model: AICommands = AICommands.gpt3
 ) -> None:
     """create a thread with an AI model"""
 
@@ -398,3 +403,25 @@ async def pfp(
     await msg.followup.send(
         content="*no pfp found*" if user.avatar is None else user.avatar.url
     )
+
+
+@cmds.new
+async def welcome(
+    msg: discord.interactions.Interaction,
+    member: typing.Optional[discord.Member] = None,
+    welcome_type: WelcomeType = WelcomeType.WELCOME,
+) -> None:
+    """welcome a member"""
+
+    await msg.response.defer()
+
+    if member is None:
+        member = msg.user  # type: ignore
+
+    await (
+        cmds.b.on_member_join
+        if welcome_type is WelcomeType.WELCOME
+        else cmds.b.on_member_remove
+    )(member)
+
+    await msg.followup.send(f"welcomed {member.mention}")

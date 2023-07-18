@@ -118,6 +118,7 @@ def calc_score(s: models.Score) -> float:
             + math.log(s.ok + 1) * const.OK_W
             + s.starboard_score * const.STAR_W
             - math.sqrt(s.reactions_post * const.REACT_POST_K) * const.REACT_POST_W
+            - ((datetime.utcnow().timestamp() - s.last_act) ** const.SCORE_DELTA_E)
         ),
     )
 
@@ -127,4 +128,8 @@ def calc_score(s: models.Score) -> float:
 
     k: float = len(data) / sum(data) * const.K_MULT
 
-    return round((score if k > score else score - k) ** const.SCORE_E, 2)
+    return round(max(0, score if k > score else score - k) ** const.SCORE_E, 2)
+
+
+def update_act(id: int) -> None:
+    get_score(id).last_act = round(datetime.utcnow().timestamp())
