@@ -19,8 +19,5 @@ ty
 
 - [x] starboard
 - [x] fix muted score ( no score while muted )
-- [ ] auto inflation of score ?
-    - [ ] economy ?
 - [x] less initial score growing
-- [ ] music function
-- [ ] actions logger
+- [x] music function
