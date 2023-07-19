@@ -195,7 +195,7 @@ you will be kicked off the score leaderboard"""
             await c.send(
                 f"""goodbye, {member.mention} ( `{member.name}{end}` ), \
 thank you for being in this server for \
-**{humanize.precisedelta(datetime.timedelta(seconds=datetime.datetime.utcnow().timestamp() - member.joined_at.timestamp()), minimum_unit='seconds') if member.joined_at is not None else "[?]"}**"""
+**{humanize.precisedelta(datetime.timedelta(seconds=round(datetime.datetime.utcnow().timestamp() - member.joined_at.timestamp())), minimum_unit='seconds') if member.joined_at is not None else "[?]"}**"""
             )
 
     async def on_voice_state_update(
