@@ -464,7 +464,7 @@ async def timelb(
     await menu.text_menu(
         msg,
         "\n".join(
-            f"{idx}. {entry} for \
+            f"{idx}, {entry} for \
 **{humanize.precisedelta(datetime.timedelta(seconds=diff), minimum_unit='seconds')}**"
             for idx, (entry, diff) in enumerate(stay_time.items())
         ),
