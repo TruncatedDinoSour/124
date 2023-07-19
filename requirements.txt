@@ -4,3 +4,5 @@ sqlalchemy
 humanize
 freeGPT
 tls_client
+pynacl
+yt_dlp

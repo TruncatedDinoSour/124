@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 """124bot constants"""
 
-from typing import Final
 import re
+from typing import Any, Final
 
 from reactionmenu import ReactionButton  # type: ignore
 
@@ -46,4 +46,32 @@ STAR_COUNT: Final[int] = 3
 SCORE_KICK_SLEEP: Final[int] = 6 * 60 * 60
 SCORE_KICK_DELTA: Final[int] = 3 * 24 * 60 * 60
 
-ANSI_REGEX: Final[re.Pattern[str]] = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
+ANSI_REGEX: Final[re.Pattern[str]] = re.compile(
+    r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])"
+)
+
+FFMPEG_OPTIONS: Final[dict[str, str]] = {
+    "before_options": "-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5",
+    "options": "-vn",
+}
+YTDL_OPTIONS: Final[dict[str, Any]] = {
+    "format": "bestaudio/best",
+    "nocheckcertificate": True,
+    "extract_flat": "in_playlist",
+    "ignoreerrors": True,
+    "logtostderr": False,
+    "quiet": True,
+    "no_warnings": True,
+    "default_search": "auto",
+    "source_address": "0.0.0.0",
+    "noprogress": True,
+    "socket_timeout": 5,
+    "socket_io_timeout": 10,
+    "sleep_interval": 1,
+    "max_sleep_interval": 5,
+    "retries": 10,
+    "fragment_retries": 10,
+    "threads": 6,
+    "nocheckcertificate": True,
+    "geo_bypass": True,
+}

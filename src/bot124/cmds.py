@@ -17,7 +17,9 @@ from freeGPT import alpaca_7b as a7  # type: ignore
 from freeGPT import gpt3 as g3  # type: ignore
 from freeGPT import gpt4 as g4  # type: ignore
 
-from . import const, menu, models, util
+from . import const, menu, models
+from . import music as music_mdl
+from . import util
 from .cmdmgr import CommandManager
 
 __all__: tuple[str] = ("cmds",)
@@ -460,7 +462,9 @@ async def timelb(
         for g in cmds.b.guilds:
             for m in g.members:
                 if m.joined_at:
-                    stay_time[f"{m.mention} ( `{m.name}` ) in `{g.name}`"] = now - m.joined_at.timestamp()
+                    stay_time[f"{m.mention} ( `{m.name}` ) in `{g.name}`"] = (
+                        now - m.joined_at.timestamp()
+                    )
 
     stay_time = {
         k: v
@@ -481,3 +485,32 @@ average stay time : {humanize.precisedelta(datetime.timedelta(seconds=sum(stay_t
             for idx, (entry, diff) in enumerate(stay_time.items(), 1)
         ),
     )
+
+
+@cmds.new
+async def music(
+    msg: discord.interactions.Interaction,
+) -> None:
+    """play music in a voice chat"""
+
+    await msg.response.defer()
+
+    if msg.user.voice is None:  # type: ignore
+        await msg.followup.send(content="join a voice chat babe xx")
+        return
+
+    c: typing.Optional[discord.VoiceProtocol] = None
+
+    if msg.guild is None or (c := msg.guild.voice_client) is not None:
+        await msg.followup.send(content=f"i am already connected to {'a voice channel' if c is None else c.channel.jump_url}")  # type: ignore
+        return
+
+    v: discord.VoiceClient = await msg.user.voice.channel.connect()  # type: ignore
+
+    t: discord.Thread = await msg.channel.create_thread(  # type: ignore
+        name=f"{msg.user.name}'s music control thread on {datetime.datetime.utcnow()} utc",
+        type=discord.ChannelType.public_thread,  # type: ignore
+    )
+
+    await msg.followup.send(content=f"use {t.jump_url} to control the music and type `help` for help in that thread")  # type: ignore
+    await music_mdl.Music(cmds.b, t, v).init()  # type: ignore

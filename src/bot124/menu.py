@@ -16,9 +16,10 @@ async def menu(
     pages: typing.Sequence[str],
 ) -> None:
     if len(pages) == 1:
-        await msg.response.defer()
-        await msg.followup.send(
-            content=pages[0], allowed_mentions=discord.mentions.AllowedMentions.none()
+        await msg.response.defer()  # type: ignore
+        await msg.followup.send(  # type: ignore
+            content=pages[0],
+            allowed_mentions=discord.mentions.AllowedMentions.none(),
         )
         return
 
