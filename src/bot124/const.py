@@ -42,5 +42,5 @@ SCORE_DELTA_E: Final[float] = 0.34
 STAR_EMOJI: Final[str] = "⭐"
 STAR_COUNT: Final[int] = 3
 
-SCORE_KICK_SLEEP: Final[int] = 60 * 60
+SCORE_KICK_SLEEP: Final[int] = 6 * 60 * 60
 SCORE_KICK_DELTA: Final[int] = 3 * 24 * 60 * 60
