@@ -9,6 +9,7 @@ from secrets import SystemRandom
 from threading import Thread
 
 import discord
+import validators
 import yt_dlp  # type: ignore
 
 from . import const, mcmdmgr, mcmds
@@ -34,18 +35,20 @@ class YTDLSource(discord.PCMVolumeTransformer):  # type: ignore
         ytdl: yt_dlp.YoutubeDL,
         *,
         loop: typing.Optional[asyncio.AbstractEventLoop] = None,
-        stream: bool = True,
     ) -> typing.Any:
         loop = loop or asyncio.get_event_loop()
 
         data: typing.Any = await loop.run_in_executor(
-            None, lambda: ytdl.extract_info(url, download=not stream)  # type: ignore
+            None, lambda: ytdl.extract_info(url, download=False)  # type: ignore
         )
+
+        if data is None:
+            return
 
         if "entries" in data:  # type: ignore
             data: typing.Any = data["entries"][0]
 
-        return cls(discord.FFmpegPCMAudio(data["url"] if stream else ytdl.prepare_filename(data), **const.FFMPEG_OPTIONS), data=data)  # type: ignore
+        return cls(discord.FFmpegPCMAudio(data["url"], **const.FFMPEG_OPTIONS), data=data)  # type: ignore
 
 
 class Music:
@@ -96,15 +99,18 @@ class Music:
 
             await asyncio.sleep(1)
 
-    def _playlist_thread(self, url: str) -> None:
+    def _play(self, url: str) -> None:
         info: dict[str, typing.Any] = self.ytdl.extract_info(url, download=False)  # type: ignore
 
         if "entries" not in info:
             self.queue.append(url)
         else:
-            for entry in info["entries"]:
-                if entry:
-                    self.queue.append(f"https://youtu.be/{entry['id']}")
+            if not validators.url(url):  # type: ignore
+                self.queue.append(f"https://youtu.be/{info['entries'][0]['id']}")
+            else:
+                for entry in info["entries"]:  # type: ignore
+                    if entry:
+                        self.queue.append(f"https://youtu.be/{entry['id']}")
 
     def __init__(
         self,
@@ -151,12 +157,4 @@ class Music:
             except ValueError:
                 await m.reply(content=f"adding `{m.content}` to the queue")
 
-                if (
-                    any(c in string.whitespace for c in m.content)
-                    or "/" not in m.content
-                ):
-                    self.queue.append(m.content)
-                else:
-                    Thread(
-                        target=self._playlist_thread, args=(m.content,), daemon=True
-                    ).start()
+                Thread(target=self._play, args=(m.content,), daemon=True).start()

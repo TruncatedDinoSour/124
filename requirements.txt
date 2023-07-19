@@ -6,3 +6,4 @@ freeGPT
 tls_client
 pynacl
 yt_dlp
+validators
