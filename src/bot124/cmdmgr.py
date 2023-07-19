@@ -15,7 +15,7 @@ __all__: tuple[str] = ("CommandManager",)
 
 class CommandManager:
     def __init__(self) -> None:
-        self.cmds: list[typing.Callable[..., typing.Any]] = []
+        self.cmds: set[typing.Callable[..., typing.Any]] = set()
         self.b: discord.Client = None  # type: ignore
 
     def new(
@@ -28,7 +28,7 @@ class CommandManager:
             ), "command manager is being used pre-initialization"
             return await fn(*args, **kwargs)
 
-        self.cmds.append(wrapper)
+        self.cmds.add(wrapper)
         return wrapper
 
     def admin(
