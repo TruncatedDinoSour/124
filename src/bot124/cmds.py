@@ -445,16 +445,22 @@ async def neofetch(
 @cmds.new
 async def timelb(
     msg: discord.interactions.Interaction,
+    local: bool = True,
 ) -> None:
-    """server time leaderboard"""
+    """server time leaderboard, if local is set to false it shows the global leadderboard"""
 
     stay_time: dict[str, float] = {}
     now: float = datetime.datetime.utcnow().timestamp()
 
-    for g in cmds.b.guilds:
-        for m in g.members:
+    if local and msg.guild is not None:
+        for m in msg.guild.members:
             if m.joined_at:
-                stay_time[f"{m.mention} in {g.name!r}"] = now - m.joined_at.timestamp()
+                stay_time[m.mention] = now - m.joined_at.timestamp()
+    else:
+        for g in cmds.b.guilds:
+            for m in g.members:
+                if m.joined_at:
+                    stay_time[f"{m.mention} ( `{m.name}` ) in `{g.name}`"] = now - m.joined_at.timestamp()
 
     stay_time = {
         k: v
@@ -463,9 +469,15 @@ async def timelb(
 
     await menu.text_menu(
         msg,
-        "\n".join(
+        f"""{'local' if local else 'global'} stay time leaderboard
+
+total users : {len(stay_time)}
+average stay time : {humanize.precisedelta(datetime.timedelta(seconds=sum(stay_time.values()) / len(stay_time)), minimum_unit='seconds')}
+
+"""
+        + "\n".join(
             f"{idx}, {entry} for \
 **{humanize.precisedelta(datetime.timedelta(seconds=diff), minimum_unit='seconds')}**"
-            for idx, (entry, diff) in enumerate(stay_time.items())
+            for idx, (entry, diff) in enumerate(stay_time.items(), 1)
         ),
     )
