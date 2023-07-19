@@ -21,7 +21,7 @@ async def quit(music: typing.Any, *_) -> None:
 
     await music.voice.disconnect()
     await music.thread.delete()
-    cmds.run = False
+    music.run = False
 
 
 @cmds.new

@@ -61,7 +61,6 @@ class MusicCommands:
         self.cmds[MusicCommandT.HELP] = _help
 
         self.music: typing.Any = None
-        self.run: bool = True
 
     def new(
         self, fn: typing.Callable[[typing.Any, MusicCommand], typing.Any]

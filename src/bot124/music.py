@@ -3,13 +3,12 @@
 """music manager"""
 
 import asyncio
-import string
 import typing
 from secrets import SystemRandom
 from threading import Thread
 
 import discord
-import validators
+import validators  # type: ignore
 import yt_dlp  # type: ignore
 
 from . import const, mcmdmgr, mcmds
@@ -62,7 +61,7 @@ class Music:
             yield item
 
     async def _music(self) -> None:
-        while self.voice.is_connected():
+        while self.run and self.voice.is_connected():
             self.reset = False
 
             for song in self._music_enum():  # type: ignore
@@ -80,6 +79,7 @@ class Music:
 
                 while (
                     self.voice.is_connected()
+                    and self.run
                     and self.current != -1
                     and not self.reset
                     and (self.voice.is_playing() or self.pause)
@@ -93,7 +93,7 @@ class Music:
     async def _cmds(self) -> None:
         mcmds.cmds.init(self)
 
-        while mcmds.cmds.run and self.voice.is_connected():
+        while self.run and self.voice.is_connected():
             while self.cqueue:
                 await mcmds.cmds.push(self.cqueue.pop())
 
@@ -130,11 +130,13 @@ class Music:
         self.pause: bool = False
         self.reset: bool = False
 
+        self.run: bool = True
+
         b.loop.create_task(self._music())
         b.loop.create_task(self._cmds())
 
     async def init(self) -> None:
-        while self.voice.is_connected() and not self.thread.archived and not self.thread.locked and self.thread.member_count > 0:  # type: ignore
+        while self.run and self.voice.is_connected() and not self.thread.archived and not self.thread.locked and self.thread.member_count > 0:  # type: ignore
             try:
                 m: discord.Message = await self.b.wait_for(  # type: ignore
                     "message", check=lambda m: m.channel == self.thread and m.content and not m.author.bot  # type: ignore
