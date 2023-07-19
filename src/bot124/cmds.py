@@ -405,25 +405,3 @@ async def pfp(
     await msg.followup.send(
         content="*no pfp found*" if user.avatar is None else user.avatar.url
     )
-
-
-@cmds.new
-async def welcome(
-    msg: discord.interactions.Interaction,
-    member: typing.Optional[discord.Member] = None,
-    welcome_type: WelcomeType = WelcomeType.WELCOME,
-) -> None:
-    """welcome a member"""
-
-    await msg.response.defer()
-
-    if member is None:
-        member = msg.user  # type: ignore
-
-    await (
-        cmds.b.on_member_join
-        if welcome_type is WelcomeType.WELCOME
-        else cmds.b.on_member_remove
-    )(member)
-
-    await msg.followup.send(f"welcomed {member.mention}")
