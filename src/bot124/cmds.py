@@ -113,7 +113,7 @@ async def rules(
 
 
 @cmds.new
-async def lb(msg: discord.interactions.Interaction) -> None:  # type: ignore
+async def ruleslb(msg: discord.interactions.Interaction) -> None:  # type: ignore
     """rules leaderboard by rule creation count"""
 
     lb: typing.Dict[int, int] = {}
@@ -166,7 +166,7 @@ async def score(msg: discord.interactions.Interaction, user: typing.Optional[dis
 
 
 @cmds.new
-async def scores(msg: discord.interactions.Interaction) -> None:  # type: ignore
+async def scorelb(msg: discord.interactions.Interaction) -> None:  # type: ignore
     """get chat scores"""
 
     scores: typing.Any = models.DB.query(models.Score).all()  # type: ignore
@@ -439,4 +439,33 @@ async def neofetch(
         content=f"""```
 {const.ANSI_REGEX.sub("", check_output("neofetch").decode().strip().replace("`", "'"))[:1990]}
 ```"""
+    )
+
+
+@cmds.new
+async def timelb(
+    msg: discord.interactions.Interaction,
+) -> None:
+    """server time leaderboard"""
+
+    stay_time: dict[str, float] = {}
+    now: float = datetime.datetime.utcnow().timestamp()
+
+    for g in cmds.b.guilds:
+        for m in g.members:
+            if m.joined_at:
+                stay_time[f"{m.mention} in {g.name!r}"] = now - m.joined_at.timestamp()
+
+    stay_time = {
+        k: v
+        for k, v in sorted(stay_time.items(), key=lambda item: item[1], reverse=True)
+    }
+
+    await menu.text_menu(
+        msg,
+        "\n".join(
+            f"{idx}. {entry} for \
+**{humanize.precisedelta(datetime.timedelta(seconds=diff), minimum_unit='seconds')}**"
+            for idx, (entry, diff) in enumerate(stay_time.items())
+        ),
     )
