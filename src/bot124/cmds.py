@@ -477,7 +477,7 @@ average stay time : {humanize.precisedelta(datetime.timedelta(seconds=sum(stay_t
 """
         + "\n".join(
             f"{idx}, {entry} for \
-**{humanize.precisedelta(datetime.timedelta(seconds=diff), minimum_unit='seconds')}**"
+{humanize.precisedelta(datetime.timedelta(seconds=diff), minimum_unit='seconds')}"
             for idx, (entry, diff) in enumerate(stay_time.items(), 1)
         ),
     )
