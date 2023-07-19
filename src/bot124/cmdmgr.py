@@ -6,8 +6,9 @@ import typing
 from functools import wraps
 
 import discord
-from . import menu
 import discord.app_commands  # type: ignore
+
+from . import menu
 
 __all__: tuple[str] = ("CommandManager",)
 
@@ -42,8 +43,21 @@ class CommandManager:
         return wrapper
 
     def register_commands(self, ct: discord.app_commands.CommandTree) -> None:
-        while self.cmds:
-            cmd: typing.Callable[..., typing.Any] = self.cmds.pop()
+        async def _help(msg: discord.interactions.Interaction) -> None:
+            """display help"""
+
+            await menu.text_menu(
+                msg,
+                f"help for {self.b.user.mention if self.b.user else 'this bot'}\n\n"
+                + "".join(
+                    f"- {cmd.__name__} -- {cmd.__doc__ or 'no help provided'}\n"
+                    for cmd in self.cmds
+                ),
+            )
+
+        ct.command(name="help", description=_help.__doc__ or "display help")(_help)
+
+        for cmd in self.cmds:
             ct.command(  # type: ignore
                 name=cmd.__name__, description=cmd.__doc__ or "no help provided"
             )(cmd)
