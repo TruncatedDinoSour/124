@@ -3,13 +3,15 @@
 """bot 124 commands"""
 
 import asyncio
+import datetime
 import time
 import typing
-from datetime import datetime
 from enum import Enum, auto
+from subprocess import check_output
 
 import discord
 import discord.app_commands  # type: ignore
+import humanize  # type: ignore
 import sqlalchemy
 from freeGPT import alpaca_7b as a7  # type: ignore
 from freeGPT import gpt3 as g3  # type: ignore
@@ -337,7 +339,7 @@ async def chatai(
     await msg.response.defer()
 
     thread: discord.Thread = await msg.channel.create_thread(  # type: ignore
-        name=(name := f"{msg.user.name}'s {model.name!r} chat @ {datetime.utcnow()} UTC")  # type: ignore
+        name=(name := f"{msg.user.name}'s {model.name!r} chat @ {datetime.datetime.utcnow()} UTC")  # type: ignore
     )
     chat: str = f"<@0> welcome to '{name}' (after @ it has today's date in UTC when the chat started), you have full access to this chat, \
 keep in mind you are {model.name if cmds.b.user is None else cmds.b.user.mention}, everyone else is other users, the owner of this chat is {msg.user.mention} \
@@ -404,4 +406,37 @@ async def pfp(
 
     await msg.followup.send(
         content="*no pfp found*" if user.avatar is None else user.avatar.url
+    )
+
+
+@cmds.new
+async def servertime(
+    msg: discord.interactions.Interaction,
+    member: typing.Optional[discord.Member] = None,
+) -> None:
+    """shows how much time a person has stayed in this server"""
+
+    await msg.response.defer()
+
+    if member is None:
+        member = msg.user  # type: ignore
+
+    await msg.followup.send(
+        content=f"{member.mention} has stayed here for \
+**{humanize.precisedelta(datetime.timedelta(seconds=round(datetime.datetime.utcnow().timestamp() - member.joined_at.timestamp())), minimum_unit='seconds') if member.joined_at is not None else '[?]'}**"
+    )
+
+
+@cmds.new
+async def neofetch(
+    msg: discord.interactions.Interaction,
+) -> None:
+    """run neofetch"""
+
+    await msg.response.defer()
+
+    await msg.followup.send(
+        content=f"""```
+{const.ANSI_REGEX.sub("", check_output("neofetch").decode().strip().replace("`", "'"))[:1990]}
+```"""
     )

@@ -3,6 +3,7 @@
 """124bot constants"""
 
 from typing import Final
+import re
 
 from reactionmenu import ReactionButton  # type: ignore
 
@@ -44,3 +45,5 @@ STAR_COUNT: Final[int] = 3
 
 SCORE_KICK_SLEEP: Final[int] = 6 * 60 * 60
 SCORE_KICK_DELTA: Final[int] = 3 * 24 * 60 * 60
+
+ANSI_REGEX: Final[re.Pattern[str]] = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
