@@ -33,9 +33,31 @@ class AICommands(Enum):
     alpaca7 = a7.Completion
 
 
+async def gen_ai(prompt: str, model: AICommands = AICommands.gpt3) -> str:
+    r: typing.Union[str, dict[str, str]] = ""
+
+    for _ in range(3):
+        try:
+            r: typing.Union[str, dict[str, str]] = await model.value.create(prompt)  # type: ignore
+
+            if type(r) is dict:
+                r = str(r.get("text")) or "*no content*"  # type: ignore
+
+            break
+        except Exception:
+            time.sleep(0.5)
+
+    return r[:2000].strip()  # type: ignore
+
+
 class WelcomeType(Enum):
     WELCOME = auto()
     LEAVE = auto()
+
+
+class TruthOrDare(Enum):
+    TRUTH = auto()
+    DARE = auto()
 
 
 @cmds.new
@@ -314,21 +336,8 @@ async def ai(
 
     await msg.response.defer()
 
-    r: typing.Union[str, dict[str, str]] = ""
-
-    for _ in range(3):
-        try:
-            r: typing.Union[str, dict[str, str]] = await model.value.create(prompt)  # type: ignore
-
-            if type(r) is dict:
-                r = str(r.get("text")) or "*no content*"  # type: ignore
-
-            break
-        except Exception:
-            time.sleep(0.5)
-
     await msg.followup.send(
-        content=(r[:2000].strip()) or "*no content*",  # type: ignore
+        content=(await gen_ai(prompt, model)) or "*no content*",  # type: ignore
     )
 
 
@@ -372,22 +381,11 @@ unconditionally"  # type: ignore
         r: typing.Union[str, dict[str, str]] = ""
 
         async with thread.typing():
-            for _ in range(3):
-                try:
-                    r = await model.value.create(chat)  # type: ignore
-                    break
-                except Exception:
-                    time.sleep(0.5)
-
-        if type(r) is dict:
-            r = str(r.get("text")) or "*no content*"  # type: ignore
-
-        r = r.strip()  # type: ignore
+            r = await gen_ai(chat, model)
 
         if not r:
             continue
 
-        r = r[:2000]  # type: ignore
         chat += f"\n{model.name if cmds.b.user is None else cmds.b.user.mention} {r}"
         chat = chat.strip()
 
@@ -514,3 +512,31 @@ async def music(
 
     await msg.followup.send(content=f"use {t.jump_url} to control the music and type `help` for help in that thread")  # type: ignore
     await music_mdl.Music(cmds.b, t, v).init()  # type: ignore
+
+
+@cmds.new
+async def tod(
+    msg: discord.interactions.Interaction,
+    type: TruthOrDare = TruthOrDare.TRUTH,
+    model: AICommands = AICommands.gpt3,
+) -> None:
+    """truth or dare"""
+
+    await msg.response.defer()
+    await msg.followup.send(
+        content=await gen_ai(
+            f"You find yourself in the '{msg.channel.name}' channel of the '{msg.guild.name}' Discord server, where user '{msg.user.name}' has \
+summoned you to generate a {type.name.lower()} singular prompt for a game of Truth or Dare. As the invoked Discord bot, your task is to provide a suitable \
+prompt for the game, without any additional information or formatting. Your output should consist solely of the prompt for the game, presented in \
+a clear and concise manner. Please take your time to craft a prompt that is appropriate for a game of Truth or Dare and will encourage honest and \
+entertaining responses from the players. The prompts should be of different {type.name.lower()} type every time, be original and unique every time, \
+don't repeat yourself and dont use very common prompts like \"What's the most embarrassing ...\", \"Perform a dramatic ...\", \"What's your secret tallent\" \
+and so on, be creative and unique."
+            + (
+                ""
+                if type == TruthOrDare.TRUTH
+                else " The prompt should also be executable on Discord."
+            ),
+            model,
+        )
+    )
