@@ -3,11 +3,11 @@
 """music commands manager"""
 
 import textwrap
+import traceback
 import typing
 from dataclasses import dataclass
 from enum import Enum
 from functools import wraps
-import traceback
 
 from discord import AllowedMentions, Message
 
@@ -46,6 +46,7 @@ class MusicCommands:
 
             for page in textwrap.wrap(
                 "help for music functions\n\n"
+                + "- to add music to the queue just type your search query or send a youtube url to your song or playlist\n"
                 + "".join(
                     f"- {type.value} -- {fun.__doc__ or 'no help provided'}\n"
                     for type, fun in self.cmds.items()
