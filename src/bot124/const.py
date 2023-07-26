@@ -100,7 +100,7 @@ TRUTHS: Final[tuple[str, ...]] = (
     "what is the last text message you sent your best friend ?",
     "what is something you would do if you knew there were no consequences ?",
     "what is the worst physical pain youve ever been in ?",
-    "personality-wise, are you more like your mom or your dad ?",
+    "personality-wise, are you more like your mum or your dad ?",
     "when is the last time you apologized ( and what did you do ) ?",
     "have you ever reported someone for doing something wrong ( either to the police or at work / school ) ?",
     "if your house caught on fire and you could only save three things ( besides people ), what would they be ?",
@@ -128,8 +128,9 @@ TRUTHS: Final[tuple[str, ...]] = (
     "besides your phone, whats the one item in your house you couldnt live without ?",
     "what is the biggest fight youve ever been in with a friend ?",
     "when did you have your first kiss ?",
+    "have you ever send feet pics",
+    "did you ever lick feet",
 )
-
 DARES: Final[tuple[str, ...]] = (
     "let another player to choose your discord profile picture for 24 hours",
     "talk in uwu language for the next 20 minutes",
@@ -182,6 +183,7 @@ DARES: Final[tuple[str, ...]] = (
     "send the fifth person in your message history 20 seconds of keyboard spam",
     "list everyone as the emoji( s ) you think best fits them",
     "imitate a behaviour of who you like",
+    "send a feet pic",
 )
 PARANOIAS: tuple[str, ...] = (
     "who would you hate to date the most here ?",
@@ -218,7 +220,7 @@ PARANOIAS: tuple[str, ...] = (
     "whos most likely to get hungover after only one drink ?",
     "whos most likely to enjoy reading over watching movies ?",
     "whos most likely to ignore huge red flags in a relationship ?",
-    "whos the mom / dad / parent of the server ?",
+    "whos the mum / dad / parent of the server ?",
     "who makes you laugh the most ?",
     "whos the most likely to choose love over a career ?",
     "who do you think the most people have a crush on here ?",
@@ -235,4 +237,7 @@ PARANOIAS: tuple[str, ...] = (
     "who do you think is the most two-faced ?",
     "whos most likely to become a serial killer ?",
     "whos the most likely to be a huge germaphobe ?",
+    "whos most likely to send feet pics ?",
+    "who would sell your organs if they got the chance ?",
+    "whos most likely to get ran over and then get up and go away like nothing happened ?",
 )
