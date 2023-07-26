@@ -6,7 +6,6 @@ import asyncio
 import datetime
 import string
 import typing
-import os
 
 import discord
 import discord.app_commands  # type: ignore

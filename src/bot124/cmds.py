@@ -83,9 +83,10 @@ async def gen_ai_img(
 
 
 class TruthOrDare(Enum):
-    truth = auto()
-    dare = auto()
     random = auto()
+    truth = const.TRUTHS
+    dare = const.DARES
+    paranoia = const.PARANOIAS
 
 
 @cmds.new
@@ -560,17 +561,25 @@ async def tod(
     msg: discord.interactions.Interaction,
     type: TruthOrDare = TruthOrDare.random,
 ) -> None:
-    """truth or dare"""
+    """truth, dare or paranoia"""
 
     await msg.response.defer()
 
     true_type: TruthOrDare = type
 
     if true_type == TruthOrDare.random:
-        true_type = RAND.choice((TruthOrDare.truth, TruthOrDare.dare))
+        true_type = RAND.choice(
+            (
+                TruthOrDare.truth,
+                TruthOrDare.dare,
+                TruthOrDare.paranoia,
+            )
+        )
 
     view: View = View(timeout=60)
-    btn: typing.Any = Button(style=discord.ButtonStyle.grey, label=f"another [{type.name}]")
+    btn: typing.Any = Button(
+        style=discord.ButtonStyle.grey, label=f"another [{type.name}]"
+    )
 
     async def cb(interaction: discord.interactions.Interaction) -> None:
         view.stop()
@@ -579,8 +588,10 @@ async def tod(
     btn.callback = cb
     view.add_item(btn)
 
+    end: str = "" if msg.user.discriminator == "0" else f"#{msg.user.discriminator}"
+
     await msg.followup.send(
-        content=f"{true_type.name} : "
-        + RAND.choice(const.TRUTHS if type == TruthOrDare.truth else const.DARES),
+        content=f"requested by {msg.user.mention} ( `{msg.user.name}{end}` )\n\n{true_type.name} : " + RAND.choice(true_type.value),  # type: ignore
         view=view,
+        allowed_mentions=discord.mentions.AllowedMentions.none(),
     )
