@@ -141,3 +141,11 @@ async def pop(music: typing.Any, cmd: mcmdmgr.MusicCommand) -> None:
     """pops / removes last item off the queue"""
 
     await cmd.msg.reply(content=f"popped {music.queue.pop()} off the queue")
+
+
+@cmds.new
+async def reset(music: typing.Any, cmd: mcmdmgr.MusicCommand) -> None:
+    """plays the queue from index 0"""
+
+    music.reset = True
+    await cmd.msg.reply(content="queue reset")

@@ -26,6 +26,7 @@ class MusicCommandT(Enum):
     CURRENT = "current"
     HELP = "help"
     POP = "pop"
+    RESET = "reset"
 
 
 @dataclass
