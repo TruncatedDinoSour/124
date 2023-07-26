@@ -8,12 +8,14 @@ import time
 import typing
 from enum import Enum, auto
 from io import BytesIO
+from secrets import SystemRandom
 from subprocess import check_output
 
 import discord
 import discord.app_commands  # type: ignore
 import humanize  # type: ignore
 import sqlalchemy
+from discord.ui import Button, View
 from freeGPT import alpaca_7b as a7  # type: ignore
 from freeGPT import gpt3 as g3  # type: ignore
 from freeGPT import gpt4 as g4  # type: ignore
@@ -27,6 +29,7 @@ from .cmdmgr import CommandManager
 __all__: tuple[str] = ("cmds",)
 
 cmds: CommandManager = CommandManager()
+RAND: SystemRandom = SystemRandom()
 
 
 class TextAICommands(Enum):
@@ -79,14 +82,10 @@ async def gen_ai_img(
     )
 
 
-class WelcomeType(Enum):
-    WELCOME = auto()
-    LEAVE = auto()
-
-
 class TruthOrDare(Enum):
-    TRUTH = auto()
-    DARE = auto()
+    truth = auto()
+    dare = auto()
+    random = auto()
 
 
 @cmds.new
@@ -559,26 +558,29 @@ async def music(
 @cmds.new
 async def tod(
     msg: discord.interactions.Interaction,
-    type: TruthOrDare = TruthOrDare.TRUTH,
-    model: TextAICommands = TextAICommands.gpt3,
+    type: TruthOrDare = TruthOrDare.random,
 ) -> None:
     """truth or dare"""
 
     await msg.response.defer()
+
+    true_type: TruthOrDare = type
+
+    if true_type == TruthOrDare.random:
+        true_type = RAND.choice((TruthOrDare.truth, TruthOrDare.dare))
+
+    view: View = View(timeout=60)
+    btn: typing.Any = Button(style=discord.ButtonStyle.grey, label=f"another [{type.name}]")
+
+    async def cb(interaction: discord.interactions.Interaction) -> None:
+        view.stop()
+        await tod(msg=interaction, type=type)
+
+    btn.callback = cb
+    view.add_item(btn)
+
     await msg.followup.send(
-        content=await gen_ai_text(
-            f"You find yourself in the '{msg.channel.name}' channel of the '{msg.guild.name}' Discord server, where user '{msg.user.name}' has \
-summoned you to generate a {type.name.lower()} singular prompt for a game of Truth or Dare. As the invoked Discord bot, your task is to provide a suitable \
-prompt for the game, without any additional information or formatting. Your output should consist solely of the prompt for the game, presented in \
-a clear and concise manner. Please take your time to craft a prompt that is appropriate for a game of Truth or Dare and will encourage honest and \
-entertaining responses from the players. The prompts should be of different {type.name.lower()} type every time, be original and unique every time, \
-don't repeat yourself and dont use very common prompts like \"What's the most embarrassing ...\", \"Perform a dramatic ...\", \"What's your secret tallent\" \
-and so on, be creative and unique."
-            + (
-                ""
-                if type == TruthOrDare.TRUTH
-                else " The prompt should also be executable on Discord."
-            ),
-            model,
-        )
+        content=f"{true_type.name} : "
+        + RAND.choice(const.TRUTHS if type == TruthOrDare.truth else const.DARES),
+        view=view,
     )
