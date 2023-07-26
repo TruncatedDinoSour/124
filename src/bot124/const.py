@@ -241,3 +241,5 @@ PARANOIAS: tuple[str, ...] = (
     "who would sell your organs if they got the chance ?",
     "whos most likely to get ran over and then get up and go away like nothing happened ?",
 )
+
+MUSIC_MAX_LEN: Final[int] = 512

@@ -25,6 +25,7 @@ class MusicCommandT(Enum):
     SHUFFLE = "shuffle"
     CURRENT = "current"
     HELP = "help"
+    POP = "pop"
 
 
 @dataclass

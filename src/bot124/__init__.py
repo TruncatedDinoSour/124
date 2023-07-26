@@ -79,6 +79,7 @@ class Bot124(discord.Client):
                             member.voice.self_mute,
                             member.voice.deaf,
                             member.voice.self_deaf,
+                            member.bot,
                         )
                     ):
                         util.get_score(member.id).vcs_joined += 1
@@ -206,6 +207,9 @@ thank you for being in this server for \
     ) -> None:
         if not member.bot:
             util.update_act(member.id)
+
+        if before.channel and len(before.channel.members) == 1:
+            await before.channel.guild.voice_client.disconnect(force=True)
 
         if member.bot or member.voice is None:
             self.vc_times.discard(member.id)

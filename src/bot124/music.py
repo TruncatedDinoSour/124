@@ -72,9 +72,7 @@ class Music:
                 )
 
                 await self.thread.send(
-                    content=f"playing https://youtu.be/{source.data['id']} from `{song}`"[
-                        :2000
-                    ]
+                    content=f"playing https://youtu.be/{source.data['id']}"[:2000]
                 )
 
                 while (
@@ -112,6 +110,12 @@ class Music:
                     if entry:
                         self.queue.append(f"https://youtu.be/{entry['id']}")
 
+    async def _quit(self) -> None:
+        while self.run and self.voice.is_connected():
+            await asyncio.sleep(1)
+
+        await mcmds.quit(self, None)  # type: ignore
+
     def __init__(
         self,
         b: discord.Client,
@@ -134,6 +138,7 @@ class Music:
 
         b.loop.create_task(self._music())
         b.loop.create_task(self._cmds())
+        b.loop.create_task(self._quit())
 
     async def init(self) -> None:
         while self.run and self.voice.is_connected() and not self.thread.archived and not self.thread.locked and self.thread.member_count > 0:  # type: ignore
@@ -143,6 +148,8 @@ class Music:
                 )
             except asyncio.TimeoutError:
                 continue
+
+            m.content = m.content.strip()[: const.MUSIC_MAX_LEN].strip()
 
             try:
                 cmd, args = (

@@ -127,6 +127,17 @@ async def current(music: typing.Any, cmd: mcmdmgr.MusicCommand) -> None:
     """display the current playing track"""
 
     await cmd.msg.reply(
-        content=f"currently playing `{'nothing' if music.current == -1 else music.queue[music.current]}`"
-        + ("" if music.voice.source is None else f" audio : ||{music.voice.source.data['url']}||")
+        content=f"currently playing {'nothing' if music.current == -1 else music.queue[music.current]}"
+        + (
+            ""
+            if music.voice.source is None
+            else f" audio : ||{music.voice.source.data['url']}||"
+        )
     )
+
+
+@cmds.new
+async def pop(music: typing.Any, cmd: mcmdmgr.MusicCommand) -> None:
+    """pops / removes last item off the queue"""
+
+    await cmd.msg.reply(content=f"popped {music.queue.pop()} off the queue")
