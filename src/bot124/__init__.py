@@ -186,7 +186,9 @@ make sure to show your respect to our national anthem -- WAP https://www.youtube
 also we have a system for chat score which you can check out using `/score` or `/scores`, \
 although dont forget that this score is volatile, if youre not active for \
 **{humanize.precisedelta(datetime.timedelta(seconds=const.SCORE_KICK_DELTA), minimum_unit='seconds')}** \
-you will be kicked off the score leaderboard"""
+you will be kicked off the score leaderboard
+
+if you want to invite people use `/invite` command"""
             )
 
     async def on_member_remove(self, member: discord.member.Member):
@@ -196,7 +198,8 @@ you will be kicked off the score leaderboard"""
             await c.send(
                 f"""goodbye, {member.mention} ( `{member.name}{end}` ), \
 thank you for being in this server for \
-**{humanize.precisedelta(datetime.timedelta(seconds=round(datetime.datetime.utcnow().timestamp() - member.joined_at.timestamp())), minimum_unit='seconds') if member.joined_at is not None else "[?]"}**"""
+**{humanize.precisedelta(datetime.timedelta(seconds=round(datetime.datetime.utcnow().timestamp() - member.joined_at.timestamp())), minimum_unit='seconds') if member.joined_at is not None else "[?]"}**, \
+keep in mind if you want to add people use `/invite` command"""
             )
 
     async def on_voice_state_update(
