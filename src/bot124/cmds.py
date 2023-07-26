@@ -595,3 +595,41 @@ async def tod(
         view=view,
         allowed_mentions=discord.mentions.AllowedMentions.none(),
     )
+
+
+@cmds.new
+async def src(
+    msg: discord.interactions.Interaction,
+) -> None:
+    """show a link to the bots source code"""
+
+    await msg.response.defer()
+    await msg.followup.send(content=const.SOURCE)
+
+
+@cmds.new
+async def invite(
+    msg: discord.interactions.Interaction,
+) -> None:
+    """link the top invite"""
+
+    await msg.response.defer()
+
+    invites: list[discord.Invite] = (
+        []
+        if msg.channel is None or msg.channel.guild is None
+        else await msg.channel.guild.invites()
+    )
+    max_invites: typing.Optional[discord.Invite] = None
+
+    for invite in invites:
+        if max_invites is None or invite.uses > max_invites.uses:  # type: ignore
+            max_invites = invite
+
+    await msg.followup.send(
+        content="no invites found"
+        if max_invites is None
+        else f"invite people using {max_invites.inviter.mention if max_invites.inviter is not None else 'server'}'s \
+{max_invites.url} which has {max_invites.uses} uses",
+        allowed_mentions=discord.AllowedMentions.none(),
+    )
