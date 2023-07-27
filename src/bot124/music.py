@@ -160,6 +160,9 @@ class Music:
 
             m.content = m.content.strip()[: const.MUSIC_MAX_LEN].strip()
 
+            if not m.content or m.content.startswith(";"):
+                continue
+
             try:
                 cmd, args = (
                     m.content.split(maxsplit=1)
