@@ -182,7 +182,7 @@ async def random(music: typing.Any, cmd: mcmdmgr.MusicCommand) -> None:
         content=f"adding {n} ( value is wrapped to {const.MUSIC_AI_MAX} ) songs"
     )
 
-    for _ in range(n):
+    for idx in range(n):
         song: str = ""
 
         for _ in range(3):
@@ -193,9 +193,11 @@ async def random(music: typing.Any, cmd: mcmdmgr.MusicCommand) -> None:
             if song:
                 break
 
+            await asyncio.sleep(1)
+
         if song:
             await cmd.msg.reply(
-                content=f"adding an ai generated song, `{song}`, to the queue"
+                content=f"[{idx + 1}/{n}] adding an ai suggested song, `{song}`, to the queue"
             )
 
             Thread(target=music._play, args=(song,), daemon=True).start()
