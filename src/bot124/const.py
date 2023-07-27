@@ -55,8 +55,7 @@ FFMPEG_OPTIONS: Final[dict[str, str]] = {
     "options": "-vn",
 }
 YTDL_OPTIONS: Final[dict[str, Any]] = {
-    "format": "bestaudio/best",
-    "nocheckcertificate": True,
+    "format": "251/bestaudio",
     "extract_flat": "in_playlist",
     "ignoreerrors": True,
     "logtostderr": False,
