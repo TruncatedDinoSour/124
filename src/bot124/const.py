@@ -257,9 +257,9 @@ MUSIC_COMMENT: Final[str] = ";"
 MUSIC_AI_LIMIT: Final[int] = 128
 MUSIC_AI_GEN: Final[
     str
-] = f"Act as if you were a suggestion algorithm and you must suggest one singular indie, indie pop, breakcore, electronic, emo \
-or any other alternative (or alternative-esc) genre song with no formatting or extra information, \
-your response is limited to {MUSIC_AI_LIMIT} characters so keep your responses short and consise, just the artist and the song. \
+] = f"Act as if you were a suggestion algorithm and you must suggest one singular indie, indie pop, breakcore, electronic, emo, \
+indie rock or any other alternative (or alternative-esc) genre song with no formatting or extra information. \
+Your response is limited to {MUSIC_AI_LIMIT} characters so keep your responses short and concise, just the artist and the song. \
 You now must give me one singular song with those requirements in the format of 'artist - song', \
 you must introduce variety to your suggestions (topics, artists, genres, vibes, sounds, lyrics, etc.) and not repeat yourself."
 MUSIC_AI_MAX: Final[int] = 64
