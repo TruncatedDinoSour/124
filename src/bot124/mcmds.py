@@ -5,8 +5,10 @@
 import textwrap
 import typing
 from secrets import SystemRandom
+from threading import Thread
 
 import discord
+from freeGPT import gpt3
 
 from . import const, mcmdmgr
 
@@ -140,7 +142,9 @@ async def current(music: typing.Any, cmd: mcmdmgr.MusicCommand) -> None:
 async def pop(music: typing.Any, cmd: mcmdmgr.MusicCommand) -> None:
     """pops / removes last item off the queue"""
 
-    await cmd.msg.reply(content=f"popped {music.queue.pop() if music.queue else 'nothing'} off the queue")
+    await cmd.msg.reply(
+        content=f"popped {music.queue.pop() if music.queue else 'nothing'} off the queue"
+    )
 
 
 @cmds.new
@@ -149,3 +153,25 @@ async def reset(music: typing.Any, cmd: mcmdmgr.MusicCommand) -> None:
 
     music.reset = True
     await cmd.msg.reply(content="queue reset")
+
+
+@cmds.new
+async def random(music: typing.Any, cmd: mcmdmgr.MusicCommand) -> None:
+    """add random song ( ai generated )"""
+
+    song: str = ""
+
+    for _ in range(3):
+        song = await gpt3.Completion.create(
+            "give me a random song, just the title and the artist, no extra formatting or information, in a format 'artist - song'",  # type: ignore
+        ).strip()
+
+        if song:
+            break
+
+    if song:
+        await cmd.msg.reply(
+            content=f"adding an ai generated song, `{song}` to the queue"
+        )
+
+        Thread(target=music._play, args=(song,), daemon=True).start()

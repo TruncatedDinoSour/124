@@ -127,8 +127,11 @@ TRUTHS: Final[tuple[str, ...]] = (
     "besides your phone, whats the one item in your house you couldnt live without ?",
     "what is the biggest fight youve ever been in with a friend ?",
     "when did you have your first kiss ?",
-    "have you ever send feet pics",
-    "did you ever lick feet",
+    "have you ever send feet pics ?",
+    "did you ever lick feet ?",
+    "whats your biggest regret in your life so far ?",
+    "have you ever lied to a friend to avoid hanging out with them ? what did you say ?",
+    "whats the most unusual or weird thing youve ever eaten, and how did it taste ?",
 )
 DARES: Final[tuple[str, ...]] = (
     "let another player to choose your discord profile picture for 24 hours",
@@ -183,6 +186,7 @@ DARES: Final[tuple[str, ...]] = (
     "list everyone as the emoji( s ) you think best fits them",
     "imitate a behaviour of who you like",
     "send a feet pic",
+    "text someone and send them 3 random emojis, without any explanation at all",
 )
 PARANOIAS: tuple[str, ...] = (
     "who would you hate to date the most here ?",
@@ -239,6 +243,9 @@ PARANOIAS: tuple[str, ...] = (
     "whos most likely to send feet pics ?",
     "who would sell your organs if they got the chance ?",
     "whos most likely to get ran over and then get up and go away like nothing happened ?",
+    "who is the most likely to accidentally set their house on fire while cooking ?",
+    "who do you think has a secret talent nobody knows about ?",
+    "who do you think is most likely to stay up late at night worrying about something that wont happen ?",
 )
 
 MUSIC_MAX_LEN: Final[int] = 512
