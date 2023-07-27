@@ -261,5 +261,6 @@ MUSIC_AI_GEN: Final[
 indie rock or any other alternative (or alternative-esc) genre song with no formatting or extra information. \
 Your response is limited to {MUSIC_AI_LIMIT} characters so keep your responses short and concise, just the artist and the song. \
 You now must give me one singular song with those requirements in the format of 'artist - song', \
-you must introduce variety to your suggestions (topics, artists, genres, vibes, sounds, lyrics, etc.) and not repeat yourself."
+you must introduce variety to your suggestions (topics, artists, genres, vibes, sounds, lyrics, popularity, etc.) and not repeat \
+yourself, meaning don't always pick the most popular option, variety is very important in this case."
 MUSIC_AI_MAX: Final[int] = 64
