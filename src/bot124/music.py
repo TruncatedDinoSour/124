@@ -162,7 +162,7 @@ class Music:
             except asyncio.TimeoutError:
                 continue
 
-            m.content = m.content.strip()[: const.MUSIC_MAX_LEN].strip()
+            m.content = m.content.strip()[: const.MUSIC_MAX_LEN].strip().lower()
 
             if not m.content:
                 continue
@@ -174,11 +174,8 @@ class Music:
                         "",
                     ]
                 )[:2]
-                cmd = cmd.lower()
 
-                self.cqueue.append(
-                    mcmdmgr.MusicCommand(args, mcmdmgr.MusicCommandT(cmd), m)
-                )
+                self.cqueue.append(mcmdmgr.MusicCommand(args, cmd, m))
             except ValueError:
                 await m.reply(content=f"adding `{m.content}` to the queue")
 

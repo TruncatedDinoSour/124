@@ -14,26 +14,10 @@ from discord import AllowedMentions, Message
 from . import const
 
 
-class MusicCommandT(Enum):
-    QUIT = "quit"
-    CLEAR = "clear"
-    QUEUE = "queue"
-    STOP = "stop"
-    PLAY = "play"
-    SKIP = "skip"
-    VOLUME = "volume"
-    SHUFFLE = "shuffle"
-    CURRENT = "current"
-    HELP = "help"
-    POP = "pop"
-    RESET = "reset"
-    RANDOM = "random"
-
-
 @dataclass
 class MusicCommand:
     args: str
-    type: MusicCommandT
+    cmd: str
     msg: Message
 
 
@@ -41,7 +25,7 @@ class MusicCommand:
 class MusicCommands:
     def __init__(self) -> None:
         self.cmds: dict[
-            MusicCommandT, typing.Callable[[typing.Any, MusicCommand], typing.Any]
+            str, typing.Callable[[typing.Any, MusicCommand], typing.Any]
         ] = {}
 
         async def _help(_: typing.Any, cmd: MusicCommand) -> None:
@@ -53,8 +37,8 @@ class MusicCommands:
                 f"- if u wanna say smt in the chat without the bot seeing start ur message with `{const.MUSIC_COMMENT}`, for example "
                 f"`{const.MUSIC_COMMENT} this is my comment`\n"
                 + "".join(
-                    f"- {type.value} -- {fun.__doc__ or 'no help provided'}\n"
-                    for type, fun in self.cmds.items()
+                    f"- {name} -- {fun.__doc__ or 'no help provided'}\n"
+                    for name, fun in self.cmds.items()
                 ),
                 const.MESSAGE_WRAP_LEN,
                 replace_whitespace=False,
@@ -64,8 +48,7 @@ class MusicCommands:
                     allowed_mentions=AllowedMentions.none(),
                 )
 
-        self.cmds[MusicCommandT.HELP] = _help
-
+        self.cmds["help"] = _help
         self.music: typing.Any = None
 
     def new(
@@ -78,7 +61,7 @@ class MusicCommands:
             ), "music command manager is being used pre-initialization"
             return await fn(*args, **kwargs)
 
-        self.cmds[MusicCommandT(fn.__name__)] = wrapper
+        self.cmds[fn.__name__] = wrapper
         return wrapper
 
     def init(self, music: typing.Any) -> None:
@@ -86,6 +69,6 @@ class MusicCommands:
 
     async def push(self, cmd: MusicCommand) -> None:
         try:
-            await self.cmds[cmd.type](self.music, cmd)
+            await self.cmds[cmd.cmd](self.music, cmd)
         except Exception:
             traceback.print_exc()
