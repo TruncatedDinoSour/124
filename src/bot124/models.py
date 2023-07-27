@@ -81,10 +81,13 @@ class Score:
     last_act: sqlalchemy.Column[int] = sqlalchemy.Column(
         sqlalchemy.Integer,
     )
+    stars_removed: sqlalchemy.Column[int] = sqlalchemy.Column(
+        sqlalchemy.Integer,
+    )
 
     def __init__(self, author: int) -> None:
         self.author = author  # type: ignore
-        self.total_bytes = self.total_messages = self.vcs_joined = self.vcs_time = self.new_words = self.reactions_get = self.reactions_post = self.starboard_score = self.ok = 0  # type: ignore
+        self.total_bytes = self.total_messages = self.vcs_joined = self.vcs_time = self.new_words = self.reactions_get = self.reactions_post = self.starboard_score = self.ok = self.stars_removed = 0  # type: ignore
         self.last_act = round(datetime.datetime.utcnow().timestamp())  # type: ignore
 
     def __str__(self) -> str:
@@ -92,7 +95,8 @@ class Score:
 ( {humanize.precisedelta(datetime.timedelta(seconds=self.vcs_time), minimum_unit='seconds')} ) / `{self.vcs_joined}` vcs; \
 `{self.new_words}` wordcloud words; `{self.reactions_get}` reac recv; `{self.reactions_post}` reac given; \
 `{DB.query(Rule.id).where(Rule.author == self.author).count()}` rules; `{self.starboard_score}` stars; \
-`{self.ok}` ok; last activity on `{str(datetime.datetime.utcfromtimestamp(self.last_act))} UTC`"  # type: ignore
+`{self.ok}` ok; last activity on `{str(datetime.datetime.utcfromtimestamp(self.last_act))} UTC`; \
+`{self.stars_removed}` removed stars"  # type: ignore
 
 
 @DB.table

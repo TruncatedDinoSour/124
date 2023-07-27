@@ -44,6 +44,16 @@ ty
         all rules must be unique, it wont create a new rule if its already a rule,
         rules are case sensitive
 -   chat score database using `/score` and `/scorelb`
+    -   based off a complex formula taking these inputs
+        -   average bytes sent per all messages sent + 1 ( positive effect )
+        -   average time ( in seconds ) spent in all voice chats + 1 ( positive effect )
+        -   square root of all reactions gotten ( positive effect )
+        -   log base 2 of all rules made ( positive effect )
+        -   log of all `ok`s + 1 in the ok channel ( positive effect )
+        -   messages ppl started of urs ( positive effect )
+        -   square root of all posted ( given ) reactions ( negative effect )
+        -   stars removed if u star a message ( negative effect )
+        -   inverse average of all values ( neutral effect )
 -   support for starboard using `/starboard` to set the starboard channel
 -   `/timelb` which keeps track of how long a person stayed in the server
 -   `/tod` for truth, dare or paranoia games
