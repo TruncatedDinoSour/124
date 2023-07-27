@@ -576,7 +576,7 @@ async def tod(
             )
         )
 
-    view: View = View(timeout=60 * 5)
+    view: View = View(timeout=const.TOD_EXPIRES)
     btn: typing.Any = Button(
         style=discord.ButtonStyle.grey,
         label=f"another [{type.name}] ( expires in {humanize.precisedelta(datetime.timedelta(seconds=0 if view.timeout is None else view.timeout))} )",

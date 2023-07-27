@@ -264,3 +264,5 @@ You now must give me one singular song with those requirements in the format of 
 you must introduce variety to your suggestions (topics, artists, genres, vibes, sounds, lyrics, popularity, etc.) and not repeat \
 yourself, meaning don't always pick the most popular option, variety is very important in this case."
 MUSIC_AI_MAX: Final[int] = 64
+
+TOD_EXPIRES: Final[float] = 60 * 5
