@@ -201,9 +201,9 @@ Your previous response was: {prev}"""  # type: ignore
 
             await asyncio.sleep(1)
 
-        prev = song
-
         if song:
+            prev = song
+
             await cmd.msg.reply(
                 content=f"[{idx + 1}/{n}] adding an ai suggested song, `{song}`, to the queue"
             )
