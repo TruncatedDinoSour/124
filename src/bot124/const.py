@@ -254,9 +254,12 @@ MUSIC_MAX_LEN: Final[int] = 512
 
 SOURCE: Final[str] = "https://ari-web.xyz/gh/124"
 MUSIC_COMMENT: Final[str] = ";"
+MUSIC_AI_LIMIT: Final[int] = 128
 MUSIC_AI_GEN: Final[
     str
-] = "Act as if you are the YouTube suggestion AI. Suggest me a one, singular, random indie, indie pop, breakcore, electronic, emo or any other alternative \
-(and alternative-esc) genre song that I would like, although introduce variety in types of songs, genres, topics, artists, etc. Give me just the title \
-and the artist, no extra formatting or information, in the format of 'artist - song'. No extra information, just the artist and the song, just one."
+] = f"Act as if you were a suggestion algorithm and you must suggest one singular indie, indie pop, breakcore, electronic, emo \
+or any other alternative (or alternative-esc) genre song with no formatting or extra information, \
+your response is limited to {MUSIC_AI_LIMIT} characters so keep your responses short and consise, just the artist and the song. \
+You now must give me one singular song with those requirements in the format of 'artist - song', \
+you must introduce variety to your suggestions (topics, artists, genres, vibes, sounds, lyrics, etc.) and not repeat yourself."
 MUSIC_AI_MAX: Final[int] = 64

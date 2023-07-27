@@ -182,18 +182,26 @@ async def random(music: typing.Any, cmd: mcmdmgr.MusicCommand) -> None:
         content=f"adding {n} ( value is wrapped to {const.MUSIC_AI_MAX} ) songs"
     )
 
+    prev: str = "<none>"
+
     for idx in range(n):
         song: str = ""
 
         for _ in range(3):
             song = (
-                await gpt3.Completion.create(const.MUSIC_AI_GEN)  # type: ignore
-            ).strip()
+                await gpt3.Completion.create(
+                    f"""{const.MUSIC_AI_GEN}
+
+Your previous response was: {prev}"""  # type: ignore
+                )
+            )[: const.MUSIC_AI_LIMIT].strip()
 
             if song:
                 break
 
             await asyncio.sleep(1)
+
+        prev = song
 
         if song:
             await cmd.msg.reply(
