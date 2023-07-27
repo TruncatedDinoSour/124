@@ -258,5 +258,5 @@ MUSIC_AI_GEN: Final[
     str
 ] = "Act as if you are the YouTube suggestion AI. Suggest me a one, singular, random indie, indie pop, breakcore, electronic, emo or any other alternative \
 (and alternative-esc) genre song that I would like, although introduce variety in types of songs, genres, topics, artists, etc. Give me just the title \
-and the artist, no extra formatting or information, in the format of 'artist - song'. No extra information, just the artist and the song."
+and the artist, no extra formatting or information, in the format of 'artist - song'. No extra information, just the artist and the song, just one."
 MUSIC_AI_MAX: Final[int] = 64
