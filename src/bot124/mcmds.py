@@ -176,7 +176,7 @@ async def random(music: typing.Any, cmd: mcmdmgr.MusicCommand) -> None:
             await cmd.msg.reply(content=f"`{cmd.args}` isnt a valid integer")
             return
 
-    n = (n % const.MUSIC_AI_MAX) + 1
+    n = min(n, const.MUSIC_AI_MAX)
 
     await cmd.msg.reply(
         content=f"adding {n} ( value is wrapped to {const.MUSIC_AI_MAX} ) songs"
