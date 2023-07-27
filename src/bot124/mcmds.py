@@ -162,10 +162,12 @@ async def random(music: typing.Any, cmd: mcmdmgr.MusicCommand) -> None:
     song: str = ""
 
     for _ in range(3):
-        song = await gpt3.Completion.create(  # type: ignore
-            "give me a random song that many people would like, just the title and the artist, no extra formatting or \
+        song = (
+            await gpt3.Completion.create(
+                "give me a random song that many people would like, just the title and the artist, no extra formatting or \
 information, in a format 'artist - song'",  # type: ignore
-        ).strip()  # type: ignore
+            )
+        ).strip()
 
         if song:
             break
