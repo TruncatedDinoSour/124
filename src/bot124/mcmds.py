@@ -163,10 +163,7 @@ async def random(music: typing.Any, cmd: mcmdmgr.MusicCommand) -> None:
 
     for _ in range(3):
         song = (
-            await gpt3.Completion.create(
-                "suggest me a singular random indie, indie pop, breakcore, electronic, emo or any other alternative genre song that i would like, \
-just the title and the artist, no extra formatting or information, in a format 'artist - song'",  # type: ignore
-            )
+            await gpt3.Completion.create(const.MUSIC_AI_GEN)  # type: ignore
         ).strip()
 
         if song:

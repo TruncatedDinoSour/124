@@ -132,6 +132,7 @@ TRUTHS: Final[tuple[str, ...]] = (
     "whats your biggest regret in your life so far ?",
     "have you ever lied to a friend to avoid hanging out with them ? what did you say ?",
     "whats the most unusual or weird thing youve ever eaten, and how did it taste ?",
+    "whats the cringiest thing youve ever done",
 )
 DARES: Final[tuple[str, ...]] = (
     "let another player to choose your discord profile picture for 24 hours",
@@ -246,9 +247,14 @@ PARANOIAS: tuple[str, ...] = (
     "who is the most likely to accidentally set their house on fire while cooking ?",
     "who do you think has a secret talent nobody knows about ?",
     "who do you think is most likely to stay up late at night worrying about something that wont happen ?",
+    "who here is most likely to commit suicide the earliest ?",
 )
 
 MUSIC_MAX_LEN: Final[int] = 512
 
 SOURCE: Final[str] = "https://ari-web.xyz/gh/124"
 MUSIC_COMMENT: Final[str] = ";"
+MUSIC_AI_GEN: Final[
+    str
+] = "suggest me a singular random indie, indie pop, breakcore, electronic, emo or any other alternative genre song that i would like, \
+just the title and the artist, no extra formatting or information, in a format 'artist - song'"
