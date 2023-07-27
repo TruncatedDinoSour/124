@@ -90,14 +90,21 @@ async def skip(music: typing.Any, cmd: mcmdmgr.MusicCommand) -> None:
 
 @cmds.new
 async def volume(music: typing.Any, cmd: mcmdmgr.MusicCommand) -> None:
-    """set the volume, requires an argument `volume` which is the volume in percent, like volume 69.1 = 69.1%"""
+    """set the volume, takes an optional argument `volume` which is the volume in percent, \
+like volume 69.1 = 69.1%, if no volume is supplied it shows current volume"""
 
     if music.voice.source is None:
         await cmd.msg.reply(content="i am currently not playing anything")
         return
 
+    if not cmd.args:
+        await cmd.msg.reply(
+            content=f"current volume : {music.voice.source.volume * 100}%\ndefault volume : 50%"
+        )
+        return
+
     try:
-        vol: float = float(cmd.args)
+        vol: float = float(cmd.args.removesuffix("%"))
     except ValueError:
         await cmd.msg.reply(
             content=f"`{cmd.args}` is not a valid floating point integer"
