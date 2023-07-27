@@ -576,9 +576,10 @@ async def tod(
             )
         )
 
-    view: View = View(timeout=60)
+    view: View = View(timeout=60 * 5)
     btn: typing.Any = Button(
-        style=discord.ButtonStyle.grey, label=f"another [{type.name}]"
+        style=discord.ButtonStyle.grey,
+        label=f"another [{type.name}] ( expires in {humanize.precisedelta(datetime.timedelta(seconds=0 if view.timeout is None else view.timeout))} )",
     )
 
     async def cb(interaction: discord.interactions.Interaction) -> None:
