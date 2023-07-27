@@ -244,3 +244,4 @@ PARANOIAS: tuple[str, ...] = (
 MUSIC_MAX_LEN: Final[int] = 512
 
 SOURCE: Final[str] = "https://ari-web.xyz/gh/124"
+MUSIC_COMMENT: Final[str] = ";"

@@ -48,7 +48,9 @@ class MusicCommands:
 
             for page in textwrap.wrap(
                 "help for music functions\n\n"
-                + "- to add music to the queue just type your search query or send a youtube url to your song or playlist\n"
+                "- to add music to the queue just type your search query or send a youtube url to your song or playlist\n"
+                f"- if u wanna say smt in the chat without the bot seeing start ur message with `{const.MUSIC_COMMENT}`, for example "
+                f"`{const.MUSIC_COMMENT} this is my comment`\n"
                 + "".join(
                     f"- {type.value} -- {fun.__doc__ or 'no help provided'}\n"
                     for type, fun in self.cmds.items()

@@ -153,14 +153,18 @@ class Music:
         while self.run and self.voice.is_connected() and not self.thread.archived and not self.thread.locked and self.thread.member_count > 0:  # type: ignore
             try:
                 m: discord.Message = await self.b.wait_for(  # type: ignore
-                    "message", check=lambda m: m.channel == self.thread and m.content and not m.author.bot  # type: ignore
+                    "message",
+                    check=lambda m: m.channel == self.thread
+                    and m.content
+                    and not m.author.bot
+                    and not m.content.startswith(const.MUSIC_COMMENT),  # type: ignore
                 )
             except asyncio.TimeoutError:
                 continue
 
             m.content = m.content.strip()[: const.MUSIC_MAX_LEN].strip()
 
-            if not m.content or m.content.startswith(";"):
+            if not m.content:
                 continue
 
             try:
