@@ -2,13 +2,14 @@
 # -*- coding: utf-8 -*-
 """music commands"""
 
+import asyncio
 import textwrap
 import typing
 from secrets import SystemRandom
 from threading import Thread
 
 import discord
-from freeGPT import gpt3
+from freeGPT import gpt3  # type: ignore
 
 from . import const, mcmdmgr
 
@@ -164,21 +165,39 @@ async def reset(music: typing.Any, cmd: mcmdmgr.MusicCommand) -> None:
 
 @cmds.new
 async def random(music: typing.Any, cmd: mcmdmgr.MusicCommand) -> None:
-    """add random song ( ai generated )"""
+    """add random ai suggested song, takes an optional argument [n] for number of songs to generate, for example `random 10`"""
 
-    song: str = ""
+    n: int = 1
 
-    for _ in range(3):
-        song = (
-            await gpt3.Completion.create(const.MUSIC_AI_GEN)  # type: ignore
-        ).strip()
+    if cmd.args:
+        try:
+            n = int(cmd.args)
+        except ValueError:
+            await cmd.msg.reply(content=f"`{cmd.args}` isnt a valid integer")
+            return
+
+    n = n % const.MUSIC_AI_MAX
+
+    await cmd.msg.reply(
+        content=f"adding {n} ( value is wrapped to {const.MUSIC_AI_MAX} ) songs"
+    )
+
+    for _ in range(n):
+        song: str = ""
+
+        for _ in range(3):
+            song = (
+                await gpt3.Completion.create(const.MUSIC_AI_GEN)  # type: ignore
+            ).strip()
+
+            if song:
+                break
 
         if song:
-            break
+            await cmd.msg.reply(
+                content=f"adding an ai generated song, `{song}`, to the queue"
+            )
 
-    if song:
-        await cmd.msg.reply(
-            content=f"adding an ai generated song, `{song}` to the queue"
-        )
+            Thread(target=music._play, args=(song,), daemon=True).start()
 
-        Thread(target=music._play, args=(song,), daemon=True).start()
+        await asyncio.sleep(1)

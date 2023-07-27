@@ -25,11 +25,14 @@ ty
 -   music commands and control using `/music`
     -   typing `help` shows help
     -   `quit` makes the bot quit the voice chat and deletes the control thread
-    -   access to the queue by typing `queue` and access to current track using `currentn`
+    -   access to the queue by typing `queue` and access to current track using `current`
     -   stopping of music using `stop` and playing with `play`
     -   skipping of tracks using `skip`
-    -   volume control by using `volume [vol in %]`
+    -   volume control by using `volume [vol in %]` or check with just `volume`
     -   true shuffling using true randomness using `shuffle`
+    -   remove items from end of the queue using `pop`
+    -   play the queue from the start using `reset`
+    -   use ai to suggest u songs using `random` to add one or `random 10` or any number to add `n` ai suggestion songs
     -   queues for both commands and music makes sure everything is managed and ran
     -   support for youtube searches ( just type anything in the thread ), youtube urls and youtube playlists
 -   support for `neofetch` in linux servers
