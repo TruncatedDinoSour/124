@@ -140,7 +140,7 @@ async def current(music: typing.Any, cmd: mcmdmgr.MusicCommand) -> None:
 async def pop(music: typing.Any, cmd: mcmdmgr.MusicCommand) -> None:
     """pops / removes last item off the queue"""
 
-    await cmd.msg.reply(content=f"popped {music.queue.pop()} off the queue")
+    await cmd.msg.reply(content=f"popped {music.queue.pop() if music.queue else 'nothing'} off the queue")
 
 
 @cmds.new

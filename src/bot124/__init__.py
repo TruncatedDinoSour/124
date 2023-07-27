@@ -211,7 +211,12 @@ keep in mind if you want to add people use `/invite` command"""
         if not member.bot:
             util.update_act(member.id)
 
-        if before.channel and len(before.channel.members) == 1:
+        if (
+            before.channel
+            and before.channel.guild
+            and before.channel.guild.voice_client
+            and len(before.channel.members) == 1
+        ):
             await before.channel.guild.voice_client.disconnect(force=True)
 
         if member.bot or member.voice is None:

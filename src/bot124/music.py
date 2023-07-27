@@ -53,7 +53,7 @@ class YTDLSource(discord.PCMVolumeTransformer):  # type: ignore
 class Music:
     def _music_enum(self) -> typing.Generator[str, None, None]:
         for idx, item in enumerate(self.queue):
-            if self.reset:
+            if self.reset or not self.run or not self.voice.is_connected():
                 return
 
             self.current = idx
@@ -98,11 +98,17 @@ class Music:
             await asyncio.sleep(1)
 
     def _play(self, url: str) -> None:
-        info: dict[str, typing.Any] = self.ytdl.extract_info(url, download=False)  # type: ignore
+        info: typing.Optional[dict[str, typing.Any]] = self.ytdl.extract_info(url, download=False)  # type: ignore
+
+        if info is None:
+            return
 
         if "entries" not in info:
             self.queue.append(url)
         else:
+            if not info["entries"]:
+                return
+
             if not validators.url(url):  # type: ignore
                 self.queue.append(f"https://youtu.be/{info['entries'][0]['id']}")
             else:
@@ -114,7 +120,10 @@ class Music:
         while self.run and self.voice.is_connected():
             await asyncio.sleep(1)
 
-        await mcmds.quit(self, None)  # type: ignore
+        try:
+            await mcmds.quit(self, None)  # type: ignore
+        except Exception:
+            pass
 
     def __init__(
         self,
