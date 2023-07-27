@@ -167,16 +167,15 @@ class Music:
             if not m.content:
                 continue
 
-            try:
-                cmd, args = (
-                    m.content.split(maxsplit=1)
-                    + [
-                        "",
-                    ]
-                )[:2]
+            cmd, args = (
+                m.content.split(maxsplit=1)
+                + [
+                    "",
+                ]
+            )[:2]
 
+            if cmd in mcmds.cmds.cmds:
                 self.cqueue.append(mcmdmgr.MusicCommand(args, cmd, m))
-            except KeyError:
+            else:
                 await m.reply(content=f"adding `{m.content}` to the queue")
-
                 Thread(target=self._play, args=(m.content,), daemon=True).start()
