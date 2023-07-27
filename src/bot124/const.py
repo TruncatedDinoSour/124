@@ -256,5 +256,5 @@ SOURCE: Final[str] = "https://ari-web.xyz/gh/124"
 MUSIC_COMMENT: Final[str] = ";"
 MUSIC_AI_GEN: Final[
     str
-] = "suggest me a singular random indie, indie pop, breakcore, electronic, emo or any other alternative genre song that i would like, \
-just the title and the artist, no extra formatting or information, in a format 'artist - song'"
+] = "Suggest me a singular random indie, indie pop, breakcore, electronic, emo or any other alternative genre song that I would like, \
+although introduce variety. Just the title and the artist, no extra formatting or information, in the format 'artist - song'."
