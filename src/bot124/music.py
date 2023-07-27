@@ -176,7 +176,7 @@ class Music:
                 )[:2]
 
                 self.cqueue.append(mcmdmgr.MusicCommand(args, cmd, m))
-            except ValueError:
+            except KeyError:
                 await m.reply(content=f"adding `{m.content}` to the queue")
 
                 Thread(target=self._play, args=(m.content,), daemon=True).start()
