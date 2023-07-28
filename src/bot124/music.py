@@ -22,7 +22,7 @@ class YTDLSource(discord.PCMVolumeTransformer):  # type: ignore
         source: discord.AudioSource,
         *,
         data: dict[typing.Any, typing.Any],
-        volume: float = 0.5,
+        volume: float = const.MUSIC_DEFAULT_VOL,
     ) -> None:
         super().__init__(source, volume)  # type: ignore
         self.data: dict[typing.Any, typing.Any] = data
@@ -51,40 +51,41 @@ class YTDLSource(discord.PCMVolumeTransformer):  # type: ignore
 
 
 class Music:
-    def _music_enum(self) -> typing.Generator[str, None, None]:
-        for idx, item in enumerate(self.queue):
-            if self.reset or not self.run or not self.voice.is_connected():
-                return
-
-            self.current = idx
-
-            yield item
-
     async def _music(self) -> None:
         while self.run and self.voice.is_connected():
-            self.reset = False
+            if self.current < 0:
+                self.current = 0
 
-            for song in self._music_enum():  # type: ignore
+            while self.queue:
+                previous_current: int = self.current
+
                 self.voice.play(
-                    source := await YTDLSource.from_url(
-                        song, self.ytdl, loop=self.b.loop  # type: ignore
+                    await YTDLSource.from_url(
+                        url := self.queue[self.current], self.ytdl, loop=self.b.loop  # type: ignore
                     )
                 )
 
                 await self.thread.send(
-                    content=f"playing https://youtu.be/{source.data['id']}"[:2000]
+                    content=f"[{previous_current + 1}/{len(self.queue)}] playing {url}"
                 )
 
                 while (
                     self.voice.is_connected()
                     and self.run
-                    and self.current != -1
-                    and not self.reset
-                    and (self.voice.is_playing() or self.pause)
+                    and self.current == previous_current
+                    and (self.voice.is_playing() or self.voice.is_paused())
                 ):
                     await asyncio.sleep(1)
 
                 self.voice.stop()
+
+                if not self.repeat and self.current == previous_current:
+                    if self.current + 1 < len(self.queue):
+                        self.current += 1
+                    elif self.loop:
+                        self.current = 0
+
+                break
 
             await asyncio.sleep(1)
 
@@ -93,7 +94,7 @@ class Music:
 
         while self.run and self.voice.is_connected():
             while self.cqueue:
-                await mcmds.cmds.push(self.cqueue.pop())
+                await mcmds.cmds.push(self.cqueue.pop(0))
 
             await asyncio.sleep(1)
 
@@ -120,10 +121,7 @@ class Music:
         while self.run and self.voice.is_connected():
             await asyncio.sleep(1)
 
-        try:
-            await mcmds.quit(self, None)  # type: ignore
-        except Exception:
-            pass
+        await mcmds.quit(self, None)  # type: ignore
 
     def __init__(
         self,
@@ -135,21 +133,26 @@ class Music:
         self.thread: discord.Thread = thread
         self.voice: discord.VoiceClient = voice
 
-        self.queue: list[str] = []
-        self.cqueue: list[mcmdmgr.MusicCommand] = []
         self.ytdl: yt_dlp.YoutubeDL = yt_dlp.YoutubeDL(const.YTDL_OPTIONS)
 
-        self.current: int = -1
-        self.pause: bool = False
-        self.reset: bool = False
+        self.queue: list[str] = []
+        self.cqueue: list[mcmdmgr.MusicCommand] = []
+
+        self.current: int = 0
 
         self.run: bool = True
+
+        self.loop: bool = False
+        self.repeat: bool = False
 
         b.loop.create_task(self._music())
         b.loop.create_task(self._cmds())
         b.loop.create_task(self._quit())
 
     async def init(self) -> None:
+        mentions: discord.AllowedMentions = discord.AllowedMentions.none()
+        mentions.replied_user = True
+
         while self.run and self.voice.is_connected() and not self.thread.archived and not self.thread.locked and self.thread.member_count > 0:  # type: ignore
             try:
                 m: discord.Message = await self.b.wait_for(  # type: ignore
@@ -178,5 +181,8 @@ class Music:
             if cmd in mcmds.cmds.cmds:
                 self.cqueue.append(mcmdmgr.MusicCommand(args, cmd, m))
             else:
-                await m.reply(content=f"adding `{m.content}` to the queue")
+                await m.reply(
+                    content=f"adding `{m.content}` to the queue",
+                    allowed_mentions=mentions,
+                )
                 Thread(target=self._play, args=(m.content,), daemon=True).start()

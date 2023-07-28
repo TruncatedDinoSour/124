@@ -76,6 +76,21 @@ YTDL_OPTIONS: Final[dict[str, Any]] = {
     "nocheckcertificate": True,
     "geo_bypass": True,
 }
+MUSIC_MAX_LEN: Final[int] = 512
+SOURCE: Final[str] = "https://ari-web.xyz/gh/124"
+MUSIC_COMMENT: Final[str] = ";"
+MUSIC_AI_LIMIT: Final[int] = 128
+MUSIC_AI_GEN: Final[
+    str
+] = f"Act as if you were an advanced suggestion algorithm and you must suggest one singular indie, indie pop, breakcore, electronic, emo, \
+indie rock or any other alternative (or alternative-esc) genre song with no formatting or extra information. \
+Your response is limited to {MUSIC_AI_LIMIT} characters so keep your responses short and concise, just the artist and the song. \
+You now must give me one singular song with those requirements in the format of 'artist - song', \
+you must introduce variety to your suggestions (topics, artists, genres, vibes, sounds, lyrics, popularity, length, etc.) and not repeat \
+yourself, meaning don't always pick the most popular and known option, variety is very important in this case."
+MUSIC_AI_MAX: Final[int] = 12
+MUSIC_AI_TRIES: Final[int] = 3
+MUSIC_DEFAULT_VOL: Final[float] = 0.5
 
 TRUTHS: Final[tuple[str, ...]] = (
     "what is a weird food that you love ?",
@@ -251,20 +266,5 @@ PARANOIAS: tuple[str, ...] = (
     "who do you think is most likely to stay up late at night worrying about something that wont happen ?",
     "who here is most likely to commit suicide the earliest ?",
 )
-
-MUSIC_MAX_LEN: Final[int] = 512
-
-SOURCE: Final[str] = "https://ari-web.xyz/gh/124"
-MUSIC_COMMENT: Final[str] = ";"
-MUSIC_AI_LIMIT: Final[int] = 128
-MUSIC_AI_GEN: Final[
-    str
-] = f"Act as if you were a suggestion algorithm and you must suggest one singular indie, indie pop, breakcore, electronic, emo, \
-indie rock or any other alternative (or alternative-esc) genre song with no formatting or extra information. \
-Your response is limited to {MUSIC_AI_LIMIT} characters so keep your responses short and concise, just the artist and the song. \
-You now must give me one singular song with those requirements in the format of 'artist - song', \
-you must introduce variety to your suggestions (topics, artists, genres, vibes, sounds, lyrics, popularity, etc.) and not repeat \
-yourself, meaning don't always pick the most popular option, variety is very important in this case."
-MUSIC_AI_MAX: Final[int] = 64
 
 TOD_EXPIRES: Final[float] = 60 * 5  # 5 minutes

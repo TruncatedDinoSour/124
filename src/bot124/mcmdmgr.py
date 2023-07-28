@@ -6,7 +6,6 @@ import textwrap
 import traceback
 import typing
 from dataclasses import dataclass
-from enum import Enum
 from functools import wraps
 
 from discord import AllowedMentions, Message
@@ -36,6 +35,7 @@ class MusicCommands:
                 "- to add music to the queue just type your search query or send a youtube url to your song or playlist\n"
                 f"- if u wanna say smt in the chat without the bot seeing start ur message with `{const.MUSIC_COMMENT}`, for example "
                 f"`{const.MUSIC_COMMENT} this is my comment`\n"
+                "\n"
                 + "".join(
                     f"- {name} -- {fun.__doc__ or 'no help provided'}\n"
                     for name, fun in self.cmds.items()
@@ -59,9 +59,40 @@ class MusicCommands:
             assert (
                 self.music is not None
             ), "music command manager is being used pre-initialization"
+
+            if not self.music.queue:
+                await args[1].msg.reply(content="no queue found")
+                return
+
             return await fn(*args, **kwargs)
 
         self.cmds[fn.__name__] = wrapper
+        return wrapper
+
+    def nnew(
+        self, fn: typing.Callable[[typing.Any, MusicCommand], typing.Any]
+    ) -> typing.Callable[..., typing.Any]:
+        @wraps(fn)
+        async def wrapper(*args: typing.Any, **kwargs: typing.Any) -> typing.Any:
+            assert (
+                self.music is not None
+            ), "music command manager is being used pre-initialization"
+            return await fn(*args, **kwargs)
+
+        self.cmds[fn.__name__] = wrapper
+        return wrapper
+
+    def args(
+        self, fn: typing.Callable[[typing.Any, MusicCommand], typing.Any]
+    ) -> typing.Callable[..., typing.Any]:
+        @wraps(fn)
+        async def wrapper(*args: typing.Any, **kwargs: typing.Any) -> typing.Any:
+            if not args[1].args:
+                await args[1].msg.reply(content="missing arguments")
+                return
+
+            return await fn(*args, **kwargs)
+
         return wrapper
 
     def init(self, music: typing.Any) -> None:

@@ -23,18 +23,22 @@ ty
 -   anonymous confessions database using `/confess` and `/confessions`
 -   auto-generated help page accessed through `/help`
 -   music commands and control using `/music`
-    -   typing `help` shows help
-    -   `quit` makes the bot quit the voice chat and deletes the control thread
-    -   access to the queue by typing `queue` and access to current track using `current`
-    -   stopping of music using `stop` and playing with `play`
-    -   skipping of tracks using `skip`
-    -   volume control by using `volume [vol in %]` or check with just `volume`
-    -   true shuffling using true randomness using `shuffle`
-    -   remove items from end of the queue using `pop`
-    -   play the queue from the start using `reset`
-    -   use ai to suggest u songs using `random` to add one or `random 10` or any number to add `n` ai suggestion songs
-    -   queues for both commands and music makes sure everything is managed and ran
-    -   support for youtube searches ( just type anything in the thread ), youtube urls and youtube playlists
+    -   controlled through a thread
+    -   u can send messages in it as normal but prefix it with `;`
+    -   support for youtube urls, playlists and search queries ( u have to just type anything without prefixing it with a command or `;` and itll be treated as a search query )
+    -   human-readable and uncomplicated command syntax
+    -   `help` which shows the auto-generated help page for music commands
+    -   `quit` for clean quitting, also happens if the voice chat is empty
+    -   support for clearing all queues -- command queue and music queue with `clear`
+    -   `pause` and `play` commands for controlling audio playback
+    -   `next`, `begin`, `end`, `back` and `goto [idx starting at 1]` for controlling the queue cursor
+    -   `remove [optional idx default = current]` and `pop` for removing songs in the queue
+    -   `volume [vol in %]` for volume control and `volume` checking
+    -   true shuffling support with `shuffle`
+    -   showing of current song and audio source using `current`
+    -   `random [optional n default = 1]` which uses
+    -   `loop` and `repeat` for looping the queue and repeating current tacks
+    -   `info` for displaying the music bot info
 -   support for `neofetch` in linux servers
 -   `/pfp` command to extract user profile pictures
 -   rules database using `/rules` and `/ruleslb`
