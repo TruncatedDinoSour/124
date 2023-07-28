@@ -6,6 +6,7 @@ import asyncio
 import datetime
 import string
 import typing
+import textwrap
 
 import discord
 import discord.app_commands  # type: ignore
@@ -42,30 +43,39 @@ class Bot124(discord.Client):
         while True:
             await asyncio.sleep(const.SCORE_KICK_SLEEP)
 
+            score_list: str = ""
+            total_scores: int = 0
+
+            score: models.Score
+
             for score in models.DB.query(models.Score):  # type: ignore
                 if (
                     delta := round(
                         datetime.datetime.utcnow().timestamp() - score.last_act
-                    )
+                    ) + const.SCORE_KICK_ADD
                 ) >= const.SCORE_KICK_DELTA:  # type: ignore
+                    score_list += f"{total_scores + 1}, <@{score.author}> no activity for \
+{humanize.precisedelta(datetime.timedelta(seconds=delta), minimum_unit='seconds')} with score `{util.calc_score(score)}` ( {str(score)} )\n"
+                    total_scores += 1
+
                     models.DB.session.execute(
                         sqlalchemy.delete(models.Score).where(
                             models.Score.author == score.author
                         )
                     )
 
-                    for g in self.guilds:
-                        if (c := g.system_channel) is not None:
-                            await c.send(
-                                f"user <@{score.author}> has been kicked off the score leaderboard due to inactivity, no activity for \
-{humanize.precisedelta(datetime.timedelta(seconds=delta), minimum_unit='seconds')}"
-                            )
-
-                        await asyncio.sleep(1)
-
-                await asyncio.sleep(1)
-
             models.DB.commit()
+
+            if total_scores > 0:
+                score_list = f"kicked {total_scores} scores off the score leaderboard\n\n{score_list}"
+
+                for g in self.guilds:
+                    if (c := g.system_channel) is not None:
+                        for page in textwrap.wrap(score_list, const.MESSAGE_WRAP_LEN, replace_whitespace=False):
+                            await c.send(content=page)
+                            await asyncio.sleep(1)
+
+                    await asyncio.sleep(1)
 
     async def on_ready(self) -> None:
         models.DB.init()
@@ -163,6 +173,8 @@ class Bot124(discord.Client):
                 await msg.reply(content=f"{'real' if real else 'fake'} rule #{rule.id}")
             except sqlalchemy.exc.IntegrityError:  # type: ignore
                 await msg.delete()
+
+        models.DB.commit()
 
     async def on_message_edit(
         self, _: discord.message.Message, msg: discord.message.Message
@@ -285,6 +297,7 @@ keep in mind if you want to add people use `/invite` command"""
 
         util.get_score(user.id).reactions_post += 1
         util.get_score(reaction.message.author.id).reactions_get += 1
+
         models.DB.commit()
 
     async def on_reaction_remove(

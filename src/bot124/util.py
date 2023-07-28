@@ -134,3 +134,4 @@ def calc_score(s: models.Score) -> float:
 
 def update_act(id: int) -> None:
     get_score(id).last_act = round(datetime.utcnow().timestamp())
+    models.DB.commit()
