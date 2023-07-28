@@ -46,7 +46,7 @@ STAR_COUNT: Final[int] = 3
 
 SCORE_KICK_SLEEP: Final[int] = 3 * 60 * 60  # every 3 hours
 SCORE_KICK_DELTA: Final[int] = 3 * 24 * 60 * 60  # every 3 days
-SCORE_KICK_ADD: Final[int] = SCORE_KICK_SLEEP  # add 3 hours to the inactivity
+SCORE_KICK_ADD: Final[float] = SCORE_KICK_SLEEP / 2  # add 1.5 hours to the inactivity
 
 ANSI_REGEX: Final[re.Pattern[str]] = re.compile(
     r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])"
