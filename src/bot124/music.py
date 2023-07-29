@@ -182,7 +182,7 @@ class Music:
                 self.cqueue.append(mcmdmgr.MusicCommand(args, cmd, m))
             else:
                 await m.reply(
-                    content=f"adding `{m.content}` to the queue",
+                    content=f"adding `{m.content}` ( #{len(self.queue) + 1} ) to the queue",
                     allowed_mentions=mentions,
                 )
                 Thread(target=self._play, args=(m.content,), daemon=True).start()
