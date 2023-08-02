@@ -166,3 +166,4 @@ cython_debug/
 .ccls-cache/
 !py.typed
 *.env
+/c
