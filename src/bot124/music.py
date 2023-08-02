@@ -59,14 +59,15 @@ class Music:
             while self.queue:
                 previous_current: int = self.current
 
-                self.voice.play(
-                    await YTDLSource.from_url(
-                        url := self.queue[self.current],
-                        self.ytdl,
-                        loop=self.b.loop,
-                        volume=self.volume,  # type: ignore
-                    )
+                s: YTDLSource = await YTDLSource.from_url(
+                    url := self.queue[self.current],
+                    self.ytdl,
+                    loop=self.b.loop,
                 )
+
+                s.volume = self.volume
+
+                self.voice.play(s)
 
                 await self.thread.send(
                     content=f"[{previous_current + 1}/{len(self.queue)}] playing {url}"
