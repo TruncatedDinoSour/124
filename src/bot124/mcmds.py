@@ -180,7 +180,7 @@ like volume 69.1 = 69.1%, if no volume is supplied it shows current volume"""
         await cmd.msg.reply(content="this is not a valid volume")
         return
 
-    music.voice.source.volume = vol / 100  # type: ignore
+    music.voice.source.volume = music.volume = vol / 100  # type: ignore
 
     await cmd.msg.reply(
         content=f"volume set to {vol}% ( {music.voice.source.volume} )"  # type: ignore

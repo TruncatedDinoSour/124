@@ -61,7 +61,10 @@ class Music:
 
                 self.voice.play(
                     await YTDLSource.from_url(
-                        url := self.queue[self.current], self.ytdl, loop=self.b.loop  # type: ignore
+                        url := self.queue[self.current],
+                        self.ytdl,
+                        loop=self.b.loop,
+                        volume=self.volume,  # type: ignore
                     )
                 )
 
@@ -144,6 +147,7 @@ class Music:
 
         self.loop: bool = False
         self.repeat: bool = False
+        self.volume: float = const.MUSIC_DEFAULT_VOL
 
         b.loop.create_task(self._music())
         b.loop.create_task(self._cmds())
