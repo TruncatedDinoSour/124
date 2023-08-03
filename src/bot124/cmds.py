@@ -709,3 +709,25 @@ async def kickslb(msg: discord.interactions.Interaction) -> None:  # type: ignor
         )
         + f"\n\naverage chat score : {total_lbv / len(lbv):.2f}\ntotal chat score : {total_lbv:.2f}",
     )
+
+
+@cmds.new
+async def advice(msg: discord.interactions.Interaction, query: typing.Optional[str] = None) -> None:  # type: ignore
+    """get or search for advice"""
+
+    if query is not None:
+        await menu.text_menu(
+            msg,
+            "\n".join(
+                f"{idx}, advice #{advice['id']} @ {advice['date']} : {advice['advice']}"
+                for idx, advice in enumerate(
+                    requests.get(f"{const.ADVICE_API}/search/{query}").json()["slips"],
+                    1,
+                )
+            ),
+        )
+    else:
+        advice: dict[str, typing.Union[int, str]] = requests.get(
+            const.ADVICE_API
+        ).json()["slip"]
+        await menu.text_menu(msg, f"advice #{advice['id']} : {advice['advice']}")

@@ -15,6 +15,13 @@ python3 src/main.py
 
 ty
 
+# thank you
+
+-   https://cataas.com/ for cat pics
+-   https://github.com/cat-milk/Anime-Girls-Holding-Programming-Books for anime girls holding programming books
+-   https://gimmeproxy.com/ for free proxies
+-   https://api.adviceslip.com/ for advice
+
 # features
 
 -   free AI access using `/ai` and `/chatai`, `/aiimg`

@@ -302,3 +302,5 @@ PROXY_API: Final[
 ] = "https://gimmeproxy.com/api/getProxy?post=true&get=true&user-agent=true&supportsHttps=true&protocol=http&minSpeed=20&curl=true"
 PROXY_TEST: Final[str] = "https://example.com/"
 PROXY_TIMEOUT: Final[float] = 10
+
+ADVICE_API: Final[str] = "https://api.adviceslip.com/advice"
