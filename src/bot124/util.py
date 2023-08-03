@@ -102,7 +102,7 @@ def filter_rules(
 
 def calc_score(s: models.Score) -> float:
     kick: models.ScoreKicks = (
-        models.DB.query(models.ScoreKicks).where(models.ScoreKicks.author == id).first()  # type: ignore
+        models.DB.query(models.ScoreKicks).where(models.ScoreKicks.author == s.author).first()  # type: ignore
     )
 
     score: float = max(
