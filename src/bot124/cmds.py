@@ -720,8 +720,11 @@ async def advice(msg: discord.interactions.Interaction, query: typing.Optional[s
             msg,
             "\n".join(
                 f"{idx}, advice #{advice['id']} @ {advice['date']} : {advice['advice']}"
-                for idx, advice in enumerate(
-                    requests.get(f"{const.ADVICE_API}/search/{query}").json()["slips"],
+                for idx, advice in enumerate(  # type: ignore
+                    requests.get(f"{const.ADVICE_API}/search/{query}")  # type: ignore
+                    .json()
+                    .get("slips")
+                    or [],
                     1,
                 )
             ),
