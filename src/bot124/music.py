@@ -44,10 +44,15 @@ class YTDLSource(discord.PCMVolumeTransformer):  # type: ignore
         if data is None:
             return
 
-        if "entries" in data:  # type: ignore
+        if "entries" in data:
             data: typing.Any = data["entries"][0]
 
-        return cls(discord.FFmpegPCMAudio(data["url"], **const.FFMPEG_OPTIONS), data=data)  # type: ignore
+        return cls(
+            discord.PCMVolumeTransformer(
+                discord.FFmpegPCMAudio(data["url"], **const.FFMPEG_OPTIONS)  # type: ignore
+            ),
+            data=data,
+        )
 
 
 class Music:

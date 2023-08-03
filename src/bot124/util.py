@@ -35,6 +35,18 @@ def get_starboard(id: int) -> models.StarBoard:
     return sql_obj
 
 
+def get_scorekicks(id: int) -> models.ScoreKicks:
+    sql_obj: typing.Any = (
+        models.DB.query(models.ScoreKicks).where(models.ScoreKicks.author == id).first()  # type: ignore
+    )
+
+    if sql_obj is None:
+        models.DB.add(sql_obj := models.ScoreKicks(author=id))
+
+    models.DB.commit()
+    return sql_obj
+
+
 def datetime_s(ts: int) -> str:
     return datetime.utcfromtimestamp(ts).strftime("%Y/%m/%d %H:%M")
 
@@ -105,8 +117,8 @@ def calc_score(s: models.Score) -> float:
         0,
         const.SCORE_MULT
         * (
-            s.total_bytes / (s.total_messages + 1) * const.MSGS_W
-            + s.vcs_time / (s.vcs_joined + 1) * const.VCS_W
+            s.total_bytes / max(s.total_messages, 1) * const.MSGS_W
+            + s.vcs_time / max(s.vcs_joined, 1) * const.VCS_W
             + s.new_words * const.WC_W
             + math.sqrt(s.reactions_get) * const.REACT_GET_W
             + math.log2(
@@ -121,13 +133,13 @@ def calc_score(s: models.Score) -> float:
             - ((datetime.utcnow().timestamp() - s.last_act) ** const.SCORE_DELTA_E)
             - (s.stars_removed * const.UNSTAR_W)
         ),
-    )
+    ) / (get_scorekicks(s.author).kicks + 1)
 
     data: tuple[int] = tuple(
         v for k, v in s.__dict__.items() if k[0] != "_" and "_" in k
     )
 
-    k: float = len(data) / sum(data) * const.K_MULT
+    k: float = len(data) / max(sum(data), 1) * const.K_MULT
 
     return round(max(0, score if k > score else score - k) ** const.SCORE_E, 2)
 

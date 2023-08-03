@@ -14,6 +14,7 @@ from subprocess import check_output
 import discord
 import discord.app_commands  # type: ignore
 import humanize  # type: ignore
+import requests
 import sqlalchemy
 from discord.ui import Button, View
 from freeGPT import alpaca_7b as a7  # type: ignore
@@ -633,4 +634,30 @@ async def invite(
         else f"invite people using {max_invites.inviter.mention if max_invites.inviter is not None else 'server'}'s \
 {max_invites.url} which has {max_invites.uses} uses",
         allowed_mentions=discord.AllowedMentions.none(),
+    )
+
+
+@cmds.new
+async def cat(msg: discord.interactions.Interaction) -> None:
+    """cat pic"""
+
+    await msg.response.defer()
+    await msg.followup.send(
+        file=discord.File(
+            BytesIO(requests.get("https://cataas.com/cat").content),
+            filename="cat124.png",
+        )
+    )
+
+
+@cmds.new
+async def anime(msg: discord.interactions.Interaction) -> None:
+    """anime pic"""
+
+    await msg.response.defer()
+    await msg.followup.send(
+        file=discord.File(
+            BytesIO(requests.get("https://pic.re/image").content),
+            filename="anime124.png",
+        ),
     )

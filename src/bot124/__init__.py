@@ -5,8 +5,8 @@
 import asyncio
 import datetime
 import string
-import typing
 import textwrap
+import typing
 
 import discord
 import discord.app_commands  # type: ignore
@@ -52,9 +52,12 @@ class Bot124(discord.Client):
                 if (
                     delta := round(
                         datetime.datetime.utcnow().timestamp() - score.last_act
-                    ) + const.SCORE_KICK_ADD
+                    )
+                    + const.SCORE_KICK_ADD
                 ) >= const.SCORE_KICK_DELTA:  # type: ignore
-                    score_list += f"{total_scores + 1}, <@{score.author}> no activity for \
+                    (k := util.get_scorekicks(score.author)).kicks += 1
+
+                    score_list += f"{total_scores + 1} ( kick #{k.kicks} ), <@{score.author}> no activity for \
 {humanize.precisedelta(datetime.timedelta(seconds=delta), minimum_unit='seconds')} with score `{util.calc_score(score)}` ( {str(score)} )\n"
                     total_scores += 1
 
@@ -71,7 +74,9 @@ class Bot124(discord.Client):
 
                 for g in self.guilds:
                     if (c := g.system_channel) is not None:
-                        for page in textwrap.wrap(score_list, const.MESSAGE_WRAP_LEN, replace_whitespace=False):
+                        for page in textwrap.wrap(
+                            score_list, const.MESSAGE_WRAP_LEN, replace_whitespace=False
+                        ):
                             await c.send(content=page)
                             await asyncio.sleep(1)
 
@@ -198,7 +203,8 @@ make sure to show your respect to our national anthem -- WAP https://www.youtube
 also we have a system for chat score which you can check out using `/score` or `/scores`, \
 although dont forget that this score is volatile, if youre not active for \
 **{humanize.precisedelta(datetime.timedelta(seconds=const.SCORE_KICK_DELTA), minimum_unit='seconds')}** \
-you will be kicked off the score leaderboard
+you will be kicked off the score leaderboard, every kick ull have a harder and harder time gaining score,
+function `f(s) = s / K` where `K` is kick count and `s` is score
 
 if you want to invite people use `/invite` command"""
             )

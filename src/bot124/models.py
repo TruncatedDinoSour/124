@@ -3,6 +3,7 @@
 """124bot database models"""
 
 import datetime
+from json import dumps
 
 import humanize  # type: ignore
 import sqlalchemy
@@ -41,6 +42,23 @@ class Rule:
         self.real = real  # type: ignore
         self.author = author  # type: ignore
         self.timestamp = round(datetime.datetime.utcnow().timestamp())  # type: ignore
+
+
+@DB.table
+class ScoreKicks:
+    author: sqlalchemy.Column[int] = sqlalchemy.Column(
+        sqlalchemy.Integer,
+        primary_key=True,
+        unique=True,
+        nullable=False,
+    )
+    kicks: sqlalchemy.Column[int] = sqlalchemy.Column(
+        sqlalchemy.Integer,
+    )
+
+    def __init__(self, author: int) -> None:
+        self.author = author  # type: ignore
+        self.kicks = 0  # type: ignore
 
 
 @DB.table
@@ -96,7 +114,7 @@ class Score:
 `{self.new_words}` wordcloud words; `{self.reactions_get}` reac recv; `{self.reactions_post}` reac given; \
 `{DB.query(Rule.id).where(Rule.author == self.author).count()}` rules; `{self.starboard_score}` stars; \
 `{self.ok}` ok; last activity on `{str(datetime.datetime.utcfromtimestamp(self.last_act))} UTC`; \
-`{self.stars_removed}` removed stars"  # type: ignore
+`{self.stars_removed}` removed stars; `{DB.query(ScoreKicks.kicks).where(ScoreKicks.author == self.author).first()[0]}` kicks"  # type: ignore
 
 
 @DB.table
@@ -156,3 +174,20 @@ class StarBoard:
     def __init__(self, id: int) -> None:
         self.id = id  # type: ignore
         self.starred_msgs = ""  # type: ignore
+
+
+@DB.table
+class MusicQueue:
+    name: sqlalchemy.Column[str] = sqlalchemy.Column(
+        sqlalchemy.String,
+        primary_key=True,
+        unique=True,
+        nullable=False,
+    )
+    queue: sqlalchemy.Column[str] = sqlalchemy.Column(
+        sqlalchemy.String,
+    )
+
+    def __init__(self, name: str, queue: list[str]) -> None:
+        self.name = name  # type: ignore
+        self.queue = dumps(queue)  # type: ignore

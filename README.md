@@ -18,8 +18,8 @@ ty
 # features
 
 -   free AI access using `/ai` and `/chatai`, `/aiimg`
-    -   supported text models : gpt3, gpt4 and alpaca 7b
-    -   supported image models : prodia
+    -   supported text models : gpt3, gpt4, [todo] deepai and alpaca 7b
+    -   supported image models : prodia, [todo] pollinations
 -   anonymous confessions database using `/confess` and `/confessions`
 -   auto-generated help page accessed through `/help`
 -   music commands and control using `/music`
@@ -39,6 +39,10 @@ ty
     -   `random [optional n default = 1]` which uses
     -   `loop` and `repeat` for looping the queue and repeating current tacks
     -   `info` for displaying the music bot info
+    -   [todo] saving of queues using `save [name]`
+    -   [todo] listing of queues or their content using `list [optional name]`
+    -   [todo] loading of queues using `load [name]` or `loadadd [name]` for adding it instead of overwriting it
+    -   [todo https://stackoverflow.com/questions/76829194/how-do-i-skip-x-seconds-in-discord-py-audio-source] `seek ( - )[seconds]` to skip time back or forth
 -   support for `neofetch` in linux servers
 -   `/pfp` command to extract user profile pictures
 -   rules database using `/rules` and `/ruleslb`
@@ -49,8 +53,8 @@ ty
         rules are case sensitive
 -   chat score database using `/score` and `/scorelb`
     -   based off a complex formula taking these inputs
-        -   average bytes sent per all messages sent + 1 ( positive effect )
-        -   average time ( in seconds ) spent in all voice chats + 1 ( positive effect )
+        -   average bytes sent per all messages sent ( positive effect )
+        -   average time ( in seconds ) spent in all voice chats ( positive effect )
         -   square root of all reactions gotten ( positive effect )
         -   log base 2 of all rules made ( positive effect )
         -   log of all `ok`s + 1 in the ok channel ( positive effect )
@@ -58,12 +62,14 @@ ty
         -   square root of all posted ( given ) reactions ( negative effect )
         -   stars removed if u star a message ( negative effect )
         -   inverse average of all values ( neutral effect )
+        -   all divided by times uve been kicked off the scoreboard ( linear effect )
 -   support for starboard using `/starboard` to set the starboard channel
 -   `/timelb` which keeps track of how long a person stayed in the server
 -   `/tod` for truth, dare or paranoia games
 -   `/wordcloud` which keeps track of all unique words used in the server
 -   `/src` for displaying a url for source code
 -   `/invite` for displaying the top invite
+-   `/cat` and `/anime` pics
 -   easy setup
 -   developer-friendly configuration in `src/bot124/const.py`
 -   feature packed and light
