@@ -661,3 +661,58 @@ async def anime(msg: discord.interactions.Interaction) -> None:
             filename="anime124.png",
         ),
     )
+
+
+@cmds.new
+async def kicks(msg: discord.interactions.Interaction, user: typing.Optional[discord.user.User] = None) -> None:  # type: ignore
+    """get your or other users' kick score"""
+
+    if user is not None and user.bot:
+        await menu.text_menu(msg, "bots cannot have kick scores")
+        return
+
+    score: typing.Any = (
+        models.DB.query(models.ScoreKicks)  # type: ignore
+        .where(models.ScoreKicks.author == (msg.user.id if user is None else user.id))  # type: ignore
+        .first()
+    )
+
+    await menu.text_menu(
+        msg,
+        (("you have" if user is None else f"{user.mention} has") + " no kicks")
+        if score is None
+        else "the kick score for "
+        + ("you" if user is None else user.mention)
+        + f" is `{score.kicks}`",
+    )
+
+
+@cmds.new
+async def kickslb(msg: discord.interactions.Interaction) -> None:  # type: ignore
+    """get kick scores"""
+
+    scores: typing.Any = models.DB.query(models.ScoreKicks).all()  # type: ignore
+
+    if not scores:
+        await menu.text_menu(msg, "no people currently have a kick score")
+        return
+
+    lb: dict[int, int] = dict(
+        sorted(  # type: ignore
+            {s.author: s.kicks for s in scores}.items(),
+            key=lambda x: x[1],
+            reverse=True,
+        )
+    )
+    lbv: tuple[int] = tuple(lb.values())
+    total_lbv: int = sum(lbv)
+
+    await menu.text_menu(
+        msg,
+        "kick score leaderboard :\n\n"
+        + "\n".join(
+            f"{idx}, <@{value[0]}> with score `{value[1]}`"
+            for idx, value in enumerate(lb.items(), 1)
+        )
+        + f"\n\naverage chat score : {total_lbv / len(lbv):.2f}\ntotal chat score : {total_lbv:.2f}",
+    )

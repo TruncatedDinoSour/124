@@ -70,6 +70,7 @@ ty
 -   `/src` for displaying a url for source code
 -   `/invite` for displaying the top invite
 -   `/cat` and `/anime` pics
+-   `/kicks` and `/kickslb` scoreboards for kick scores ( how many times uve been kicked off )
 -   easy setup
 -   developer-friendly configuration in `src/bot124/const.py`
 -   feature packed and light

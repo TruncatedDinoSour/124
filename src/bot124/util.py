@@ -12,7 +12,7 @@ from . import const, models
 
 
 def get_score(id: int) -> models.Score:
-    sql_obj: typing.Any = (
+    sql_obj: models.Score = (
         models.DB.query(models.Score).where(models.Score.author == id).first()  # type: ignore
     )
 
@@ -24,24 +24,12 @@ def get_score(id: int) -> models.Score:
 
 
 def get_starboard(id: int) -> models.StarBoard:
-    sql_obj: typing.Any = (
+    sql_obj: models.StarBoard = (
         models.DB.query(models.StarBoard).where(models.StarBoard.id == id).first()  # type: ignore
     )
 
     if sql_obj is None:
         models.DB.add(sql_obj := models.StarBoard(id=id))
-
-    models.DB.commit()
-    return sql_obj
-
-
-def get_scorekicks(id: int) -> models.ScoreKicks:
-    sql_obj: typing.Any = (
-        models.DB.query(models.ScoreKicks).where(models.ScoreKicks.author == id).first()  # type: ignore
-    )
-
-    if sql_obj is None:
-        models.DB.add(sql_obj := models.ScoreKicks(author=id))
 
     models.DB.commit()
     return sql_obj
@@ -113,6 +101,10 @@ def filter_rules(
 
 
 def calc_score(s: models.Score) -> float:
+    kick: models.ScoreKicks = (
+        models.DB.query(models.ScoreKicks).where(models.ScoreKicks.author == id).first()  # type: ignore
+    )
+
     score: float = max(
         0,
         const.SCORE_MULT
@@ -133,7 +125,7 @@ def calc_score(s: models.Score) -> float:
             - ((datetime.utcnow().timestamp() - s.last_act) ** const.SCORE_DELTA_E)
             - (s.stars_removed * const.UNSTAR_W)
         ),
-    ) / (get_scorekicks(s.author).kicks + 1)
+    ) / ((kick.kicks + 1) if kick is not None else 1)
 
     data: tuple[int] = tuple(
         v for k, v in s.__dict__.items() if k[0] != "_" and "_" in k
