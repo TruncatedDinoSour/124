@@ -9,8 +9,8 @@ from json import loads as load_json
 from secrets import SystemRandom
 from threading import Thread
 
-from discord import AllowedMentions
 from freeGPT import gpt3  # type: ignore
+from sqlalchemy import delete as delete_stmt
 from sqlalchemy.exc import IntegrityError
 
 from . import const, mcmdmgr, models
@@ -399,10 +399,7 @@ async def load(
     else:
         music.queue.extend(q)
 
-    await cmd.msg.reply(
-        content=f"queue `{cmd.args}` loaded",
-        allowed_mentions=const.REPLY_MENTIONS,
-    )
+    await cmd.msg.reply(content="queue loaded")
 
 
 @cmds.nnew
@@ -411,3 +408,17 @@ async def loadadd(music: typing.Any, cmd: mcmdmgr.MusicCommand) -> None:
     """load and append to current queue, takes arg `name`"""
 
     await load(music, cmd, False)
+
+
+@cmds.nnew
+@cmds.admin
+@cmds.args
+async def delq(_: typing.Any, cmd: mcmdmgr.MusicCommand) -> None:
+    """delete a queue from saved queues, takes argument `name`, admin only"""
+
+    models.DB.session.execute(
+        delete_stmt(models.MusicQueue).where(models.MusicQueue.name == cmd.args)
+    )
+    models.DB.commit()
+
+    await cmd.msg.reply(content="deleted this queue")

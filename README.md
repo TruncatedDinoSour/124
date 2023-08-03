@@ -42,6 +42,7 @@ ty
     -   saving of queues using `save [name]`
     -   listing of queues or their content using `listq [optional name]`
     -   loading of queues using `load [name]` or `loadadd [name]` for adding it instead of overwriting it
+    -   `delq [name]` to delete queues ( only admins )
     -   [todo https://stackoverflow.com/questions/76829194/how-do-i-skip-x-seconds-in-discord-py-audio-source] `seek ( - )[seconds]` to skip time back or forth
 -   support for `neofetch` in linux servers
 -   `/pfp` command to extract user profile pictures

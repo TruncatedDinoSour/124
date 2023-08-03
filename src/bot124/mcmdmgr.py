@@ -95,6 +95,18 @@ class MusicCommands:
 
         return wrapper
 
+    def admin(
+        self, fn: typing.Callable[..., typing.Any]
+    ) -> typing.Callable[..., typing.Any]:
+        @wraps(fn)
+        async def wrapper(*args: typing.Any, **kwargs: typing.Any) -> typing.Any:
+            if args[1].msg.author.guild_permissions.administrator:
+                return await fn(*args, **kwargs)
+
+            await args[1].msg.reply(content="you have no permissions to run this command")
+
+        return wrapper
+
     def init(self, music: typing.Any) -> None:
         self.music = music
 
