@@ -5,6 +5,7 @@
 import re
 from typing import Any, Final
 
+import requests
 from reactionmenu import ReactionButton  # type: ignore
 
 BOT_DB_URL: Final[str] = "sqlite:///bot.db?check_same_thread=False"
@@ -268,3 +269,13 @@ PARANOIAS: tuple[str, ...] = (
 )
 
 TOD_EXPIRES: Final[float] = 60 * 5  # 5 minutes
+
+CAT_TAGS: Final[tuple[str, ...]] = tuple(
+    filter(
+        lambda item: bool(item)
+        and " " not in item
+        and "#" not in item
+        and "@" not in item,
+        map(str.lower, requests.get("https://cataas.com/api/tags").json()),
+    )
+)

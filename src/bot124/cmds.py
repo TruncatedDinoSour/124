@@ -658,6 +658,18 @@ async def cat(
         )
         return
 
+    if tag is not None:
+        tag = tag.lower()
+
+        if tag not in const.CAT_TAGS:
+            await menu.text_menu(
+                msg,
+                f"invalid tag `{tag}`, list of available tags :\n\n"
+                + "".join(f"{idx}, {t}\n" for idx, t in enumerate(const.CAT_TAGS, 1)),
+                wrap=const.WORDCLOUD_WRAP,
+            )
+            return
+
     gif = gif and not any((says, tag))
 
     await msg.followup.send(
