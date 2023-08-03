@@ -7,6 +7,7 @@ import datetime
 import time
 import typing
 from enum import Enum, auto
+from http import HTTPStatus
 from io import BytesIO
 from secrets import SystemRandom
 from subprocess import check_output
@@ -638,14 +639,35 @@ async def invite(
 
 
 @cmds.new
-async def cat(msg: discord.interactions.Interaction) -> None:
+async def cat(
+    msg: discord.interactions.Interaction,
+    gif: bool = False,
+    says: typing.Optional[str] = None,
+    tag: typing.Optional[str] = None,
+    http: typing.Optional[int] = None,
+) -> None:
     """cat pic"""
 
     await msg.response.defer()
+
+    if http is not None:
+        await msg.followup.send(
+            content=f"https://http.cat/{http}.jpg"
+            if http in tuple(HTTPStatus.__members__.values()) + (420,)
+            else "not a valid http code"
+        )
+        return
+
+    gif = gif and not any((says, tag))
+
     await msg.followup.send(
         file=discord.File(
-            BytesIO(requests.get("https://cataas.com/cat").content),
-            filename="cat124.png",
+            BytesIO(
+                requests.get(
+                    f"https://cataas.com/cat{('/' + tag) if tag else ''}{('/says/' + says) if says else ''}{'/gif' if gif else ''}"
+                ).content
+            ),
+            filename=f"cat124.{'gif' if gif else 'png'}",
         )
     )
 
@@ -653,6 +675,8 @@ async def cat(msg: discord.interactions.Interaction) -> None:
 @cmds.new
 async def anime(msg: discord.interactions.Interaction) -> None:
     """anime pic"""
+
+    # this api is total garbage lol
 
     await msg.response.defer()
     await msg.followup.send(
