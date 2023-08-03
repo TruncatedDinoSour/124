@@ -69,12 +69,10 @@ def gen_ai_img(
 ) -> discord.File:
     r: bytes = bytes()
 
-    for _ in range(3):
-        try:
-            r = model.value[0](prompt)  # type: ignore
-            break
-        except Exception:
-            time.sleep(0.5)
+    try:
+        r = model.value[0](prompt)  # type: ignore
+    except Exception:
+        time.sleep(0.5)
 
     return discord.File(
         BytesIO(r),  # type: ignore
