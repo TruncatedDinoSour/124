@@ -4,7 +4,6 @@
 
 import asyncio
 import datetime
-import time
 import typing
 from enum import Enum, auto
 from http import HTTPStatus
@@ -18,11 +17,8 @@ import humanize  # type: ignore
 import requests
 import sqlalchemy
 from discord.ui import Button, View
-from freeGPT import alpaca_7b as a7  # type: ignore
-from freeGPT import gpt3 as g3  # type: ignore
-from freeGPT import gpt4 as g4  # type: ignore
-from freeGPT import prodia as pr  # type: ignore
 
+from . import ai as ai_impl
 from . import const, menu, models
 from . import music as music_mdl
 from . import util
@@ -32,56 +28,6 @@ __all__: tuple[str] = ("cmds",)
 
 cmds: CommandManager = CommandManager()
 RAND: SystemRandom = SystemRandom()
-
-
-class TextAICommands(Enum):
-    gpt3 = g3.Completion
-    gpt4 = g4.Completion
-    alpaca7 = a7.Completion
-
-
-async def gen_ai_text(prompt: str, model: TextAICommands = TextAICommands.gpt3) -> str:
-    r: typing.Union[str, dict[str, str]] = ""
-
-    for _ in range(3):
-        try:
-            r: typing.Union[str, dict[str, str]] = await model.value.create(prompt)  # type: ignore
-
-            if type(r) is dict:
-                r = str(r.get("text")) or "*no content*"  # type: ignore
-
-            break
-        except Exception:
-            time.sleep(0.5)
-
-    return r[:2000].strip()  # type: ignore
-
-
-class FakeProdia(pr.Generation):
-    pass
-
-
-class ImageAICommands(Enum):
-    prodia = pr.Generation
-    fake_prodia = FakeProdia
-
-
-async def gen_ai_img(
-    prompt: str, model: ImageAICommands = ImageAICommands.prodia
-) -> discord.File:
-    r: BytesIO = BytesIO()
-
-    for _ in range(3):
-        try:
-            r: BytesIO = await model.value.create(prompt)  # type: ignore
-            break
-        except Exception:
-            time.sleep(0.5)
-
-    return discord.File(
-        r,
-        f"{cmds.b.user.name if cmds.b.user else 124}_{model.name}_generation_{datetime.datetime.utcnow()}.png",
-    )
 
 
 class TruthOrDare(Enum):
@@ -361,14 +307,13 @@ async def starboard(
 async def ai(
     msg: discord.interactions.Interaction,
     prompt: str,
-    model: TextAICommands = TextAICommands.gpt3,
+    model: ai_impl.TextAI = ai_impl.TextAI.gpt4,
 ) -> None:
     """generate content using an AI large language model"""
 
     await msg.response.defer()
-
     await msg.followup.send(
-        content=(await gen_ai_text(prompt, model)) or "*no content*",  # type: ignore
+        content=ai_impl.gen_ai_text(prompt, model) or "*no content*",  # type: ignore
     )
 
 
@@ -376,18 +321,18 @@ async def ai(
 async def aiimg(
     msg: discord.interactions.Interaction,
     prompt: str,
-    model: ImageAICommands = ImageAICommands.prodia,
+    model: ai_impl.ImageAI = ai_impl.ImageAI.pollinations,
 ) -> None:
     """generate content using an AI image model"""
 
     await msg.response.defer()
-
-    await msg.followup.send(file=await gen_ai_img(prompt, model))
+    await msg.followup.send(file=ai_impl.gen_ai_img(prompt, model))
 
 
 @cmds.new
 async def chatai(
-    msg: discord.interactions.Interaction, model: TextAICommands = TextAICommands.gpt3
+    msg: discord.interactions.Interaction,
+    model: ai_impl.TextAI = ai_impl.TextAI.gpt4,
 ) -> None:
     """create a thread with an AI model"""
 
@@ -425,7 +370,7 @@ unconditionally"  # type: ignore
         r: typing.Union[str, dict[str, str]] = ""
 
         async with thread.typing():
-            r = await gen_ai_text(chat, model)
+            r = ai_impl.gen_ai_text(chat, model)
 
         if not r:
             continue

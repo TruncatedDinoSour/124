@@ -5,7 +5,9 @@
 import math
 import typing
 from datetime import datetime
+from time import sleep
 
+import requests
 from discord import User
 
 from . import const, models
@@ -139,3 +141,28 @@ def calc_score(s: models.Score) -> float:
 def update_act(id: int) -> None:
     get_score(id).last_act = round(datetime.utcnow().timestamp())
     models.DB.commit()
+
+
+def get_proxies() -> dict[str, dict[str, str]]:
+    while True:
+        proxy: str = requests.get(const.PROXY_API).text
+
+        proxies: dict[str, dict[str, str]] = {
+            "proxies": {
+                "http": proxy,
+                "https": proxy,
+                "http2": proxy,
+            }
+        }
+
+        try:
+            requests.get(
+                const.PROXY_TEST,
+                timeout=const.PROXY_TIMEOUT,
+                **proxies,  # type: ignore
+            )
+        except Exception:
+            sleep(1)
+            continue
+
+        return proxies

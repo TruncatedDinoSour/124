@@ -2,10 +2,9 @@ discord.py
 reactionmenu
 sqlalchemy
 humanize
-freeGPT
-tls_client
 pynacl
 yt_dlp
 validators
 requests
 types-requests
+rebelai

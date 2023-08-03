@@ -18,8 +18,8 @@ ty
 # features
 
 -   free AI access using `/ai` and `/chatai`, `/aiimg`
-    -   supported text models : gpt3, gpt4, [todo] deepai and alpaca 7b
-    -   supported image models : prodia, [todo] pollinations
+    -   supported text models : gpt3, gpt4, deepai and alpaca 7b
+    -   supported image models : prodia, pollinations
 -   anonymous confessions database using `/confess` and `/confessions`
 -   auto-generated help page accessed through `/help`
 -   music commands and control using `/music`

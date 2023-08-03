@@ -9,11 +9,10 @@ from json import loads as load_json
 from secrets import SystemRandom
 from threading import Thread
 
-from freeGPT import gpt3  # type: ignore
 from sqlalchemy import delete as delete_stmt
 from sqlalchemy.exc import IntegrityError
 
-from . import const, mcmdmgr, models
+from . import ai, const, mcmdmgr, models
 
 cmds: mcmdmgr.MusicCommands = mcmdmgr.MusicCommands()
 
@@ -234,36 +233,30 @@ async def random(music: typing.Any, cmd: mcmdmgr.MusicCommand) -> None:
     )
 
     prev: list[str] = []
-    nl: str = "\n"
+
+    async def _gen() -> str:
+        nl: str = "\n"
+
+        return (
+            ai.gen_ai_text(
+                f"""{const.MUSIC_AI_GEN}
+
+Your previous responses were (artist - song):
+{nl.join(prev)[-(const.MESSAGE_WRAP_LEN - len(const.MUSIC_AI_GEN)):] if prev else '<none> - <none>'}""",  # type: ignore
+                ai.TextAI.gpt4,
+            )[: const.MUSIC_AI_LIMIT]
+            .strip()
+            .splitlines()
+            + [""]
+        )[0]
 
     for idx in range(n):
         song: str = ""
 
-        for _ in range(const.MUSIC_AI_TRIES):
-            try:
-                song = (
-                    (
-                        await asyncio.wait_for(
-                            gpt3.Completion.create(
-                                f"""{const.MUSIC_AI_GEN}
-
-Your previous responses were:
-{nl.join(prev)[-(const.MESSAGE_WRAP_LEN - len(const.MUSIC_AI_GEN)):] if prev else '<none>'}"""  # type: ignore
-                            ),
-                            timeout=15,
-                        )
-                    )[: const.MUSIC_AI_LIMIT]
-                    .strip()
-                    .splitlines()
-                    + [""]
-                )[0]
-            except Exception:
-                pass
-
-            if song:
-                break
-
-            await asyncio.sleep(5)
+        try:
+            song = await asyncio.wait_for(_gen(), timeout=15)
+        except Exception:
+            pass
 
         if song:
             prev.append(song)
