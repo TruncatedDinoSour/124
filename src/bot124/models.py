@@ -4,6 +4,7 @@
 
 import datetime
 from json import dumps
+from typing import Optional
 
 import humanize  # type: ignore
 import sqlalchemy
@@ -109,12 +110,16 @@ class Score:
         self.last_act = round(datetime.datetime.utcnow().timestamp())  # type: ignore
 
     def __str__(self) -> str:
+        kick: Optional[tuple[int]] = (
+            DB.query(ScoreKicks.kicks).where(ScoreKicks.author == self.author).first()  # type: ignore
+        )
+
         return f"`{self.total_bytes}` b / `{self.total_messages}` msgs; `{self.vcs_time}` s \
 ( {humanize.precisedelta(datetime.timedelta(seconds=self.vcs_time), minimum_unit='seconds')} ) / `{self.vcs_joined}` vcs; \
 `{self.new_words}` wordcloud words; `{self.reactions_get}` reac recv; `{self.reactions_post}` reac given; \
 `{DB.query(Rule.id).where(Rule.author == self.author).count()}` rules; `{self.starboard_score}` stars; \
 `{self.ok}` ok; last activity on `{str(datetime.datetime.utcfromtimestamp(self.last_act))} UTC`; \
-`{self.stars_removed}` removed stars; `{DB.query(ScoreKicks.kicks).where(ScoreKicks.author == self.author).first()[0]}` kicks"  # type: ignore
+`{self.stars_removed}` removed stars; `{0 if kick is None else kick[0]}` kicks"  # type: ignore
 
 
 @DB.table
