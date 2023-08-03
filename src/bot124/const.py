@@ -279,3 +279,17 @@ CAT_TAGS: Final[tuple[str, ...]] = tuple(
         map(str.lower, requests.get("https://cataas.com/api/tags").json()),
     )
 )
+ANIME_GITHUB_API: Final[
+    str
+] = "https://api.github.com/repos/cat-milk/Anime-Girls-Holding-Programming-Books/contents"
+ANIME_DIRS: Final[tuple[str, ...]] = tuple(
+    map(
+        lambda item: item["name"],  # type: ignore
+        filter(
+            lambda item: item["type"] == "dir",  # type: ignore
+            requests.get(
+                ANIME_GITHUB_API,
+            ).json(),
+        ),
+    )
+)

@@ -685,17 +685,29 @@ async def cat(
 
 
 @cmds.new
-async def anime(msg: discord.interactions.Interaction) -> None:
-    """anime pic"""
-
-    # this api is total garbage lol
+async def anime(
+    msg: discord.interactions.Interaction,
+    lang: typing.Optional[str] = None,
+) -> None:
+    """anime girls holding programming books pics"""
 
     await msg.response.defer()
+
+    if lang is not None and lang not in const.ANIME_DIRS:
+        await menu.text_menu(
+            msg,
+            f"invalid lang `{lang}`, list of available langs :\n\n"
+            + "".join(f"{idx}, {t}\n" for idx, t in enumerate(const.ANIME_DIRS, 1)),
+            wrap=const.WORDCLOUD_WRAP,
+        )
+        return
+
     await msg.followup.send(
-        file=discord.File(
-            BytesIO(requests.get("https://pic.re/image").content),
-            filename="anime124.png",
-        ),
+        content=RAND.choice(
+            requests.get(
+                f"{const.ANIME_GITHUB_API}/{RAND.choice(const.ANIME_DIRS) if lang is None else lang}"
+            ).json()
+        )["download_url"]
     )
 
 
