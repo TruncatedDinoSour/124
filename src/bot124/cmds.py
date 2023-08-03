@@ -727,7 +727,8 @@ async def advice(msg: discord.interactions.Interaction, query: typing.Optional[s
                     or [],
                     1,
                 )
-            ),
+            )
+            or "*no advice found :(*",
         )
     else:
         advice: dict[str, typing.Union[int, str]] = requests.get(
