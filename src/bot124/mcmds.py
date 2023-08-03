@@ -5,12 +5,15 @@
 import asyncio
 import textwrap
 import typing
+from json import loads as load_json
 from secrets import SystemRandom
 from threading import Thread
 
+from discord import AllowedMentions
 from freeGPT import gpt3  # type: ignore
+from sqlalchemy.exc import IntegrityError
 
-from . import const, mcmdmgr
+from . import const, mcmdmgr, models
 
 cmds: mcmdmgr.MusicCommands = mcmdmgr.MusicCommands()
 
@@ -310,3 +313,101 @@ paused : {music.voice.is_paused()}
 latency : {music.voice.average_latency * 1000} ms
 volume : {music.voice.source.volume * 100}%"""
     )
+
+
+@cmds.new
+@cmds.args
+async def save(music: typing.Any, cmd: mcmdmgr.MusicCommand) -> None:
+    """save queue to global database, takes argument `name`"""
+
+    try:
+        models.DB.add(models.MusicQueue(cmd.args, music.queue))
+        models.DB.commit()
+        await cmd.msg.reply(content="saved the queue")
+    except IntegrityError:
+        await cmd.msg.reply(content="failed to save the queue")
+
+
+@cmds.nnew
+async def listq(_: typing.Any, cmd: mcmdmgr.MusicCommand) -> None:
+    """list all queues or contents of queues, optional argument : queue name"""
+
+    output: str = ""
+
+    if not cmd.args:
+        name: str
+
+        for idx, name in enumerate(models.DB.query(models.MusicQueue.name).all(), 1):  # type: ignore
+            output += f"{idx}, {name[0]}\n"
+
+        output = f"all queues\n\n{output}" if output else "*no queues found*"
+    else:
+        queue: typing.Optional[tuple[tuple[str]]] = (  # type: ignore
+            models.DB.query(models.MusicQueue.queue)  # type: ignore
+            .where(models.MusicQueue.name == cmd.args)
+            .first()
+        )
+
+        if queue is None:
+            await cmd.msg.reply(content="no such saved queue")
+            return
+
+        for idx, item in enumerate(load_json(queue[0]), 1):  # type: ignore
+            output += f"{idx}, <{item}>\n"
+
+        output = (
+            f"queue `{cmd.args}`\n\n{output}"
+            if output
+            else "*no items found in the queue*"
+        )
+
+    for page in textwrap.wrap(
+        output,
+        const.MESSAGE_WRAP_LEN,
+        replace_whitespace=False,
+    ):
+        await cmd.msg.reply(
+            content=page,
+            allowed_mentions=const.REPLY_MENTIONS,
+        )
+
+
+@cmds.nnew
+@cmds.args
+async def load(
+    music: typing.Any, cmd: mcmdmgr.MusicCommand, clear_all: bool = True
+) -> None:
+    """load and overwrite current queue, takes arg `name`"""
+
+    queue: typing.Optional[tuple[tuple[str]]] = (  # type: ignore
+        models.DB.query(models.MusicQueue.queue)  # type: ignore
+        .where(models.MusicQueue.name == cmd.args)
+        .first()
+    )
+
+    if queue is None:
+        await cmd.msg.reply(content="no such saved queue")
+        return
+
+    q: list[str] = load_json(queue[0])  # type: ignore
+
+    if clear_all:
+        music.queue.clear()
+        music.cqueue.clear()
+        music.queue = q
+        music.current = -1
+    else:
+        music.queue.extend(q)
+
+    await cmd.msg.reply(
+        content=f"queue `{cmd.args}` loaded",
+        allowed_mentions=const.REPLY_MENTIONS,
+    )
+
+
+@cmds.nnew
+@cmds.args
+async def loadadd(music: typing.Any, cmd: mcmdmgr.MusicCommand) -> None:
+    """load and append to current queue, takes arg `name`"""
+
+    await load(music, cmd, False)

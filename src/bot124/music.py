@@ -160,9 +160,6 @@ class Music:
         b.loop.create_task(self._quit())
 
     async def init(self) -> None:
-        mentions: discord.AllowedMentions = discord.AllowedMentions.none()
-        mentions.replied_user = True
-
         while self.run and self.voice.is_connected() and not self.thread.archived and not self.thread.locked and self.thread.member_count > 0:  # type: ignore
             try:
                 m: discord.Message = await self.b.wait_for(  # type: ignore
@@ -193,6 +190,6 @@ class Music:
             else:
                 await m.reply(
                     content=f"adding `{m.content}` ( #{len(self.queue) + 1} ) to the queue",
-                    allowed_mentions=mentions,
+                    allowed_mentions=const.REPLY_MENTIONS,
                 )
                 Thread(target=self._play, args=(m.content,), daemon=True).start()

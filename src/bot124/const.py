@@ -6,6 +6,7 @@ import re
 from typing import Any, Final
 
 import requests
+from discord import AllowedMentions
 from reactionmenu import ReactionButton  # type: ignore
 
 BOT_DB_URL: Final[str] = "sqlite:///bot.db?check_same_thread=False"
@@ -293,3 +294,6 @@ ANIME_DIRS: Final[tuple[str, ...]] = tuple(
         ),
     )
 )
+
+REPLY_MENTIONS: AllowedMentions = AllowedMentions.none()
+REPLY_MENTIONS.replied_user = True

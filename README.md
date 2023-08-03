@@ -39,9 +39,9 @@ ty
     -   `random [optional n default = 1]` which uses
     -   `loop` and `repeat` for looping the queue and repeating current tacks
     -   `info` for displaying the music bot info
-    -   [todo] saving of queues using `save [name]`
-    -   [todo] listing of queues or their content using `list [optional name]`
-    -   [todo] loading of queues using `load [name]` or `loadadd [name]` for adding it instead of overwriting it
+    -   saving of queues using `save [name]`
+    -   listing of queues or their content using `listq [optional name]`
+    -   loading of queues using `load [name]` or `loadadd [name]` for adding it instead of overwriting it
     -   [todo https://stackoverflow.com/questions/76829194/how-do-i-skip-x-seconds-in-discord-py-audio-source] `seek ( - )[seconds]` to skip time back or forth
 -   support for `neofetch` in linux servers
 -   `/pfp` command to extract user profile pictures
