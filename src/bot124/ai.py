@@ -42,6 +42,7 @@ class TextAI(Enum):
     async def _inferkit(prompt: str) -> typing.Optional[str]:
         return await rebelai.ai.inferkit.standard(
             prompt,
+            length=1000,
             request_args=await util.get_proxies(),
         )
 
