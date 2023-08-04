@@ -313,7 +313,7 @@ async def ai(
 
     await msg.response.defer()
     await msg.followup.send(
-        content=ai_impl.gen_ai_text(prompt, model) or "*no content*",  # type: ignore
+        content=(await ai_impl.gen_ai_text(prompt, model)) or "*no content*",  # type: ignore
     )
 
 
@@ -326,7 +326,7 @@ async def aiimg(
     """generate content using an AI image model"""
 
     await msg.response.defer()
-    await msg.followup.send(file=ai_impl.gen_ai_img(prompt, model))
+    await msg.followup.send(file=await ai_impl.gen_ai_img(prompt, model))
 
 
 @cmds.new

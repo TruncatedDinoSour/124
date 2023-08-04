@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 """random bot utilities"""
 
+import asyncio
 import math
 import typing
 from datetime import datetime
-from time import sleep
 
-import requests
+import aiohttp
 from discord import User
 
 from . import const, models
@@ -143,26 +143,22 @@ def update_act(id: int) -> None:
     models.DB.commit()
 
 
-def get_proxies() -> dict[str, dict[str, str]]:
-    while True:
-        proxy: str = requests.get(const.PROXY_API).text
+async def get_proxies() -> dict[str, str]:
+    async with aiohttp.ClientSession() as session:
+        while True:
+            async with session.get(const.PROXY_API) as resp:
+                proxy: str = await resp.text()
 
-        proxies: dict[str, dict[str, str]] = {
-            "proxies": {
-                "http": proxy,
-                "https": proxy,
-                "http2": proxy,
-            }
-        }
+            try:
+                async with session.get(
+                    const.PROXY_TEST,
+                    timeout=const.PROXY_TIMEOUT,
+                    proxy=proxy,
+                ) as resp:
+                    if not resp.ok:
+                        raise Exception("proxy failed")
+            except Exception:
+                await asyncio.sleep(1)
+                continue
 
-        try:
-            requests.get(
-                const.PROXY_TEST,
-                timeout=const.PROXY_TIMEOUT,
-                **proxies,  # type: ignore
-            )
-        except Exception:
-            sleep(1)
-            continue
-
-        return proxies
+            return {"proxy": proxy}

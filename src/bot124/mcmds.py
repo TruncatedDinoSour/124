@@ -232,29 +232,30 @@ async def random(music: typing.Any, cmd: mcmdmgr.MusicCommand) -> None:
         content=f"adding {n} ( value is wrapped to {const.MUSIC_AI_MAX} ) songs"
     )
 
+    nl: str = "\n"
     prev: list[str] = []
-
-    async def _gen() -> str:
-        nl: str = "\n"
-
-        return (
-            ai.gen_ai_text(
-                f"""{const.MUSIC_AI_GEN}
-
-Your previous responses were (artist - song):
-{nl.join(prev)[-(const.MESSAGE_WRAP_LEN - len(const.MUSIC_AI_GEN)):] if prev else '<none> - <none>'}""",  # type: ignore
-                ai.TextAI.gpt4,
-            )[: const.MUSIC_AI_LIMIT]
-            .strip()
-            .splitlines()
-            + [""]
-        )[0]
 
     for idx in range(n):
         song: str = ""
 
         try:
-            song = await asyncio.wait_for(_gen(), timeout=15)
+            song = (
+                (
+                    await asyncio.wait_for(
+                        ai.gen_ai_text(
+                            f"""{const.MUSIC_AI_GEN}
+
+Your previous responses were (artist - song):
+{nl.join(prev)[-(const.MESSAGE_WRAP_LEN - len(const.MUSIC_AI_GEN)):] if prev else '<none> - <none>'}""",  # type: ignore
+                            ai.TextAI.gpt4,
+                        ),
+                        timeout=15,
+                    )
+                )[: const.MUSIC_AI_LIMIT]
+                .strip()
+                .splitlines()
+                + [""]
+            )[0]
         except Exception:
             pass
 
