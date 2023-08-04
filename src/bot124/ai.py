@@ -24,7 +24,7 @@ class TextAI(Enum):
     @staticmethod
     async def _alpaca7(prompt: str) -> typing.Optional[str]:
         return await rebelai.ai.alpaca.alpaca_7b(
-            prompt,
+            prompt=prompt,
             request_args=await util.get_proxies(),
         )
 
@@ -32,8 +32,8 @@ class TextAI(Enum):
     async def _deepai(prompt: str) -> str:
         return (
             await rebelai.ai.deepai.deepai(
-                rebelai.enums.DeepAIModel.TEXT,
-                {"text": prompt},
+                model=rebelai.enums.DeepAIModel.TEXT,
+                data={"text": prompt},
                 request_args=await util.get_proxies(),
             )
         )["output"]
@@ -41,7 +41,7 @@ class TextAI(Enum):
     @staticmethod
     async def _inferkit(prompt: str) -> typing.Optional[str]:
         return await rebelai.ai.inferkit.standard(
-            prompt,
+            prompt=prompt,
             length=1000,
             request_args=await util.get_proxies(),
         )
@@ -57,7 +57,7 @@ class ImageAI(Enum):
     @staticmethod
     async def _pollinations(prompt: str) -> bytes:
         return await rebelai.ai.pollinations.pollinations(  # type: ignore
-            prompt,
+            prompt=prompt,
             request_args=await util.get_proxies(),
         )
 
@@ -73,7 +73,7 @@ async def gen_ai_text(
 
     for _ in range(3):
         try:
-            r: typing.Optional[str] = await model.value[0](prompt)
+            r: typing.Optional[str] = await model.value[0](prompt=prompt)
             break
         except Exception:
             time.sleep(0.5)
@@ -88,11 +88,11 @@ async def gen_ai_img(
     r: bytes = bytes()
 
     try:
-        r = await model.value[0](prompt)
+        r = await model.value[0](prompt=prompt)
     except Exception:
         time.sleep(0.5)
 
     return discord.File(
-        BytesIO(r),  # type: ignore
-        f"124_{model.name}_generation_{datetime.datetime.utcnow()}.png",
+        fp=BytesIO(r),
+        filename=f"124_{model.name}_generation_{datetime.datetime.utcnow()}.png",
     )

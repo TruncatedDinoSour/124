@@ -370,7 +370,7 @@ unconditionally"  # type: ignore
         r: typing.Union[str, dict[str, str]] = ""
 
         async with thread.typing():
-            r = ai_impl.gen_ai_text(chat, model)
+            r = await ai_impl.gen_ai_text(chat, model)
 
         if not r:
             continue
