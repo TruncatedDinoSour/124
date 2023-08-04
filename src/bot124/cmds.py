@@ -657,6 +657,21 @@ async def anime(
 
 
 @cmds.new
+async def hrony4anime(msg: discord.interactions.Interaction) -> None:
+    """hrony for anime ( my friends made me add this why )"""
+
+    await msg.response.defer()
+    await msg.followup.send(
+        file=discord.File(
+            BytesIO(requests.get("https://pic.re/image").content),
+            filename="hrony4anime.png",
+            spoiler=True,
+        ),
+        content="why are you so hrony ...",
+    )
+
+
+@cmds.new
 async def kicks(msg: discord.interactions.Interaction, user: typing.Optional[discord.user.User] = None) -> None:  # type: ignore
     """get your or other users' kick score"""
 
