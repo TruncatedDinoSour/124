@@ -4,6 +4,7 @@
 
 import asyncio
 import datetime
+import json
 import typing
 from enum import Enum, auto
 from http import HTTPStatus
@@ -11,10 +12,10 @@ from io import BytesIO
 from secrets import SystemRandom
 from subprocess import check_output
 
+import aiohttp
 import discord
 import discord.app_commands  # type: ignore
 import humanize  # type: ignore
-import requests
 import sqlalchemy
 from discord.ui import Button, View
 
@@ -617,16 +618,16 @@ async def cat(
 
     gif = gif and not any((says, tag))
 
-    await msg.followup.send(
-        file=discord.File(
-            BytesIO(
-                requests.get(
-                    f"https://cataas.com/cat{('/' + tag) if tag else ''}{('/says/' + says) if says else ''}{'/gif' if gif else ''}"
-                ).content
-            ),
-            filename=f"cat124.{'gif' if gif else 'png'}",
-        )
-    )
+    async with aiohttp.ClientSession() as s:
+        async with s.get(
+            f"https://cataas.com/cat{('/' + tag) if tag else ''}{('/says/' + says) if says else ''}{'/gif' if gif else ''}"
+        ) as r:
+            await msg.followup.send(
+                file=discord.File(
+                    BytesIO(await r.content.read()),
+                    filename=f"cat124.{'gif' if gif else 'png'}",
+                )
+            )
 
 
 @cmds.new
@@ -647,13 +648,11 @@ async def anime(
         )
         return
 
-    await msg.followup.send(
-        content=RAND.choice(
-            requests.get(
-                f"{const.ANIME_GITHUB_API}/{RAND.choice(const.ANIME_DIRS) if lang is None else lang}"
-            ).json()
-        )["download_url"]
-    )
+    async with aiohttp.ClientSession() as s:
+        async with s.get(
+            f"{const.ANIME_GITHUB_API}/{RAND.choice(const.ANIME_DIRS) if lang is None else lang}"
+        ) as r:
+            await msg.followup.send(content=RAND.choice(await r.json())["download_url"])
 
 
 @cmds.new
@@ -661,14 +660,17 @@ async def hrony4anime(msg: discord.interactions.Interaction) -> None:
     """hrony for anime ( my friends made me add this why )"""
 
     await msg.response.defer()
-    await msg.followup.send(
-        file=discord.File(
-            BytesIO(requests.get("https://pic.re/image").content),
-            filename="hrony4anime.png",
-            spoiler=True,
-        ),
-        content="why are you so hrony ...",
-    )
+
+    async with aiohttp.ClientSession() as s:
+        async with s.get("https://pic.re/image") as r:
+            await msg.followup.send(
+                file=discord.File(
+                    BytesIO(await r.content.read()),
+                    filename="hrony4anime.png",
+                    spoiler=True,
+                ),
+                content="why are you so hrony ...",
+            )
 
 
 @cmds.new
@@ -730,15 +732,17 @@ async def kickslb(msg: discord.interactions.Interaction) -> None:  # type: ignor
 async def advice(msg: discord.interactions.Interaction, query: typing.Optional[str] = None) -> None:  # type: ignore
     """get or search for advice"""
 
+    s: aiohttp.ClientSession = aiohttp.ClientSession()
+
     if query is not None:
         await menu.text_menu(
             msg,
             "\n".join(
                 f"{idx}, advice #{advice['id']} @ {advice['date']} : {advice['advice']}"
                 for idx, advice in enumerate(  # type: ignore
-                    requests.get(f"{const.ADVICE_API}/search/{query}")  # type: ignore
-                    .json()
-                    .get("slips")
+                    json.loads(
+                        await (await s.get(f"{const.ADVICE_API}/search/{query}")).text()  # type: ignore
+                    ).get("slips")
                     or [],
                     1,
                 )
@@ -746,7 +750,9 @@ async def advice(msg: discord.interactions.Interaction, query: typing.Optional[s
             or "*no advice found :(*",
         )
     else:
-        advice: dict[str, typing.Union[int, str]] = requests.get(
-            const.ADVICE_API
-        ).json()["slip"]
+        advice: dict[str, typing.Union[int, str]] = json.loads(
+            await (await s.get(const.ADVICE_API)).text()
+        )["slip"]
         await menu.text_menu(msg, f"advice #{advice['id']} : {advice['advice']}")
+
+    await s.close()

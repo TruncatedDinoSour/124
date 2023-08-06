@@ -8,3 +8,4 @@ validators
 requests
 types-requests
 rebelai
+aiohttp
