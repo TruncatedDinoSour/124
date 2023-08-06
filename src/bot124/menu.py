@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""124 bot menu utils"""
+"""124bot menu utils"""
 
 import textwrap
 import typing
