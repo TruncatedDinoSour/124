@@ -56,11 +56,11 @@ class Bot124(discord.Client):
                     + const.SCORE_KICK_ADD
                 ) >= const.SCORE_KICK_DELTA:  # type: ignore
                     kick: models.ScoreKicks = (
-                        models.DB.query(models.ScoreKicks).where(models.ScoreKicks.author == id).first()  # type: ignore
+                        models.DB.query(models.ScoreKicks).where(models.ScoreKicks.author == score.author).first()  # type: ignore
                     )
 
                     if kick is None:
-                        models.DB.add(kick := models.ScoreKicks(author=id))
+                        models.DB.add(kick := models.ScoreKicks(author=score.author))
 
                     score_list += f"{total_scores + 1} ( kick #{kick.kicks + 1} ), <@{score.author}> no activity for \
 {humanize.precisedelta(datetime.timedelta(seconds=delta), minimum_unit='seconds')} with score `{util.calc_score(score)}` ( {str(score)} )\n"
