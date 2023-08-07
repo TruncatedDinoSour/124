@@ -68,7 +68,9 @@ class Bot124(discord.Client):
 
                     kick.kicks += 1
                     models.DB.session.execute(
-                        sqlalchemy.delete(models.Score).where(models.Score.author == score.author)
+                        sqlalchemy.delete(models.Score).where(
+                            models.Score.author == score.author
+                        )
                     )
 
             models.DB.commit()
@@ -270,6 +272,7 @@ keep in mind if you want to add people use `/invite` command"""
     ) -> None:
         if not user.bot:
             util.update_act(user.id)
+            util.get_score(user.id).reactions_post += 1
 
         if (
             str(reaction.emoji) == const.STAR_EMOJI
@@ -305,14 +308,23 @@ keep in mind if you want to add people use `/invite` command"""
         ):
             return
 
-        util.get_score(user.id).reactions_post += 1
         util.get_score(reaction.message.author.id).reactions_get += 1
+        util.update_act(reaction.message.author.id)
 
         models.DB.commit()
 
     async def on_reaction_remove(
         self, reaction: discord.Reaction, user: discord.User
     ) -> None:
+        if not user.bot:
+            s: models.Score = util.get_score(user.id)
+
+            if str(reaction.emoji) == const.STAR_EMOJI:
+                s.stars_removed += 1
+
+            util.update_act(user.id)
+            s.reactions_post -= 1  # type: ignore
+
         if (
             user.bot
             or reaction.message.author.bot
@@ -320,13 +332,7 @@ keep in mind if you want to add people use `/invite` command"""
         ):
             return
 
-        (s := util.get_score(user.id)).reactions_post -= 1
         util.get_score(reaction.message.author.id).reactions_get -= 1
-
-        if str(reaction.emoji) == const.STAR_EMOJI:
-            s.stars_removed += 1
-
-        util.update_act(user.id)
         util.update_act(reaction.message.author.id)
 
         models.DB.commit()

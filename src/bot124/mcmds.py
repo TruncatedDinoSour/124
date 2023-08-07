@@ -19,7 +19,7 @@ cmds: mcmdmgr.MusicCommands = mcmdmgr.MusicCommands()
 RAND: SystemRandom = SystemRandom()
 
 
-@cmds.new
+@cmds.nnew
 async def quit(music: typing.Any, *_) -> None:
     """makes the bot quit playing music"""
 
@@ -247,7 +247,7 @@ async def random(music: typing.Any, cmd: mcmdmgr.MusicCommand) -> None:
 
 Your previous responses were (artist - song):
 {nl.join(prev)[-(const.MESSAGE_WRAP_LEN - len(const.MUSIC_AI_GEN)):] if prev else '<none> - <none>'}""",  # type: ignore
-                            ai.TextAI.gpt4,
+                            ai.TextAI.gpt3,
                         ),
                         timeout=15,
                     )

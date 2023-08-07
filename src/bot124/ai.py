@@ -30,11 +30,12 @@ class TextAI(Enum):
 
     @staticmethod
     async def _deepai(prompt: str) -> str:
+        # no more proxies :( request_args=await util.get_proxies(),
+
         return (
             await rebelai.ai.deepai.deepai(
                 model=rebelai.enums.DeepAIModel.TEXT,
                 data={"text": prompt},
-                request_args=await util.get_proxies(),
             )
         )["output"]
 
@@ -67,7 +68,7 @@ class ImageAI(Enum):
 
 async def gen_ai_text(
     prompt: str,
-    model: TextAI = TextAI.gpt4,
+    model: TextAI = TextAI.gpt3,
 ) -> str:
     r: typing.Optional[str] = None
 
