@@ -724,7 +724,7 @@ async def kickslb(msg: discord.interactions.Interaction) -> None:  # type: ignor
             f"{idx}, <@{value[0]}> with score `{value[1]}`"
             for idx, value in enumerate(lb.items(), 1)
         )
-        + f"\n\naverage chat score : {total_lbv / len(lbv):.2f}\ntotal chat score : {total_lbv:.2f}",
+        + f"\n\naverage kick score : {total_lbv / len(lbv):.2f}\ntotal kick score : {total_lbv:.2f}",
     )
 
 
