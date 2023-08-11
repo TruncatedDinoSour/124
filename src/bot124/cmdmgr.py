@@ -26,6 +26,21 @@ class CommandManager:
             assert (
                 self.b is not None
             ), "command manager is being used pre-initialization"
+
+            await args[0].response.defer()
+            return await fn(*args, **kwargs)
+
+        self.cmds.add(wrapper)
+        return wrapper
+
+    def nnew(
+        self, fn: typing.Callable[..., typing.Any]
+    ) -> typing.Callable[..., typing.Any]:
+        @wraps(fn)
+        async def wrapper(*args: typing.Any, **kwargs: typing.Any) -> typing.Any:
+            assert (
+                self.b is not None
+            ), "command manager is being used pre-initialization"
             return await fn(*args, **kwargs)
 
         self.cmds.add(wrapper)

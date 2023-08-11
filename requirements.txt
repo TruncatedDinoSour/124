@@ -9,3 +9,4 @@ requests
 types-requests
 rebelai
 aiohttp
+iso639

@@ -46,8 +46,6 @@ async def status(
 ) -> None:  # type: ignore
     """set or reset bots 'playing' status"""
 
-    await msg.response.defer()
-
     if value is not None:
         value = value[: const.MAX_PRESENCE_LEN].strip()
 
@@ -242,7 +240,7 @@ async def wordcloud(
     )
 
 
-@cmds.new
+@cmds.nnew
 async def confess(
     msg: discord.interactions.Interaction,
     content: str,
@@ -312,7 +310,6 @@ async def ai(
 ) -> None:
     """generate content using an AI large language model"""
 
-    await msg.response.defer()
     await msg.followup.send(
         content=(
             await ai_impl.gen_ai_text(
@@ -333,7 +330,6 @@ async def aiimg(
 ) -> None:
     """generate content using an AI image model"""
 
-    await msg.response.defer()
     await msg.followup.send(file=await ai_impl.gen_ai_img(prompt, model))
 
 
@@ -343,8 +339,6 @@ async def chatai(
     model: ai_impl.TextAI = ai_impl.TextAI.gpt3,
 ) -> None:
     """create a thread with an AI model"""
-
-    await msg.response.defer()
 
     thread: discord.Thread = await msg.channel.create_thread(  # type: ignore
         name=(name := f"{msg.user.name}'s {model.name!r} chat @ {datetime.datetime.utcnow()} UTC")  # type: ignore
@@ -396,8 +390,6 @@ async def pfp(
 ) -> None:
     """extract yours or other users' profile pictures"""
 
-    await msg.response.defer()
-
     if user is None:
         user = msg.user
 
@@ -413,8 +405,6 @@ async def servertime(
 ) -> None:
     """shows how much time a person has stayed in this server"""
 
-    await msg.response.defer()
-
     if member is None:
         member = msg.user  # type: ignore
 
@@ -429,8 +419,6 @@ async def neofetch(
     msg: discord.interactions.Interaction,
 ) -> None:
     """run neofetch"""
-
-    await msg.response.defer()
 
     await msg.followup.send(
         content=f"""```
@@ -488,8 +476,6 @@ async def music(
 ) -> None:
     """play music in a voice chat"""
 
-    await msg.response.defer()
-
     if msg.user.voice is None:  # type: ignore
         await msg.followup.send(content="join a voice chat babe xx")
         return
@@ -517,8 +503,6 @@ async def tod(
     type: TruthOrDare = TruthOrDare.random,
 ) -> None:
     """truth, dare or paranoia"""
-
-    await msg.response.defer()
 
     true_type: TruthOrDare = type
 
@@ -559,7 +543,6 @@ async def src(
 ) -> None:
     """show a link to the bots source code"""
 
-    await msg.response.defer()
     await msg.followup.send(content=const.SOURCE)
 
 
@@ -568,8 +551,6 @@ async def invite(
     msg: discord.interactions.Interaction,
 ) -> None:
     """link the top invite"""
-
-    await msg.response.defer()
 
     invites: list[discord.Invite] = (
         []
@@ -600,8 +581,6 @@ async def cat(
     http: typing.Optional[int] = None,
 ) -> None:
     """cat pic"""
-
-    await msg.response.defer()
 
     if http is not None:
         await msg.followup.send(
@@ -644,8 +623,6 @@ async def anime(
 ) -> None:
     """anime girls holding programming books pics"""
 
-    await msg.response.defer()
-
     if lang is not None and lang not in const.ANIME_DIRS:
         await menu.text_menu(
             msg,
@@ -666,8 +643,6 @@ async def anime(
 async def hrony4anime(msg: discord.interactions.Interaction) -> None:
     """hrony for anime ( my friends made me add this why )"""
 
-    await msg.response.defer()
-
     async with aiohttp.ClientSession() as s:
         async with s.get("https://pic.re/image") as r:
             await msg.followup.send(
@@ -681,7 +656,10 @@ async def hrony4anime(msg: discord.interactions.Interaction) -> None:
 
 
 @cmds.new
-async def kicks(msg: discord.interactions.Interaction, user: typing.Optional[discord.user.User] = None) -> None:  # type: ignore
+async def kicks(
+    msg: discord.interactions.Interaction,
+    user: typing.Optional[discord.user.User] = None,
+) -> None:
     """get your or other users' kick score"""
 
     if user is not None and user.bot:
@@ -705,7 +683,7 @@ async def kicks(msg: discord.interactions.Interaction, user: typing.Optional[dis
 
 
 @cmds.new
-async def kickslb(msg: discord.interactions.Interaction) -> None:  # type: ignore
+async def kickslb(msg: discord.interactions.Interaction) -> None:
     """get kick scores"""
 
     scores: typing.Any = models.DB.query(models.ScoreKicks).all()  # type: ignore
@@ -736,7 +714,9 @@ async def kickslb(msg: discord.interactions.Interaction) -> None:  # type: ignor
 
 
 @cmds.new
-async def advice(msg: discord.interactions.Interaction, query: typing.Optional[str] = None) -> None:  # type: ignore
+async def advice(
+    msg: discord.interactions.Interaction, query: typing.Optional[str] = None
+) -> None:
     """get or search for advice"""
 
     s: aiohttp.ClientSession = aiohttp.ClientSession()
@@ -763,3 +743,22 @@ async def advice(msg: discord.interactions.Interaction, query: typing.Optional[s
         await menu.text_menu(msg, f"advice #{advice['id']} : {advice['advice']}")
 
     await s.close()
+
+
+@cmds.new
+async def tr(
+    msg: discord.interactions.Interaction,
+    text: str,
+    to_lang: str,
+    from_lang: str = const.DEFAULT_TRANSLATE_SOURCE,
+) -> None:
+    """translate from one language to another using deepL ai"""
+
+    await menu.menu(
+        msg,
+        await ai_impl.translate(
+            text=text,
+            to_lang=to_lang.upper(),
+            from_lang=from_lang.upper(),
+        ),
+    )
