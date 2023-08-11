@@ -92,7 +92,7 @@ async def gen_ai_text(
 
 async def gen_ai_img(
     prompt: str,
-    model: ImageAI = ImageAI.prodia,
+    model: ImageAI = ImageAI.pollinations,
 ) -> discord.File:
     r: bytes = bytes()
 
