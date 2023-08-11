@@ -308,7 +308,7 @@ async def starboard(
 async def ai(
     msg: discord.interactions.Interaction,
     prompt: str,
-    model: ai_impl.TextAI = ai_impl.TextAI.gpt4,
+    model: ai_impl.TextAI = ai_impl.TextAI.gpt3,
 ) -> None:
     """generate content using an AI large language model"""
 
@@ -340,7 +340,7 @@ async def aiimg(
 @cmds.new
 async def chatai(
     msg: discord.interactions.Interaction,
-    model: ai_impl.TextAI = ai_impl.TextAI.gpt4,
+    model: ai_impl.TextAI = ai_impl.TextAI.gpt3,
 ) -> None:
     """create a thread with an AI model"""
 
