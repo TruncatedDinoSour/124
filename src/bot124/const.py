@@ -82,10 +82,10 @@ MUSIC_MAX_LEN: Final[int] = 512
 SOURCE: Final[str] = "https://ari-web.xyz/gh/124"
 MUSIC_COMMENT: Final[str] = ";"
 MUSIC_AI_LIMIT: Final[int] = 128
-MUSIC_AI_GEN: Final[
+MUSIC_AI_GEN: Final[  # %s gets replaced with the topics
     str
-] = f"Act as if you were an advanced suggestion algorithm and you must suggest one singular indie, indie pop, breakcore, electronic, emo, \
-indie rock or any other alternative (or alternative-esc) genre song with no formatting or extra information, the suggestion must be provided on the first \
+] = f"Act as if you were an advanced suggestion algorithm and you must suggest one singular %s \
+song with no formatting or extra information, the suggestion must be provided on the first \
 line of output. Your response is limited to {MUSIC_AI_LIMIT} characters so keep your responses short and concise, just the artist and the song. \
 You now must give me one singular song with those requirements in the format of 'artist - song', \
 you must introduce variety to your suggestions (topics, artists, genres, vibes, sounds, lyrics, popularity, length, etc.) and not repeat \

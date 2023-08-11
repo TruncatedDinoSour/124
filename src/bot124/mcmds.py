@@ -215,21 +215,26 @@ async def current(music: typing.Any, cmd: mcmdmgr.MusicCommand) -> None:
 
 @cmds.nnew
 async def random(music: typing.Any, cmd: mcmdmgr.MusicCommand) -> None:
-    """add random ai suggested song, takes an optional argument [n] for number of songs to generate, for example `random 10`"""
+    """add random ai suggested song, takes an optional argument [n] for number of songs to generate and [t] for topic( s ), for example `random 10`
+    and `random 10 indie, indie pop, hello`"""
 
     n: int = 1
+    t: str = "indie, indie pop, breakcore, electronic, emo, indie rock or any other alternative (or alternative-esc) genre"
 
     if cmd.args:
+        nx, t = (cmd.args.split(maxsplit=1) + [t])[:2]
+
         try:
-            n = int(cmd.args)
+            n = int(nx)
         except ValueError:
             await cmd.msg.reply(content=f"`{cmd.args}` isnt a valid integer")
             return
 
     n = min(n, const.MUSIC_AI_MAX)
+    t = t[: const.MUSIC_MAX_LEN]
 
     await cmd.msg.reply(
-        content=f"adding {n} ( value is wrapped to {const.MUSIC_AI_MAX} ) songs"
+        content=f"adding {n} ( value is wrapped to {const.MUSIC_AI_MAX} ) songs with topic `{t}`"
     )
 
     nl: str = "\n"
@@ -243,15 +248,16 @@ async def random(music: typing.Any, cmd: mcmdmgr.MusicCommand) -> None:
                 (
                     await asyncio.wait_for(
                         ai.gen_ai_text(
-                            f"""{const.MUSIC_AI_GEN}
+                            f"""{const.MUSIC_AI_GEN % (t,)}
 
 Your previous responses were (artist - song):
 {nl.join(prev)[-(const.MESSAGE_WRAP_LEN - len(const.MUSIC_AI_GEN)):] if prev else '<none> - <none>'}""",  # type: ignore
-                            ai.TextAI.gpt3,
+                            regen=True,
                         ),
                         timeout=15,
                     )
-                )[: const.MUSIC_AI_LIMIT]
+                )
+                .replace(":", "")[: const.MUSIC_AI_LIMIT]
                 .strip()
                 .splitlines()
                 + [""]

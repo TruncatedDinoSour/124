@@ -314,7 +314,14 @@ async def ai(
 
     await msg.response.defer()
     await msg.followup.send(
-        content=(await ai_impl.gen_ai_text(prompt, model)) or "*no content*",  # type: ignore
+        content=(
+            await ai_impl.gen_ai_text(
+                prompt,
+                model,
+                False,
+            )
+        )
+        or "*no content*",  # type: ignore
     )
 
 

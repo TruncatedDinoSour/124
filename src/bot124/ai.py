@@ -69,6 +69,7 @@ class ImageAI(Enum):
 async def gen_ai_text(
     prompt: str,
     model: TextAI = TextAI.gpt3,
+    regen: bool = True,
 ) -> str:
     r: typing.Optional[str] = None
 
@@ -77,6 +78,13 @@ async def gen_ai_text(
             r: typing.Optional[str] = await model.value[0](prompt=prompt)
             break
         except Exception:
+            if regen:
+                return await gen_ai_text(
+                    prompt,
+                    TextAI.gpt4 if model is TextAI.gpt3 else TextAI.gpt3,
+                    False,
+                )
+
             time.sleep(0.5)
 
     return (r or "")[:2000].strip()
@@ -84,7 +92,7 @@ async def gen_ai_text(
 
 async def gen_ai_img(
     prompt: str,
-    model: ImageAI = ImageAI.pollinations,
+    model: ImageAI = ImageAI.prodia,
 ) -> discord.File:
     r: bytes = bytes()
 

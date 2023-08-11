@@ -79,7 +79,8 @@ class Music:
                 )
 
                 while (
-                    self.voice.is_connected()
+                    self.queue
+                    and self.voice.is_connected()
                     and self.run
                     and self.current == previous_current
                     and (self.voice.is_playing() or self.voice.is_paused())
