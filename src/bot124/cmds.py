@@ -18,6 +18,9 @@ import discord.app_commands  # type: ignore
 import humanize  # type: ignore
 import sqlalchemy
 from discord.ui import Button, View
+from rebelai import enums as ai_enums
+from rebelai.ai.deepai import deepai as deepai_ai
+from rebelai.ai.prodia import prodia as prodia_ai
 
 from . import ai as ai_impl
 from . import const, menu, models
@@ -29,6 +32,10 @@ __all__: tuple[str] = ("cmds",)
 
 cmds: CommandManager = CommandManager()
 RAND: SystemRandom = SystemRandom()
+
+_PRODIA_MODELS: tuple[str, ...] = tuple(
+    map(lambda item: item.name, ai_enums.ProdiaModel)
+)
 
 
 class TruthOrDare(Enum):
@@ -640,22 +647,6 @@ async def anime(
 
 
 @cmds.new
-async def hrony4anime(msg: discord.interactions.Interaction) -> None:
-    """hrony for anime ( my friends made me add this why )"""
-
-    async with aiohttp.ClientSession() as s:
-        async with s.get("https://pic.re/image") as r:
-            await msg.followup.send(
-                file=discord.File(
-                    BytesIO(await r.content.read()),
-                    filename="hrony4anime.png",
-                    spoiler=True,
-                ),
-                content="why are you so hrony ...",
-            )
-
-
-@cmds.new
 async def kicks(
     msg: discord.interactions.Interaction,
     user: typing.Optional[discord.user.User] = None,
@@ -760,5 +751,110 @@ async def tr(
             text=text,
             to_lang=to_lang.upper(),
             from_lang=from_lang.upper(),
+        ),
+    )
+
+
+@cmds.new
+async def deepai(
+    msg: discord.interactions.Interaction,
+    model: typing.Optional[ai_enums.DeepAIModel] = None,
+    text: typing.Optional[str] = None,
+    image: typing.Optional[discord.Attachment] = None,
+    image1: typing.Optional[discord.Attachment] = None,
+    image2: typing.Optional[discord.Attachment] = None,
+) -> None:
+    """interract with all deepai models, run with no arguments for more info abt arguments"""
+
+    if model is None or all(arg is None for arg in (text, image, image1, image2)):
+        await msg.followup.send(
+            content="""- `model` is required
+
+text :
+- text2img
+- text-generator
+- fantasy-world-generator
+- stable-diffusion
+- cyberpunk-generator
+- cute-creature-generator
+- renaissance-painting-generator
+- old-style-generator
+- anime-portrait-generator
+- surreal-graphics-generator
+- 3d-objects-generator
+- impressionism-painting-generator
+- watercolor-painting-generator
+- 3d-character-generator
+- future-architecture-generator
+- anime-world-generator
+- steampunk-generator
+- street-art-generator
+- origami-3d-generator
+- hologram-3d-generator
+
+image + text :
+- image-editor
+
+image :
+- torch-srgan
+- waifu2x
+- nsfw-detector
+
+image1 + image2 :
+- image-similarity"""
+        )
+        return
+
+    async def read(f: typing.Optional[discord.Attachment]) -> bytes:
+        return (await f.read()) if f is not None else b""
+
+    out: dict[str, typing.Any] = await deepai_ai(
+        model=model,
+        data={
+            "text": text or "",
+            "image": await read(image),
+            "image1": await read(image1),
+            "image2": await read(image2),
+        },
+    )
+
+    realout: str = ""
+
+    for r in "output", "output_url", "err":
+        if r in out:
+            realout += f"{r} : {out[r]}\n\n"
+
+    await msg.followup.send(
+        content=realout.strip()
+        or f"""```json
+{json.dumps(out, indent=4)}
+```""",
+    )
+
+
+@cmds.new
+async def prodia(
+    msg: discord.interactions.Interaction,
+    prompt: str,
+    model: typing.Literal[*_PRODIA_MODELS[:25]] = ai_enums.ProdiaModel.REALISTIC_VISION_V5_0.name,  # type: ignore
+    model1: typing.Optional[typing.Literal[*_PRODIA_MODELS[25:]]] = None,  # type: ignore
+    sampler: ai_enums.ProdiaSampler = ai_enums.ProdiaSampler.EULER,
+    seed: int = -1,
+    negative: bool = True,
+) -> None:
+    """prodia image generation ( with more options )"""
+
+    await msg.followup.send(
+        file=discord.File(
+            fp=BytesIO(
+                await prodia_ai(
+                    prompt=prompt,
+                    model=getattr(ai_enums.ProdiaModel, model1 or model),  # type: ignore
+                    sampler=sampler,
+                    seed=seed,
+                    negative=negative,
+                )
+            ),
+            filename=f"124_prodia_{model}_{sampler.name}_{seed}_{'neg' if negative else 'nneg'}_generation_{datetime.datetime.utcnow()}.png",
         ),
     )

@@ -79,8 +79,9 @@ ty
 -   `/cat` and `/anime` pics
 -   `/kicks` and `/kickslb` scoreboards for kick scores ( how many times uve been kicked off )
 -   `/advice` for random advice and searching for it
--   `/hrony4anime` bc my friends made me implement it :(
 -   `/tr` for ai-powered translations
+-   `/deepai` for more customisable deepai model access
+-   `/prodia` for more customisable prodia model access
 -   easy setup
 -   developer-friendly configuration in `src/bot124/const.py`
 -   feature packed and light
