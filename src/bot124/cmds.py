@@ -530,7 +530,7 @@ async def tod(
 
     async def cb(interaction: discord.interactions.Interaction) -> None:
         view.stop()
-        await tod(msg=interaction, type=type)
+        await tod(interaction, type=type)
 
     btn.callback = cb
     view.add_item(btn)
