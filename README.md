@@ -21,6 +21,7 @@ ty
 -   https://github.com/cat-milk/Anime-Girls-Holding-Programming-Books for anime girls holding programming books
 -   https://gimmeproxy.com/ for free proxies
 -   https://api.adviceslip.com/ for advice
+-   https://ari-web.xyz/gh/rebelai ( me ) for ai library shit :3
 
 # features
 
