@@ -78,7 +78,9 @@ async def gen_ai_text(
     for _ in range(3):
         try:
             r: typing.Optional[str] = await model.value[0](prompt=prompt)
-            break
+
+            if r:
+                break
         except Exception:
             if regen:
                 return await gen_ai_text(
@@ -98,10 +100,14 @@ async def gen_ai_img(
 ) -> discord.File:
     r: bytes = bytes()
 
-    try:
-        r = await model.value[0](prompt=prompt)
-    except Exception:
-        time.sleep(0.5)
+    for _ in range(3):
+        try:
+            r = await model.value[0](prompt=prompt)
+
+            if r:
+                break
+        except Exception:
+            time.sleep(0.5)
 
     return discord.File(
         fp=BytesIO(r),
@@ -129,7 +135,7 @@ async def translate(
                 request_args=await util.get_proxies(),
             )
 
-            if tr is not None:
+            if tr:
                 break
         except Exception:
             time.sleep(0.5)
