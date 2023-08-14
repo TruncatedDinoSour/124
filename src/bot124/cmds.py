@@ -861,7 +861,10 @@ async def prodia(
 
 
 @cmds.new
-async def everyone(msg: discord.interactions.Interaction) -> None:
+async def everyone(
+    msg: discord.interactions.Interaction,
+    content: str,
+) -> None:
     """ping everyone individually instead of `@everyone`"""
 
     if not msg.user.guild_permissions.mention_everyone:  # type: ignore
@@ -869,12 +872,12 @@ async def everyone(msg: discord.interactions.Interaction) -> None:
         return
 
     if msg.guild is None:
-        await msg.followup.send(content="no guild in the interraction ( ? )")
+        await msg.followup.send(content="no guild / message in the interraction ( ? )")
         return
 
-    await msg.followup.send(content="pinging everyone ...")
+    message: discord.WebhookMessage = await msg.followup.send(content=content)  # type: ignore
 
     for page in menu.wrap_text(
         " ".join("" if member.bot else member.mention for member in msg.guild.members)
     ):
-        await msg.channel.send(content=page)  # type: ignore
+        await message.reply(content=page)
