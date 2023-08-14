@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 """music commands manager"""
 
-import textwrap
 import traceback
 import typing
 from dataclasses import dataclass
@@ -10,7 +9,7 @@ from functools import wraps
 
 from discord import AllowedMentions, Message
 
-from . import const
+from . import const, menu
 
 
 @dataclass
@@ -30,7 +29,7 @@ class MusicCommands:
         async def _help(_: typing.Any, cmd: MusicCommand) -> None:
             """display help"""
 
-            for page in textwrap.wrap(
+            for page in menu.wrap_text(
                 "help for music functions\n\n"
                 "- to add music to the queue just type your search query or send a youtube url to your song or playlist\n"
                 f"- if u wanna say smt in the chat without the bot seeing start ur message with `{const.MUSIC_COMMENT}`, for example "
@@ -40,8 +39,6 @@ class MusicCommands:
                     f"- {name} -- {fun.__doc__ or 'no help provided'}\n"
                     for name, fun in self.cmds.items()
                 ),
-                const.MESSAGE_WRAP_LEN,
-                replace_whitespace=False,
             ):
                 await cmd.msg.reply(
                     content=page,
@@ -103,7 +100,9 @@ class MusicCommands:
             if args[1].msg.author.guild_permissions.administrator:
                 return await fn(*args, **kwargs)
 
-            await args[1].msg.reply(content="you have no permissions to run this command")
+            await args[1].msg.reply(
+                content="you have no permissions to run this command"
+            )
 
         return wrapper
 

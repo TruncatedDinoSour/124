@@ -858,3 +858,23 @@ async def prodia(
             filename=f"124_prodia_{model}_{sampler.name}_{seed}_{'neg' if negative else 'nneg'}_generation_{datetime.datetime.utcnow()}.png",
         ),
     )
+
+
+@cmds.new
+async def everyone(msg: discord.interactions.Interaction) -> None:
+    """ping everyone individually instead of `@everyone`"""
+
+    if not msg.user.guild_permissions.mention_everyone:  # type: ignore
+        await msg.followup.send(content="u have no `everyone ping` permission")
+        return
+
+    if msg.guild is None:
+        await msg.followup.send(content="no guild in the interraction ( ? )")
+        return
+
+    await msg.followup.send(content="pinging everyone ...")
+
+    for page in menu.wrap_text(
+        " ".join("" if member.bot else member.mention for member in msg.guild.members)
+    ):
+        await msg.channel.send(content=page)  # type: ignore

@@ -5,7 +5,6 @@
 import asyncio
 import datetime
 import string
-import textwrap
 import typing
 
 import discord
@@ -13,7 +12,7 @@ import discord.app_commands  # type: ignore
 import humanize  # type: ignore
 import sqlalchemy
 
-from . import cmds, const, models, util
+from . import cmds, const, models, util, menu
 
 __all__: tuple[str] = ("Bot124",)
 
@@ -80,9 +79,7 @@ class Bot124(discord.Client):
 
                 for g in self.guilds:
                     if (c := g.system_channel) is not None:
-                        for page in textwrap.wrap(
-                            score_list, const.MESSAGE_WRAP_LEN, replace_whitespace=False
-                        ):
+                        for page in await menu.wrap_text(score_list):
                             await c.send(content=page)
                             await asyncio.sleep(1)
 

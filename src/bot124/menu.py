@@ -38,7 +38,11 @@ async def menu(
     await menu.start()
 
 
+def wrap_text(text: str, wrap: int = const.MESSAGE_WRAP_LEN) -> list[str]:
+    return textwrap.wrap(text, wrap, replace_whitespace=False)
+
+
 async def text_menu(
     msg: discord.interactions.Interaction, text: str, wrap: int = const.MESSAGE_WRAP_LEN
 ) -> None:
-    await menu(msg, textwrap.wrap(text, wrap, replace_whitespace=False))
+    await menu(msg, wrap_text(text, wrap))

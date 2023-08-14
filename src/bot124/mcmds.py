@@ -3,7 +3,6 @@
 """music commands"""
 
 import asyncio
-import textwrap
 import typing
 from json import loads as load_json
 from secrets import SystemRandom
@@ -12,7 +11,7 @@ from threading import Thread
 from sqlalchemy import delete as delete_stmt
 from sqlalchemy.exc import IntegrityError
 
-from . import ai, const, mcmdmgr, models
+from . import ai, const, mcmdmgr, menu, models
 
 cmds: mcmdmgr.MusicCommands = mcmdmgr.MusicCommands()
 
@@ -44,14 +43,12 @@ async def clear(music: typing.Any, cmd: mcmdmgr.MusicCommand) -> None:
 async def queue(music: typing.Any, cmd: mcmdmgr.MusicCommand) -> None:
     """lists the current queue"""
 
-    for page in textwrap.wrap(
+    for page in menu.wrap_text(
         f"music queue for {music.thread.jump_url}\n\n"
         + "".join(
             f"{'**[CURRENT]** ' if idx == (music.current + 1) else ''}{idx}, <{q}>\n"
             for idx, q in enumerate(music.queue, 1)
         ),
-        const.MESSAGE_WRAP_LEN,
-        replace_whitespace=False,
     ):
         await cmd.msg.reply(content=page)
 
@@ -361,11 +358,7 @@ async def listq(_: typing.Any, cmd: mcmdmgr.MusicCommand) -> None:
             else "*no items found in the queue*"
         )
 
-    for page in textwrap.wrap(
-        output,
-        const.MESSAGE_WRAP_LEN,
-        replace_whitespace=False,
-    ):
+    for page in menu.wrap_text(output):
         await cmd.msg.reply(
             content=page,
             allowed_mentions=const.REPLY_MENTIONS,
