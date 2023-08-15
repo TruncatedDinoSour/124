@@ -267,10 +267,6 @@ keep in mind if you want to add people use `/invite` command"""
     async def on_reaction_add(
         self, reaction: discord.Reaction, user: discord.User
     ) -> None:
-        if not user.bot:
-            util.update_act(user.id)
-            util.get_score(user.id).reactions_post += 1
-
         if (
             str(reaction.emoji) == const.STAR_EMOJI
             and sum([(not u.bot) async for u in reaction.users()]) >= const.STAR_COUNT
@@ -298,12 +294,17 @@ keep in mind if you want to add people use `/invite` command"""
                 ],
             )
 
+        if not user.bot:
+            util.update_act(user.id)
+
         if (
             user.bot
             or reaction.message.author.bot
             or reaction.message.author.id == user.id
         ):
             return
+
+        util.get_score(user.id).reactions_post += 1
 
         util.get_score(reaction.message.author.id).reactions_get += 1
         util.update_act(reaction.message.author.id)
@@ -320,7 +321,6 @@ keep in mind if you want to add people use `/invite` command"""
                 s.stars_removed += 1
 
             util.update_act(user.id)
-            s.reactions_post -= 1  # type: ignore
 
         if (
             user.bot
@@ -329,6 +329,7 @@ keep in mind if you want to add people use `/invite` command"""
         ):
             return
 
+        s.reactions_post -= 1  # type: ignore
         util.get_score(reaction.message.author.id).reactions_get -= 1
         util.update_act(reaction.message.author.id)
 
