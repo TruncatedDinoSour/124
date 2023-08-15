@@ -120,17 +120,34 @@ async def rules(
 
 
 @cmds.new
-async def ruleslb(msg: discord.interactions.Interaction) -> None:  # type: ignore
+async def ruleslb(
+    msg: discord.interactions.Interaction,
+    local: bool = False,
+) -> None:  # type: ignore
     """rules leaderboard by rule creation count"""
 
     lb: typing.Dict[int, int] = {}
 
+    members: tuple[int] = tuple()
+
+    if local:
+        members = (
+            tuple(map(lambda m: m.id, msg.guild.members)) if msg.guild else members
+        )
+
     for (author,) in models.DB.query(sqlalchemy.distinct(models.Rule.author)).all():  # type: ignore
+        if local and author not in members:
+            continue
+
         lb[author] = (  # type: ignore
             models.DB.query(sqlalchemy.distinct(models.Rule.id))  # type: ignore
             .where(models.Rule.author == author)
             .count()
         )
+
+    if not lb:
+        await menu.text_menu(msg, "no rules found")
+        return
 
     lb: dict[int, int] = {
         k: v for k, v in sorted(lb.items(), key=lambda item: item[1], reverse=True)
@@ -173,10 +190,19 @@ async def score(msg: discord.interactions.Interaction, user: typing.Optional[dis
 
 
 @cmds.new
-async def scorelb(msg: discord.interactions.Interaction) -> None:  # type: ignore
+async def scorelb(
+    msg: discord.interactions.Interaction,
+    local: bool = False,
+) -> None:  # type: ignore
     """get chat scores"""
 
     scores: typing.Any = models.DB.query(models.Score).all()  # type: ignore
+
+    if local:
+        members: tuple[int, ...] = (
+            tuple(map(lambda m: m.id, msg.guild.members)) if msg.guild else tuple()
+        )
+        scores = tuple(score for score in scores if score.author in members)
 
     if not scores:
         await menu.text_menu(msg, "no people currently have a score")
