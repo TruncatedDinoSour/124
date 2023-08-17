@@ -491,7 +491,7 @@ async def timelb(
 
     if not local:
         guilds = f"""
-guilds : {len(cmds.b.guilds)}
+guilds : {len(cmds.b.guilds)} ( `{"`, `".join(g.name for g in cmds.b.guilds)}` )
 average member count : {len(stay_time) / len(cmds.b.guilds):.2f}"""
 
     await menu.text_menu(
