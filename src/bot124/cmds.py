@@ -487,12 +487,19 @@ async def timelb(
         for k, v in sorted(stay_time.items(), key=lambda item: item[1], reverse=True)
     }
 
+    guilds: str = ""
+
+    if not local:
+        guilds = f"""
+guilds : {len(cmds.b.guilds)}
+average member count : {len(stay_time) / len(cmds.b.guilds):.2f}"""
+
     await menu.text_menu(
         msg,
         f"""{'local' if local else 'global'} stay time leaderboard
 
-total users : {len(stay_time)}
-average stay time : {humanize.precisedelta(datetime.timedelta(seconds=sum(stay_time.values()) / len(stay_time)), minimum_unit='seconds')}
+total users : {len(stay_time)}{guilds}
+average stay time : {humanize.precisedelta(datetime.timedelta(seconds=round(sum(stay_time.values()) / len(stay_time), 2)), minimum_unit='seconds')}
 
 """
         + "\n".join(
