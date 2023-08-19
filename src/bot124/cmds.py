@@ -17,6 +17,7 @@ import discord
 import discord.app_commands  # type: ignore
 import humanize  # type: ignore
 import sqlalchemy
+import yt_dlp
 from discord.ui import Button, View
 from rebelai import enums as ai_enums
 from rebelai.ai.deepai import deepai as deepai_ai
@@ -914,3 +915,25 @@ async def everyone(
         " ".join("" if member.bot else member.mention for member in msg.guild.members)
     ):
         await message.reply(content=page)
+
+
+@cmds.new
+async def yt(
+    msg: discord.interactions.Interaction,
+    query: str,
+) -> None:
+    """search stuff on youtube"""
+
+    ytdl: yt_dlp.YoutubeDL = yt_dlp.YoutubeDL(const.YTDL_OPTIONS)
+    data: typing.Any = await asyncio.get_event_loop().run_in_executor(
+        None, lambda: ytdl.extract_info(query, download=False)  # type: ignore
+    )
+
+    if data is None:
+        await msg.followup.send(content="*no results*")
+        return
+
+    if "entries" in data:
+        data: typing.Any = data["entries"][0]
+
+    await msg.followup.send(content=f"https://youtu.be/{data['id']}")

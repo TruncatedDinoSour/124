@@ -83,6 +83,7 @@ ty
 -   `/tr` for ai-powered translations
 -   `/deepai` for more customisable deepai model access
 -   `/prodia` for more customisable prodia model access
+-   `/yt` for searching youtube :)
 -   ping `/everyone` individually with a single command
 -   easy setup
 -   developer-friendly configuration in `src/bot124/const.py`
