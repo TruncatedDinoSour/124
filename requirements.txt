@@ -10,3 +10,4 @@ types-requests
 rebelai
 aiohttp
 iso639
+rule34Py

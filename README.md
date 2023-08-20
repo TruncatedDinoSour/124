@@ -84,6 +84,7 @@ ty
 -   `/deepai` for more customisable deepai model access
 -   `/prodia` for more customisable prodia model access
 -   `/yt` for searching youtube :)
+-   `/r34` bc my friends forced me to ( i am not happy abt it )
 -   ping `/everyone` individually with a single command
 -   easy setup
 -   developer-friendly configuration in `src/bot124/const.py`

@@ -17,11 +17,13 @@ import discord
 import discord.app_commands  # type: ignore
 import humanize  # type: ignore
 import sqlalchemy
-import yt_dlp
+import yt_dlp  # type: ignore
 from discord.ui import Button, View
 from rebelai import enums as ai_enums
 from rebelai.ai.deepai import deepai as deepai_ai
 from rebelai.ai.prodia import prodia as prodia_ai
+from rule34Py import rule34Py as Rule34
+from rule34Py.post import Post as Rule34Post
 
 from . import ai as ai_impl
 from . import const, menu, models
@@ -937,3 +939,19 @@ async def yt(
         data: typing.Any = data["entries"][0]
 
     await msg.followup.send(content=f"https://youtu.be/{data['id']}")
+
+
+@cmds.new
+async def r34(
+    msg: discord.interactions.Interaction,
+    query: str,
+) -> None:
+    """rule 34 :( ( add multiple tags using ; )"""
+
+    await menu.menu(
+        msg,
+        tuple(
+            s.sample  # type: ignore
+            for s in Rule34().search(query.lower().replace(" ", "_").split(";"))  # type: ignore
+        ),
+    )
