@@ -944,16 +944,16 @@ async def yt(
 @cmds.new
 async def r34(
     msg: discord.interactions.Interaction,
-    query: str,
+    tags: str,
 ) -> None:
-    """rule 34 :( ( add multiple tags using ; )"""
+    """rule 34 :( ( add multiple tags using `:` )"""
 
     await menu.menu(
         msg,
         tuple(
             s.sample  # type: ignore
             for s in Rule34().search(  # type: ignore
-                query.lower().replace(" ", "_").split(";"),
+                tags.lower().replace(" ", "_").split(":"),
             )
         )
         or ("*no results*",),
