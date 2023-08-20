@@ -954,7 +954,7 @@ async def r34(
             s.sample  # type: ignore
             for s in Rule34().search(  # type: ignore
                 query.lower().replace(" ", "_").split(";"),
-                limit=50,
             )
-        ),
+        )
+        or ("*no results",),
     )
