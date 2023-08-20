@@ -952,6 +952,9 @@ async def r34(
         msg,
         tuple(
             s.sample  # type: ignore
-            for s in Rule34().search(query.lower().replace(" ", "_").split(";"))  # type: ignore
+            for s in Rule34().search(  # type: ignore
+                query.lower().replace(" ", "_").split(";"),
+                limit=50,
+            )
         ),
     )
