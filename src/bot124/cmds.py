@@ -956,5 +956,5 @@ async def r34(
                 query.lower().replace(" ", "_").split(";"),
             )
         )
-        or ("*no results",),
+        or ("*no results*",),
     )
