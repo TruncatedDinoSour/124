@@ -151,10 +151,6 @@ class Bot124(discord.Client):
             else:
                 util.get_score(msg.author.id).ok += 1
         elif msg.channel.name == const.RULES_CHANNEL:  # type: ignore
-            if msg.author.id == 837689842140708914:  # cel
-                await msg.reply(content="👨‍🦼 ?")
-                return
-
             if msg.author.bot:
                 return
 
