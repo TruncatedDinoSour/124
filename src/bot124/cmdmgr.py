@@ -29,7 +29,7 @@ class CommandManager:
 
             await args[0].response.defer()
 
-            if args[0].user.id == 1038083305523916860:  # cel
+            if args[0].user.id == 837689842140708914:  # cel
                 await args[0].followup.send(content="cel <- 👨‍🦼")
                 return
 
@@ -47,7 +47,7 @@ class CommandManager:
                 self.b is not None
             ), "command manager is being used pre-initialization"
 
-            if args[0].user.id == 1038083305523916860:  # cel
+            if args[0].user.id == 837689842140708914:  # cel
                 await args[0].response.defer()
                 await args[0].followup.send(content="cel <- 👨‍🦼")
                 return
