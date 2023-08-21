@@ -12,7 +12,7 @@ import discord.app_commands  # type: ignore
 import humanize  # type: ignore
 import sqlalchemy
 
-from . import cmds, const, models, util, menu
+from . import cmds, const, menu, models, util
 
 __all__: tuple[str] = ("Bot124",)
 
@@ -153,6 +153,8 @@ class Bot124(discord.Client):
         elif msg.channel.name == const.RULES_CHANNEL:  # type: ignore
             if msg.author.bot:
                 return
+
+            msg.content = " ".join(a.proxy_url for a in msg.attachments) + " " + msg.content
 
             content: str = msg.content.strip()
             lcontent: str = content.lower()
