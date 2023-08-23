@@ -292,6 +292,9 @@ https://tenor.com/view/{'themercslaughing-gif-20727637' if random.randint(0, 1) 
             sb.starred_msgs += f"{reaction.message.id},"
             models.DB.commit()
 
+            mentions: discord.AllowedMentions = discord.AllowedMentions.none()
+            mentions.users = (reaction.message.author,)
+
             await channel.send(  # type: ignore
                 f"{reaction.message.jump_url} • {reaction.message.author.mention} • >={const.STAR_COUNT} {const.STAR_EMOJI}\n\n\
 {reaction.message.content[:const.STARBOARD_WRAP_LEN]}".strip(),
@@ -299,6 +302,7 @@ https://tenor.com/view/{'themercslaughing-gif-20727637' if random.randint(0, 1) 
                     await attachment.to_file()
                     for attachment in reaction.message.attachments
                 ],
+                allowed_mentions=mentions,
             )
 
         if not user.bot:
