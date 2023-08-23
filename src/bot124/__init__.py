@@ -4,6 +4,7 @@
 
 import asyncio
 import datetime
+import random
 import string
 import typing
 
@@ -154,7 +155,9 @@ class Bot124(discord.Client):
             if msg.author.bot:
                 return
 
-            msg.content = " ".join(a.proxy_url for a in msg.attachments) + " " + msg.content
+            msg.content = (
+                " ".join(a.proxy_url for a in msg.attachments) + " " + msg.content
+            )
 
             content: str = msg.content.strip()
             lcontent: str = content.lower()
@@ -222,7 +225,9 @@ if you want to invite people use `/invite` command"""
                 f"""goodbye, {member.mention} ( `{member.name}{end}` ), \
 thank you for being in this server for \
 **{humanize.precisedelta(datetime.timedelta(seconds=round(datetime.datetime.utcnow().timestamp() - member.joined_at.timestamp())), minimum_unit='seconds') if member.joined_at is not None else "[?]"}**, \
-keep in mind if you want to add people use `/invite` command"""
+keep in mind if you want to add people use `/invite` command
+
+https://tenor.com/view/{'themercslaughing-gif-20727637' if random.randint(0, 1) else 'john-roblox-laugh-gif-22520624'}"""
             )
 
     async def on_voice_state_update(
