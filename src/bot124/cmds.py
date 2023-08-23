@@ -946,14 +946,14 @@ async def r34(
     msg: discord.interactions.Interaction,
     tags: str,
 ) -> None:
-    """rule 34 :( ( add multiple tags using `:` )"""
+    """rule 34 :( ( add multiple tags using `:` or `;` )"""
 
     await menu.menu(
         msg,
         tuple(
             s.sample  # type: ignore
             for s in Rule34().search(  # type: ignore
-                tags.lower().replace(" ", "_").split(":"),
+                tags.lower().replace(" ", "_").replace(";", ":").split(":"),
             )
         )
         or ("*no results*",),
