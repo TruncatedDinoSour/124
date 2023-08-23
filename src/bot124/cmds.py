@@ -119,7 +119,7 @@ async def rules(
     for r in q:
         rules += f"{r.id}, {r.content} ( {'real' if r.real else 'fake'} rule ) by <@{r.author}> on {util.datetime_s(r.timestamp)}\n"
 
-    await menu.text_menu(msg, rules)
+    await menu.text_menu(msg, rules or "*no rules found*")
 
 
 @cmds.new
