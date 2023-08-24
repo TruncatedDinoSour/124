@@ -27,8 +27,8 @@ WORDCLOUD_WRAP: Final[int] = 540
 STARBOARD_WRAP_LEN: Final[int] = MESSAGE_WRAP_LEN - 128
 
 MSGS_W: Final[float] = 0.1
-VCS_W: Final[float] = 0.2
-WC_W: Final[float] = 0.15
+VCS_W: Final[float] = 0.15
+WC_W: Final[float] = 0.1
 REACT_GET_W: Final[float] = 0.2
 REACT_POST_W: Final[float] = 0.1
 STAR_W: Final[float] = 0.5
