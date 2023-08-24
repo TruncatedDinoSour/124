@@ -23,7 +23,6 @@ from rebelai import enums as ai_enums
 from rebelai.ai.deepai import deepai as deepai_ai
 from rebelai.ai.prodia import prodia as prodia_ai
 from rule34Py import rule34Py as Rule34
-from rule34Py.post import Post as Rule34Post
 
 from . import ai as ai_impl
 from . import const, menu, models

@@ -295,7 +295,7 @@ https://tenor.com/view/{'themercslaughing-gif-20727637' if random.randint(0, 1) 
             mentions: discord.AllowedMentions = discord.AllowedMentions.none()
             mentions.users = (reaction.message.author,)
 
-            await channel.send(  # type: ignore
+            msg: discord.Message = await channel.send(  # type: ignore
                 f"{reaction.message.jump_url} • {reaction.message.author.mention} • >={const.STAR_COUNT} {const.STAR_EMOJI}\n\n\
 {reaction.message.content[:const.STARBOARD_WRAP_LEN]}".strip(),
                 files=[
@@ -304,6 +304,27 @@ https://tenor.com/view/{'themercslaughing-gif-20727637' if random.randint(0, 1) 
                 ],
                 allowed_mentions=mentions,
             )
+
+            if reaction.message.reference:
+                refm: typing.Optional[  # type: ignore
+                    discord.Message
+                ] = await msg.channel.fetch_message(  # type: ignore
+                    reaction.message.reference.message_id or 0
+                )
+
+                if refm is None:
+                    return
+
+                refmt: discord.AllowedMentions = discord.AllowedMentions.none()
+                refmt.users = (refm.author.id,)  # type: ignore
+
+                await msg.reply(  # type: ignore
+                    content=f"in reply to {refm.jump_url} by {refm.author.mention}\n\n{refm.content[:const.STARBOARD_WRAP_LEN].strip()}",  # type: ignore
+                    files=[  # type: ignore
+                        await attachment.to_file() for attachment in refm.attachments  # type: ignore
+                    ],
+                    allowed_mentions=mentions,
+                )
 
         if not user.bot:
             util.update_act(user.id)
