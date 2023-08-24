@@ -310,7 +310,7 @@ https://tenor.com/view/{'themercslaughing-gif-20727637' if random.randint(0, 1) 
             while ref is not None:
                 refm: typing.Optional[  # type: ignore
                     discord.Message
-                ] = await msg.channel.fetch_message(  # type: ignore
+                ] = await reaction.message.channel.fetch_message(
                     ref.message_id or 0  # type: ignore
                 )
 
