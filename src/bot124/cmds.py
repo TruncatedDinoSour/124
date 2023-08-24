@@ -966,7 +966,7 @@ async def guilds(
 ) -> None:
     """what servers 124 is used in"""
 
-    await menu.menu(
+    await menu.text_menu(
         msg,
         "\n".join(f"{idx}, {guild.name}" for idx, guild in enumerate(cmds.b.guilds, 1)),
     )
