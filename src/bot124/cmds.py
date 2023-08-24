@@ -967,5 +967,5 @@ async def guilds(
 
     await menu.text_menu(
         msg,
-        "\n".join(f"{idx}, {guild.name}" for idx, guild in enumerate(cmds.b.guilds, 1)),
+        "\n".join(f"{idx}, `{guild.name}`" for idx, guild in enumerate(cmds.b.guilds, 1)),
     )
