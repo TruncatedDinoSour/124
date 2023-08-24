@@ -958,3 +958,15 @@ async def r34(
         )
         or ("*no results*",),
     )
+
+
+@cmds.new
+async def guilds(
+    msg: discord.interactions.Interaction,
+) -> None:
+    """what servers 124 is used in"""
+
+    await menu.menu(
+        msg,
+        "\n".join(f"{idx}, {guild.name}" for idx, guild in enumerate(cmds.b.guilds, 1)),
+    )
