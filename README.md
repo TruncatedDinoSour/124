@@ -67,6 +67,7 @@ ty
         -   log base 2 of all rules made ( positive effect )
         -   log of all `ok`s + 1 in the ok channel ( positive effect )
         -   messages ppl started of urs ( positive effect )
+        -   participation in star reply chains ( positive effect )
         -   square root of all posted ( given ) reactions ( negative effect )
         -   stars removed if u star a message ( negative effect )
         -   inverse average of all values ( neutral effect )

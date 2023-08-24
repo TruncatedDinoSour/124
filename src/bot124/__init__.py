@@ -305,26 +305,33 @@ https://tenor.com/view/{'themercslaughing-gif-20727637' if random.randint(0, 1) 
                 allowed_mentions=mentions,
             )
 
-            if reaction.message.reference:
+            ref: typing.Optional[discord.MessageReference] = reaction.message.reference
+
+            while ref is not None:
                 refm: typing.Optional[  # type: ignore
                     discord.Message
                 ] = await msg.channel.fetch_message(  # type: ignore
-                    reaction.message.reference.message_id or 0
+                    ref.message_id or 0  # type: ignore
                 )
 
                 if refm is None:
-                    return
+                    continue
 
                 refmt: discord.AllowedMentions = discord.AllowedMentions.none()
                 refmt.users = (refm.author.id,)  # type: ignore
 
-                await msg.reply(  # type: ignore
+                msg = await msg.reply(  # type: ignore
                     content=f"in reply to {refm.jump_url} by {refm.author.mention}\n\n{refm.content[:const.STARBOARD_WRAP_LEN].strip()}",  # type: ignore
                     files=[  # type: ignore
                         await attachment.to_file() for attachment in refm.attachments  # type: ignore
                     ],
                     allowed_mentions=mentions,
                 )
+
+                if not user.bot and not refm.author.bot:  # type: ignore
+                    util.get_score(refm.author.id).stars_participated += 1  # type: ignore
+
+                ref = refm.reference  # type: ignore
 
         if not user.bot:
             util.update_act(user.id)

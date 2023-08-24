@@ -34,6 +34,7 @@ REACT_POST_W: Final[float] = 0.1
 STAR_W: Final[float] = 0.5
 OK_W: Final[float] = 0.1
 UNSTAR_W: Final[float] = 1.5
+STARP_W: Final[float] = STAR_W / 3
 
 REACT_POST_K: Final[float] = 0.7
 

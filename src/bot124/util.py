@@ -123,6 +123,7 @@ def calc_score(s: models.Score) -> float:
             )
             + math.log(s.ok + 1) * const.OK_W
             + s.starboard_score * const.STAR_W
+            + (s.stars_participated * const.STARP_W)
             - math.sqrt(s.reactions_post * const.REACT_POST_K) * const.REACT_POST_W
             - ((datetime.utcnow().timestamp() - s.last_act) ** const.SCORE_DELTA_E)
             - (s.stars_removed * const.UNSTAR_W)

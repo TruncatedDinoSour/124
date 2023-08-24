@@ -103,14 +103,17 @@ class Score:
     stars_removed: sqlalchemy.Column[int] = sqlalchemy.Column(
         sqlalchemy.Integer,
     )
+    stars_participated: sqlalchemy.Column[int] = sqlalchemy.Column(
+        sqlalchemy.Integer,
+    )
 
     def __init__(self, author: int) -> None:
         self.author = author  # type: ignore
-        self.total_bytes = self.total_messages = self.vcs_joined = self.vcs_time = self.new_words = self.reactions_get = self.reactions_post = self.starboard_score = self.ok = self.stars_removed = 0  # type: ignore
+        self.total_bytes = self.total_messages = self.vcs_joined = self.vcs_time = self.new_words = self.reactions_get = self.reactions_post = self.starboard_score = self.ok = self.stars_removed = self.stars_participated = 0  # type: ignore
         self.last_act = round(datetime.datetime.utcnow().timestamp())  # type: ignore
 
     def __str__(self) -> str:
-        kick: Optional[tuple[int]] = (
+        kick: Optional[tuple[int]] = (  # type: ignore
             DB.query(ScoreKicks.kicks).where(ScoreKicks.author == self.author).first()  # type: ignore
         )
 
@@ -119,7 +122,7 @@ class Score:
 `{self.new_words}` wordcloud words; `{self.reactions_get}` reac recv; `{self.reactions_post}` reac given; \
 `{DB.query(Rule.id).where(Rule.author == self.author).count()}` rules; `{self.starboard_score}` stars; \
 `{self.ok}` ok; last activity on `{str(datetime.datetime.utcfromtimestamp(self.last_act))} UTC`; \
-`{self.stars_removed}` removed stars; `{0 if kick is None else kick[0]}` kicks"  # type: ignore
+`{self.stars_removed}` removed stars; `{0 if kick is None else kick[0]}` kicks; `{self.stars_participated}` star participations"  # type: ignore
 
 
 @DB.table
