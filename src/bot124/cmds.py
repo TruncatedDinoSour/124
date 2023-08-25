@@ -967,5 +967,19 @@ async def guilds(
 
     await menu.text_menu(
         msg,
-        "\n".join(f"{idx}, `{guild.name}`" for idx, guild in enumerate(cmds.b.guilds, 1)),
+        "\n".join(
+            f"{idx}, `{guild.name}`" for idx, guild in enumerate(cmds.b.guilds, 1)
+        ),
+    )
+
+
+@cmds.new
+async def icon(
+    msg: discord.interactions.Interaction,
+) -> None:
+    """server icon"""
+
+    await menu.text_menu(
+        msg,
+        msg.guild.icon.url if msg.guild and msg.guild.icon else "*no server icon*",
     )

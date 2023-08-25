@@ -88,6 +88,7 @@ ty
 -   `/r34` bc my friends forced me to ( i am not happy abt it )
 -   ping `/everyone` individually with a single command
 -   `/guilds` for showing all guilds the bot is in
+-   get the server `/icon`
 -   easy setup
 -   developer-friendly configuration in `src/bot124/const.py`
 -   feature packed and light
