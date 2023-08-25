@@ -190,9 +190,10 @@ class Bot124(discord.Client):
         models.DB.commit()
 
     async def on_message_edit(
-        self, _: discord.message.Message, msg: discord.message.Message
+        self, msg0: discord.message.Message, msg: discord.message.Message
     ) -> None:
-        await self.on_message(msg)
+        if msg0.content != msg.content:
+            await self.on_message(msg)
 
     async def on_member_join(self, member: discord.member.Member):
         if (c := member.guild.system_channel) is not None:
