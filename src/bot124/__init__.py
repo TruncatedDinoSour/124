@@ -160,14 +160,14 @@ class Bot124(discord.Client):
             )
 
             content: str = msg.content.strip()
-            lcontent: str = content.lower()
-            real: bool = any(lcontent.endswith(r) for r in const.REAL_RULES_ID)
+            real: bool = any(content.endswith(r) for r in const.REAL_RULES_ID)
 
-            if not (real or any(lcontent.endswith(r) for r in const.FAKE_RULES_ID)):
+            if not (real or any(content.endswith(r) for r in const.FAKE_RULES_ID)):
                 return
 
             for suf in const.REAL_RULES_ID if real else const.FAKE_RULES_ID:
                 content = content.removesuffix(suf).strip()
+
                 if content != msg.content:
                     break
 
