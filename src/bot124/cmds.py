@@ -22,7 +22,7 @@ from discord.ui import Button, View
 from rebelai import enums as ai_enums
 from rebelai.ai.deepai import deepai as deepai_ai
 from rebelai.ai.prodia import prodia as prodia_ai
-from rule34Py import rule34Py as Rule34
+from rule34Py import rule34Py as Rule34  # type: ignore
 
 from . import ai as ai_impl
 from . import const, menu, models

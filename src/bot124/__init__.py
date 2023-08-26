@@ -12,6 +12,7 @@ import discord
 import discord.app_commands  # type: ignore
 import humanize  # type: ignore
 import sqlalchemy
+from discord.ui import Button, View
 
 from . import cmds, const, menu, models, util
 
@@ -196,10 +197,63 @@ class Bot124(discord.Client):
 
     async def on_member_join(self, member: discord.member.Member):
         if (c := member.guild.system_channel) is not None:
-            end: str = "" if member.discriminator == "0" else f"#{member.discriminator}"
+            user: str = (
+                "" if member.discriminator == "0" else f"#{member.discriminator}"
+            )
+            user = f"`{member.name}{user}`"
+
+            view: View = View(timeout=const.WELCOME_EXP)
+            exp: str = f"( expires in {humanize.precisedelta(datetime.timedelta(seconds=view.timeout or 0), minimum_unit='seconds')} )"
+
+            ban: typing.Any = Button(
+                style=discord.ButtonStyle.danger,
+                label=f"ban {user} {exp}",
+            )
+            kick: typing.Any = Button(
+                style=discord.ButtonStyle.danger,
+                label=f"kick {user} {exp}",
+            )
+
+            async def _ban(interaction: discord.interactions.Interaction) -> None:
+                await interaction.response.defer()
+
+                if not interaction.user.guild_permissions.administrator:  # type: ignore
+                    await interaction.followup.send(
+                        content=f"[join] {interaction.user.mention} you cannot ban {user}"
+                    )
+                    return
+
+                await member.ban(
+                    reason=f"[join] banned by {interaction.user.name} at {datetime.datetime.utcnow()} UTC"
+                )
+                await interaction.followup.send(
+                    content=f"[join] {interaction.user.mention} banned {user}"
+                )
+
+            async def _kick(interaction: discord.interactions.Interaction) -> None:
+                await interaction.response.defer()
+
+                if not interaction.user.guild_permissions.administrator:  # type: ignore
+                    await interaction.followup.send(
+                        content=f"[join] {interaction.user.mention} you cannot kick {user}"
+                    )
+                    return
+
+                await member.kick(
+                    reason=f"[join] kicked by {interaction.user.name} at {datetime.datetime.utcnow()} UTC"
+                )
+                await interaction.followup.send(
+                    content=f"[join] {interaction.user.mention} banned {user}"
+                )
+
+            ban.callback = _ban
+            kick.callback = _kick
+
+            view.add_item(ban)
+            view.add_item(kick)
 
             await c.send(
-                f"""welcome, {member.mention} ( `{member.name}{end}` ),
+                f"""welcome, {member.mention} ( {user} ),
 
 hope youre doing alright, you can check out @Clyde ( with an uppsercase C ) if \
 you want to use clyde AI, you can also use {self.user.mention if self.user else 'my'} commands to use AI \
@@ -214,20 +268,51 @@ although dont forget that this score is volatile, if youre not active for \
 you will be kicked off the score leaderboard, every kick ull have a harder and harder time gaining score,
 function `f(s) = s / K` where `K` is kick count and `s` is score
 
-if you want to invite people use `/invite` command"""
+if you want to invite people use `/invite` command""",
+                view=view,
             )
 
     async def on_member_remove(self, member: discord.member.Member):
         if (c := member.guild.system_channel) is not None:
-            end: str = "" if member.discriminator == "0" else f"#{member.discriminator}"
+            user: str = (
+                "" if member.discriminator == "0" else f"#{member.discriminator}"
+            )
+            user = f"`{member.name}{user}`"
+
+            view: View = View(timeout=const.WELCOME_EXP)
+
+            ban: typing.Any = Button(
+                style=discord.ButtonStyle.danger,
+                label=f"ban {user} ( expires in {humanize.precisedelta(datetime.timedelta(seconds=view.timeout or 0), minimum_unit='seconds')} )",
+            )
+
+            async def _ban(interaction: discord.interactions.Interaction) -> None:
+                await interaction.response.defer()
+
+                if not interaction.user.guild_permissions.administrator:  # type: ignore
+                    await interaction.followup.send(
+                        content=f"[leave] {interaction.user.mention} you cannot ban {user}"
+                    )
+                    return
+
+                await member.ban(
+                    reason=f"[leave] banned by {interaction.user.name} at {datetime.datetime.utcnow()} UTC"
+                )
+                await interaction.followup.send(
+                    content=f"[leave] {interaction.user.mention} banned {user}"
+                )
+
+            ban.callback = _ban
+            view.add_item(ban)
 
             await c.send(
-                f"""goodbye, {member.mention} ( `{member.name}{end}` ), \
+                f"""goodbye, {member.mention} ( {user} ), \
 thank you for being in this server for \
 **{humanize.precisedelta(datetime.timedelta(seconds=round(datetime.datetime.utcnow().timestamp() - member.joined_at.timestamp())), minimum_unit='seconds') if member.joined_at is not None else "[?]"}**, \
 keep in mind if you want to add people use `/invite` command
 
-https://tenor.com/view/{'themercslaughing-gif-20727637' if random.randint(0, 1) else 'john-roblox-laugh-gif-22520624'}"""
+https://tenor.com/view/{'themercslaughing-gif-20727637' if random.randint(0, 1) else 'john-roblox-laugh-gif-22520624'}""",
+                view=view,
             )
 
     async def on_voice_state_update(

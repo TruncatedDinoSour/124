@@ -307,3 +307,5 @@ PROXY_TIMEOUT: Final[float] = 10
 ADVICE_API: Final[str] = "https://api.adviceslip.com/advice"
 
 DEFAULT_TRANSLATE_SOURCE: Final[str] = "EN"
+
+WELCOME_EXP: Final[int] = 60 * 20
