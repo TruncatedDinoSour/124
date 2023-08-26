@@ -155,20 +155,19 @@ class Bot124(discord.Client):
             if msg.author.bot:
                 return
 
-            msg.content = (
+            content: str = (
                 " ".join(a.proxy_url for a in msg.attachments) + " " + msg.content
-            )
-
-            content: str = msg.content.strip()
+            ).strip()
             real: bool = any(content.endswith(r) for r in const.REAL_RULES_ID)
 
             if not (real or any(content.endswith(r) for r in const.FAKE_RULES_ID)):
                 return
 
             for suf in const.REAL_RULES_ID if real else const.FAKE_RULES_ID:
+                oc: str = content
                 content = content.removesuffix(suf).strip()
 
-                if content != msg.content:
+                if content != oc:
                     break
 
             if not (content := content.strip()):
