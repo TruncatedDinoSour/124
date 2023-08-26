@@ -9,7 +9,7 @@ from enum import Enum
 from io import BytesIO
 
 import discord
-import iso639
+import iso639  # type: ignore
 import rebelai.ai.alpaca
 import rebelai.ai.deepai
 import rebelai.ai.deepl
@@ -17,6 +17,7 @@ import rebelai.ai.gpt
 import rebelai.ai.inferkit
 import rebelai.ai.pollinations
 import rebelai.ai.prodia
+import rebelai.ai.h2o
 import rebelai.enums
 
 from . import const, util
@@ -49,11 +50,19 @@ class TextAI(Enum):
             request_args=await util.get_proxies(),
         )
 
+    @staticmethod
+    async def _falcon40(prompt: str) -> typing.Optional[str]:
+        return await rebelai.ai.h2o.falcon_40b(
+            prompt=prompt,
+            request_args=await util.get_proxies(),
+        )
+
     alpaca7 = (_alpaca7,)
     deepai = (_deepai,)
     gpt3 = (rebelai.ai.gpt.gpt3,)
     gpt4 = (rebelai.ai.gpt.gpt4,)
     inferkit = (_inferkit,)
+    falcon40 = (_falcon40,)
 
 
 class ImageAI(Enum):
