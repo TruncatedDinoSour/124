@@ -219,7 +219,8 @@ class Bot124(discord.Client):
 
                 if not interaction.user.guild_permissions.administrator:  # type: ignore
                     await interaction.followup.send(
-                        content=f"[join] {interaction.user.mention} you cannot ban {user}"
+                        content=f"[join] {interaction.user.mention} you cannot ban {user}",
+                        ephemeral=True,
                     )
                     return
 
@@ -235,7 +236,8 @@ class Bot124(discord.Client):
 
                 if not interaction.user.guild_permissions.administrator:  # type: ignore
                     await interaction.followup.send(
-                        content=f"[join] {interaction.user.mention} you cannot kick {user}"
+                        content=f"[join] {interaction.user.mention} you cannot kick {user}",
+                        ephemeral=True,
                     )
                     return
 
@@ -291,7 +293,8 @@ if you want to invite people use `/invite` command""",
 
                 if not interaction.user.guild_permissions.administrator:  # type: ignore
                     await interaction.followup.send(
-                        content=f"[leave] {interaction.user.mention} you cannot ban {user}"
+                        content=f"[leave] {interaction.user.mention} you cannot ban {user}",
+                        ephemeral=True,
                     )
                     return
 
