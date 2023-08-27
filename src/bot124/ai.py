@@ -57,9 +57,16 @@ class TextAI(Enum):
             request_args=await util.get_proxies(),
         )
 
+    @staticmethod
+    async def _gpt3(prompt: str) -> typing.Optional[str]:
+        return await rebelai.ai.gpt.gpt3(
+            prompt=prompt,
+            request_args=await util.get_proxies(),
+        )
+
     alpaca7 = (_alpaca7,)
     deepai = (_deepai,)
-    gpt3 = (rebelai.ai.gpt.gpt3,)
+    gpt3 = (_gpt3,)
     gpt4 = (rebelai.ai.gpt.gpt4,)
     inferkit = (_inferkit,)
     falcon40 = (_falcon40,)
