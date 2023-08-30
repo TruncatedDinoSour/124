@@ -259,7 +259,7 @@ class Bot124(discord.Client):
 
 hope youre doing alright, you can check out @Clyde ( with an uppsercase C ) if \
 you want to use clyde AI, you can also use {self.user.mention if self.user else 'my'} commands to use AI \
-stuff : `/ai` and `/chatai`
+stuff : `/ai`, `/chatai` and `/aiimg`
 
 also, dont forget to check out our rules using `/rules` command and \
 make sure to show your respect to our national anthem -- WAP https://www.youtube.com/watch?v=Wc5IbN4xw70
