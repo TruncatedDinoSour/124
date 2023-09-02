@@ -989,11 +989,11 @@ async def icon(
 @cmds.new
 async def uwu(
     msg: discord.interactions.Interaction,
-    text: str,
+    content: str,
 ) -> None:
     """uwuify t-text UwU"""
 
     await menu.text_menu(
         msg,
-        uwuify.uwu(text, flags=uwuify.SMILEY | uwuify.YU),
+        uwuify.uwu(content, flags=uwuify.SMILEY | uwuify.YU),  # type: ignore
     )

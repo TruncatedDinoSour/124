@@ -26,7 +26,7 @@ ty
 # features
 
 -   free AI access using `/ai` and `/chatai`, `/aiimg`
-    -   supported text models : gpt3, gpt4, deepai and alpaca 7b
+    -   supported text models : gpt3, gpt4, deepai, alpaca 7b, inferkit and falcon 40 b
     -   supported image models : prodia, pollinations
 -   anonymous confessions database using `/confess` and `/confessions`
 -   auto-generated help page accessed through `/help`
