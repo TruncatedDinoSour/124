@@ -26,7 +26,7 @@ ty
 # features
 
 -   free AI access using `/ai` and `/chatai`, `/aiimg`
-    -   supported text models : gpt3, gpt4, deepai, alpaca 7b, inferkit and falcon 40 b
+    -   supported text models : gpt3, gpt4, deepai, alpaca 7b, inferkit, falcon 40 b
     -   supported image models : prodia, pollinations
 -   anonymous confessions database using `/confess` and `/confessions`
 -   auto-generated help page accessed through `/help`
@@ -51,7 +51,7 @@ ty
     -   listing of queues or their content using `listq [optional name]`
     -   loading of queues using `load [name]` or `loadadd [name]` for adding it instead of overwriting it
     -   `delq [name]` to delete queues ( only admins )
--   support for `neofetch` in linux servers
+-   support for `/neofetch` in linux servers
 -   `/pfp` command to extract user profile pictures
 -   rules database using `/rules` and `/ruleslb`
     -   to create rules create a `#rules` channel and type something
