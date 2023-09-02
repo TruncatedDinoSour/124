@@ -11,3 +11,4 @@ rebelai
 aiohttp
 iso639
 rule34Py
+uwuify

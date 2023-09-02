@@ -22,7 +22,7 @@ MAX_PRESENCE_LEN: Final[int] = 64
 OK_CHANNEL: Final[str] = "ok"
 RULES_CHANNEL: Final[str] = "rules"
 REAL_RULES_ID: Final[tuple[str, ...]] = ("(real rule)", "( real rule )")
-FAKE_RULES_ID: Final[tuple[str, ...]] = ("(fake rule)", "( fake rule )")
+FAKE_RULES_ID: Final[tuple[str, ...]] = tuple(r.replace("real", "fake") for r in REAL_RULES_ID)
 WORDCLOUD_WRAP: Final[int] = 540
 STARBOARD_WRAP_LEN: Final[int] = MESSAGE_WRAP_LEN - 128
 

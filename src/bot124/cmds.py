@@ -17,6 +17,7 @@ import discord
 import discord.app_commands  # type: ignore
 import humanize  # type: ignore
 import sqlalchemy
+import uwuify  # type: ignore
 import yt_dlp  # type: ignore
 from discord.ui import Button, View
 from rebelai import enums as ai_enums
@@ -982,4 +983,17 @@ async def icon(
     await menu.text_menu(
         msg,
         msg.guild.icon.url if msg.guild and msg.guild.icon else "*no server icon*",
+    )
+
+
+@cmds.new
+async def uwu(
+    msg: discord.interactions.Interaction,
+    text: str,
+) -> None:
+    """uwuify t-text UwU"""
+
+    await menu.text_menu(
+        msg,
+        uwuify.uwu(text, flags=uwuify.SMILEY | uwuify.YU),
     )

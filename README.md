@@ -89,6 +89,7 @@ ty
 -   ping `/everyone` individually with a single command
 -   `/guilds` for showing all guilds the bot is in
 -   get the server `/icon`
+-   `/uwu`-ify text
 -   easy setup
 -   developer-friendly configuration in `src/bot124/const.py`
 -   feature packed and light
