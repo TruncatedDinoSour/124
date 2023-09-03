@@ -880,12 +880,14 @@ async def prodia(
 ) -> None:
     """prodia image generation ( with more options )"""
 
+    model = model1 or model  # type: ignore
+
     await msg.followup.send(
         file=discord.File(
             fp=BytesIO(
                 await prodia_ai(
                     prompt=prompt,
-                    model=getattr(ai_enums.ProdiaModel, model1 or model),  # type: ignore
+                    model=getattr(ai_enums.ProdiaModel, model),  # type: ignore
                     sampler=sampler,
                     seed=seed,
                     negative=negative,
