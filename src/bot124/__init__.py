@@ -81,7 +81,7 @@ class Bot124(discord.Client):
 
                 for g in self.guilds:
                     if (c := g.system_channel) is not None:
-                        for page in await menu.wrap_text(score_list):
+                        for page in menu.wrap_text(score_list):
                             await c.send(content=page)
                             await asyncio.sleep(1)
 
