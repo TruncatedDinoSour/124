@@ -1006,8 +1006,9 @@ async def uwu(
 async def tkill(msg: discord.interactions.Interaction) -> None:
     """close all open threads"""
 
-    for t in msg.channel.threads:  # type: ignore
-        await t.edit(archived=True)  # type: ignore
+    for c in msg.guild.text_channels:  # type: ignore
+        for t in c.threads:  # type: ignore
+            await t.edit(archived=True)  # type: ignore
 
     await menu.text_menu(
         msg,
