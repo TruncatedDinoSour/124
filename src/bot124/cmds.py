@@ -999,3 +999,17 @@ async def uwu(
         msg,
         uwuify.uwu(content, flags=uwuify.SMILEY | uwuify.YU),  # type: ignore
     )
+
+
+@cmds.new
+@cmds.admin
+async def tkill(msg: discord.interactions.Interaction) -> None:
+    """close all open threads"""
+
+    for t in msg.channel.threads:  # type: ignore
+        await t.edit(archived=True)  # type: ignore
+
+    await menu.text_menu(
+        msg,
+        "closed all open threads",
+    )

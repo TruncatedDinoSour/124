@@ -90,6 +90,7 @@ ty
 -   `/guilds` for showing all guilds the bot is in
 -   get the server `/icon`
 -   `/uwu`-ify text
+-   `/tkill` all threads
 -   easy setup
 -   developer-friendly configuration in `src/bot124/const.py`
 -   feature packed and light
