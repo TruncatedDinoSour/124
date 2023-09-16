@@ -159,12 +159,11 @@ async def ruleslb(
 
     await menu.text_menu(
         msg,
-        "rules leaderboard :\n\n"
+        f"rules leaderboard\n\n{total} rule( s ) in total\n\n"
         + "".join(
             f"{rank}, <@{id}> with {count} ( {(count / total * 100):.2f}% ) created rule( s )\n"
             for rank, (id, count) in enumerate(lb.items(), 1)
         )
-        + f"\n{total} rule( s ) in total",
     )
 
 
@@ -223,12 +222,16 @@ async def scorelb(
 
     await menu.text_menu(
         msg,
-        "chat score leaderboard :\n\n"
+        f"""chat score leaderboard
+
+average chat score : {total_lbv / len(lbv):.2f}
+total chat score : {total_lbv:.2f}
+
+"""
         + "\n".join(
             f"{idx}, <@{value[0]}> with score `{value[1]}`"
             for idx, value in enumerate(lb.items(), 1)
         )
-        + f"\n\naverage chat score : {total_lbv / len(lbv):.2f}\ntotal chat score : {total_lbv:.2f}",
     )
 
 
@@ -731,12 +734,16 @@ async def kickslb(msg: discord.interactions.Interaction) -> None:
 
     await menu.text_menu(
         msg,
-        "kick score leaderboard :\n\n"
+        f"""kick score leaderboard
+
+average kick score : {total_lbv / len(lbv):.2f}
+total kick score : {total_lbv:.2f}
+
+        """
         + "\n".join(
             f"{idx}, <@{value[0]}> with score `{value[1]}`"
             for idx, value in enumerate(lb.items(), 1)
         )
-        + f"\n\naverage kick score : {total_lbv / len(lbv):.2f}\ntotal kick score : {total_lbv:.2f}",
     )
 
 

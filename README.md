@@ -60,18 +60,22 @@ ty
         all rules must be unique, it wont create a new rule if its already a rule,
         rules are case sensitive
 -   chat score database using `/score` and `/scorelb`
-    -   based off a complex formula taking these inputs
-        -   average bytes sent per all messages sent ( positive effect )
-        -   average time ( in seconds ) spent in all voice chats ( positive effect )
-        -   square root of all reactions gotten ( positive effect )
-        -   log base 2 of all rules made ( positive effect )
-        -   log of all `ok`s + 1 in the ok channel ( positive effect )
-        -   messages ppl started of urs ( positive effect )
-        -   participation in star reply chains ( positive effect )
-        -   square root of all posted ( given ) reactions ( negative effect )
-        -   stars removed if u star a message ( negative effect )
-        -   inverse average of all values ( neutral effect )
-        -   all divided by times uve been kicked off the scoreboard ( linear effect )
+    -   based off a formula taking these inputs
+        -   total send text bytes in all messages ( positive effect )
+        -   total message count ( positive effect )
+        -   average voice chat length in seconds ( weighted positive effect )
+        -   log2 of time spent in seconds in voice chats + 1 ( weighted positive effect )
+        -   log2 of all new words + 1 ( weighted positive effect )
+        -   all reactions received ( positive effect )
+        -   all reactions posted ( weighted negative effect )
+        -   log of all `ok`s + 1 ( positive effect )
+        -   diff between 2 utc timestamps -- now and ur last activity ( exponential negative effect )
+        -   stars removed ( weighted negative effect )
+        -   star participations ( weighed positive effect )
+        -   \- score bar ( constant negative effect )
+        -   \* score weight ( constant neutral effect )
+        -   / kicks ( constant linear effect )
+        -   \*\* score exponent ( constant exponential effect )
 -   support for starboard using `/starboard` to set the starboard channel
 -   `/timelb` which keeps track of how long a person stayed in the server
 -   `/tod` for truth, dare or paranoia games

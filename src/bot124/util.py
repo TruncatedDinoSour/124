@@ -109,34 +109,26 @@ def calc_score(s: models.Score) -> float:
 
     score: float = max(
         0,
-        const.SCORE_MULT
-        * (
-            s.total_bytes / max(s.total_messages, 1) * const.MSGS_W
-            + s.vcs_time / max(s.vcs_joined, 1) * const.VCS_W
-            + s.new_words * const.WC_W
-            + math.sqrt(s.reactions_get) * const.REACT_GET_W
-            + math.log2(
-                models.DB.query(models.Rule.id)  # type: ignore
-                .where(models.Rule.author == s.author)
-                .count()
-                + 1
-            )
-            + math.log(s.ok + 1) * const.OK_W
-            + s.starboard_score * const.STAR_W
-            + (s.stars_participated * const.STARP_W)
-            - math.sqrt(s.reactions_post * const.REACT_POST_K) * const.REACT_POST_W
-            - ((datetime.utcnow().timestamp() - s.last_act) ** const.SCORE_DELTA_E)
-            - (s.stars_removed * const.UNSTAR_W)
-        ),
+        (
+            s.total_bytes
+            + s.total_messages
+            + (s.total_bytes / max(s.total_messages, 1))
+            + ((s.vcs_time / max(s.vcs_joined, 1)) * const.SCORE_VCS_AVG_W)
+            + (math.log2(s.vcs_time + 1) * const.SCORE_VCS_TIME_W)
+            + (math.log2(s.new_words + 1) / const.SCORE_NEW_WORDS_D)
+            + s.reactions_get
+            - (s.reactions_post / const.SCORE_REACTIONS_POST_D)
+            + (s.starboard_score * const.SCORE_STARBOARD_W)
+            + math.log(s.ok + 1)
+            - ((datetime.utcnow().timestamp() - s.last_act) ** const.SCORE_TIME_E)
+            - (s.stars_removed * const.SCORE_STAR_RM_W)
+            + (s.stars_participated / const.SCORE_STAR_P_D)
+            - const.SCORE_BAR
+        )
+        * const.SCORE_W,
     ) / ((kick.kicks + 1) if kick is not None else 1)
 
-    data: tuple[int] = tuple(
-        v for k, v in s.__dict__.items() if k[0] != "_" and "_" in k
-    )
-
-    k: float = len(data) / max(sum(data), 1) * const.K_MULT
-
-    return round(max(0, score if k > score else score - k) ** const.SCORE_E, 2)
+    return round(score**const.SCORE_E, 2)
 
 
 def update_act(id: int) -> None:

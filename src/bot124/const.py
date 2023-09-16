@@ -3,6 +3,7 @@
 """124bot constants"""
 
 import re
+from time import sleep
 from typing import Any, Final
 
 import requests
@@ -22,30 +23,28 @@ MAX_PRESENCE_LEN: Final[int] = 64
 OK_CHANNEL: Final[str] = "ok"
 RULES_CHANNEL: Final[str] = "rules"
 REAL_RULES_ID: Final[tuple[str, ...]] = ("(real rule)", "( real rule )")
-FAKE_RULES_ID: Final[tuple[str, ...]] = tuple(r.replace("real", "fake") for r in REAL_RULES_ID)
+FAKE_RULES_ID: Final[tuple[str, ...]] = tuple(
+    r.replace("real", "fake") for r in REAL_RULES_ID
+)
 WORDCLOUD_WRAP: Final[int] = 540
 STARBOARD_WRAP_LEN: Final[int] = MESSAGE_WRAP_LEN - 128
 
-MSGS_W: Final[float] = 0.1
-VCS_W: Final[float] = 0.15
-WC_W: Final[float] = 0.1
-REACT_GET_W: Final[float] = 0.2
-REACT_POST_W: Final[float] = 0.1
-STAR_W: Final[float] = 0.5
-OK_W: Final[float] = 0.1
-UNSTAR_W: Final[float] = 1.5
-STARP_W: Final[float] = STAR_W / 3
-
-REACT_POST_K: Final[float] = 0.7
-
-K_MULT: Final[float] = 300
-SCORE_MULT: Final[float] = 50
-
-SCORE_E: Final[float] = 0.69
-SCORE_DELTA_E: Final[float] = 0.34
-
 STAR_EMOJI: Final[str] = "⭐"
 STAR_COUNT: Final[int] = 3
+
+SCORE_VCS_AVG_W: Final[float] = 1.5
+SCORE_VCS_TIME_W: Final[float] = 135
+SCORE_NEW_WORDS_D: Final[float] = 3
+SCORE_REACTIONS_POST_D: Final[float] = 1.4
+SCORE_STARBOARD_W: Final[float] = 1.5
+SCORE_TIME_E: Final[float] = 0.34
+SCORE_STAR_RM_W: Final[float] = 1.5
+SCORE_STAR_P_D: Final[float] = 2
+
+SCORE_BAR: Final[float] = 30
+
+SCORE_W: Final[float] = 0.18
+SCORE_E: Final[float] = 0.69
 
 SCORE_KICK_SLEEP: Final[int] = 3 * 60 * 60  # every 3 hours
 SCORE_KICK_DELTA: Final[int] = 3 * 24 * 60 * 60  # every 3 days
@@ -271,6 +270,12 @@ PARANOIAS: tuple[str, ...] = (
 
 TOD_EXPIRES: Final[float] = 60 * 5  # 5 minutes
 
+PROXY_API: Final[
+    str
+] = "https://gimmeproxy.com/api/getProxy?post=true&get=true&user-agent=true&supportsHttps=true&protocol=http&minSpeed=20&curl=true"
+PROXY_TEST: Final[str] = "https://example.com/"
+PROXY_TIMEOUT: Final[float] = 10
+
 CAT_TAGS: Final[tuple[str, ...]] = tuple(
     filter(
         lambda item: bool(item)
@@ -283,6 +288,38 @@ CAT_TAGS: Final[tuple[str, ...]] = tuple(
 ANIME_GITHUB_API: Final[
     str
 ] = "https://api.github.com/repos/cat-milk/Anime-Girls-Holding-Programming-Books/contents"
+
+
+def _proxy() -> dict[str, str]:
+    print(" * getting proxy")
+
+    while True:
+        proxy: str = requests.get(PROXY_API).text
+
+        proxies: dict[str, str] = {
+            "http": proxy,
+            "https": proxy,
+            "http2": proxy,
+        }
+
+        print(f" * trying proxy {proxy!r}")
+
+        try:
+            if not requests.get(
+                PROXY_TEST,
+                timeout=PROXY_TIMEOUT,
+                proxies=proxies,
+            ).ok:
+                raise Exception("proxy failed")
+        except Exception:
+            sleep(1)
+            continue
+
+        print(f" * using proxy {proxy!r}")
+
+        return proxies
+
+
 ANIME_DIRS: Final[tuple[str, ...]] = tuple(
     map(
         lambda item: item["name"],  # type: ignore
@@ -290,6 +327,7 @@ ANIME_DIRS: Final[tuple[str, ...]] = tuple(
             lambda item: item["type"] == "dir",  # type: ignore
             requests.get(
                 ANIME_GITHUB_API,
+                proxies=_proxy(),
             ).json(),
         ),
     )
@@ -297,12 +335,6 @@ ANIME_DIRS: Final[tuple[str, ...]] = tuple(
 
 REPLY_MENTIONS: AllowedMentions = AllowedMentions.none()
 REPLY_MENTIONS.replied_user = True
-
-PROXY_API: Final[
-    str
-] = "https://gimmeproxy.com/api/getProxy?post=true&get=true&user-agent=true&supportsHttps=true&protocol=http&minSpeed=20&curl=true"
-PROXY_TEST: Final[str] = "https://example.com/"
-PROXY_TIMEOUT: Final[float] = 10
 
 ADVICE_API: Final[str] = "https://api.adviceslip.com/advice"
 
