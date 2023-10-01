@@ -79,7 +79,7 @@ YTDL_OPTIONS: Final[dict[str, Any]] = {
     "geo_bypass": True,
 }
 MUSIC_MAX_LEN: Final[int] = 512
-SOURCE: Final[str] = "https://ari-web.xyz/gh/124"
+SOURCE: Final[str] = "https://ari-web.xyz/gh/124 ( use https://ari-web.xyz/gh/124tg instead )"
 MUSIC_COMMENT: Final[str] = ";"
 MUSIC_AI_LIMIT: Final[int] = 128
 MUSIC_AI_GEN: Final[  # %s gets replaced with the topics
