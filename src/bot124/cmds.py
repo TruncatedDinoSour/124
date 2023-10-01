@@ -163,7 +163,7 @@ async def ruleslb(
         + "".join(
             f"{rank}, <@{id}> with {count} ( {(count / total * 100):.2f}% ) created rule( s )\n"
             for rank, (id, count) in enumerate(lb.items(), 1)
-        )
+        ),
     )
 
 
@@ -231,7 +231,7 @@ total chat score : {total_lbv:.2f}
         + "\n".join(
             f"{idx}, <@{value[0]}> with score `{value[1]}`"
             for idx, value in enumerate(lb.items(), 1)
-        )
+        ),
     )
 
 
@@ -743,7 +743,7 @@ total kick score : {total_lbv:.2f}
         + "\n".join(
             f"{idx}, <@{value[0]}> with score `{value[1]}`"
             for idx, value in enumerate(lb.items(), 1)
-        )
+        ),
     )
 
 
@@ -1020,4 +1020,14 @@ async def tkill(msg: discord.interactions.Interaction) -> None:
     await menu.text_menu(
         msg,
         "closed all open threads",
+    )
+
+
+@cmds.new
+async def readme(msg: discord.interactions.Interaction) -> None:
+    """read this"""
+
+    await menu.text_menu(
+        msg,
+        "goodbye, 124, this bot is no longer supported, use https://ari-web.xyz/gh/124tg instead",
     )

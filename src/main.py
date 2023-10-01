@@ -15,6 +15,11 @@ def main() -> int:
 
     token: typing.Optional[str]
 
+    print(
+        "\33[31m\33[1m!!! this version of the 124 bot is no longer supported, use https://ari-web.xyz/gh/124tg instead\33[0m",
+        file=sys.stderr,
+    )
+
     if (token := os.environ.get("D")) is None:
         print(
             "no discord token found ( `D` env var )\n$ export D='your-discord-token ...'",

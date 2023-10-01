@@ -113,6 +113,9 @@ class Bot124(discord.Client):
         self.loop.create_task(self._kick_scores())
 
     async def on_message(self, msg: discord.message.Message) -> None:
+        if random.randint(0, 1010) % 10 == 0:
+            await msg.reply(content="reminder that this version of 124 is no longer supported and u should use https://ari-web.xyz/gh/124tg instead")
+
         if not msg.author.bot:
             util.update_act(msg.author.id)
 

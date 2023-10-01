@@ -1,10 +1,12 @@
-# 124
+# 124 ( deprecated )
 
-> silly little bot for my friend grp server
+> silly little bot for my friend grp server ( deprecated )
 
 # telegram version
 
 telegram version is at <https://ari-web.xyz/gh/124tg> :)
+
+**discord version will not b maintained or supported anymore**
 
 # running
 

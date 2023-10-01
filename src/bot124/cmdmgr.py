@@ -65,7 +65,7 @@ class CommandManager:
 
             await menu.text_menu(
                 msg,
-                f"help for {self.b.user.mention if self.b.user else 'this bot'}\n\n"
+                f"help for {self.b.user.mention if self.b.user else 'this bot'} ( note : no longer supported, use https://ari-web.xyz/gh/124tg instead )\n\n"
                 + "".join(
                     f"- {cmd.__name__} -- {cmd.__doc__ or 'no help provided'}\n"
                     for cmd in self.cmds
