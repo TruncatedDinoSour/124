@@ -2,8 +2,9 @@
 
 > silly little bot for my friend grp server
 
-ur also free to join it if u want, it was made public for clyde AI access,
-but honestly its mainly used for fun at this point : <https://discord.gg/PqcseUzDGF>
+# telegram version
+
+telegram version is at <https://ari-web.xyz/gh/124tg> :)
 
 # running
 
